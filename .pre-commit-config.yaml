@@ -1,0 +1,14 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-format
+        name: Ruff formatter via uv
+        entry: uv run ruff format
+        language: system
+        files: ^app/.*\.py$
+      - id: lock-update
+        name: Update uv.lock
+        entry: uv lock
+        language: system
+        files: ^pyproject\.toml$
+        pass_filenames: false  

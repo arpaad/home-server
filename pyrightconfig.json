@@ -1,0 +1,29 @@
+{
+  "include": ["app"],
+  "exclude": [
+    "test/",
+    "migrations",
+    "**/venv",
+    "**/.venv",
+    "**/__pycache__"
+  ],
+
+  "pythonVersion": "3.13",
+  "typeCheckingMode": "strict",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "executionEnvironments": [
+    {
+      "root": "app",
+      "pythonVersion": "3.13",
+      "extraPaths": ["app"]
+    }
+  ],
+
+  "analysis": {
+    "useLibraryCodeForTypes": true,
+    "autoSearchPaths": true,
+    "diagnosticMode": "workspace",
+    "logLevel": "error"
+  }
+}

@@ -1,7 +1,15 @@
-# Byte-compiled / optimized / DLL files
+# ---- UV / Virtual Environment ----
+.venv/
+.python-version
+
+# ---- Python cache ----
 __pycache__/
-*.py[codz]
-*$py.class
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.pkl
+*.log
 
 # C extensions
 *.so
