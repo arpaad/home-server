@@ -1,0 +1,28 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.swp
+
+# Virtual environments
+venv/
+.env/
+.poetry/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test / coverage files
+.coverage
+htmlcov/
+*.pytest_cache/
+.tox/
+
+# Poetry lock / config (optional if exporting requirements)
+poetry.lock
+
