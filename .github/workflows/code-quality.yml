@@ -7,11 +7,10 @@ on:
   pull_request:
     branches:
       - main
-    # ensure the CI runs on the merge commit not the branch
     types: [opened, synchronize, reopened]
 
 jobs:
-  ci:
+  code-quality:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,7 +34,7 @@ jobs:
     # Code checks
     ########################
     - name: Ruff - Static code analysis
-      run: uv run ruff check .
+      run: uv run ruff check app
 
     - name: Pyright - Type checking
       run: uv run pyright

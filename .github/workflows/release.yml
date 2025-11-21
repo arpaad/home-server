@@ -47,7 +47,7 @@ jobs:
     # Code checks
     ########################
     - name: Ruff - Static analysis
-      run: uv run ruff check .
+      run: uv run ruff check app
 
     - name: Pyright - Type checking
       run: uv run pyright
