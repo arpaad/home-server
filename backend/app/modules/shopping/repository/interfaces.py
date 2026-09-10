@@ -202,6 +202,20 @@ class ShoppingItemRepository(Protocol):
         """
         ...
 
+    def detach_store_from_bought_items(self, store_id: UUID) -> None:
+        """Drop a store's links to items that have already been bought.
+
+        A store link records that an item *may* be bought at a store, not that
+        it *was*, so removing it loses no purchase history. This is what lets
+        a store the household no longer uses be deleted once its outstanding
+        items are gone, while the foreign key still refuses to drop a store
+        an outstanding item depends on.
+
+        Args:
+            store_id: The store being deleted.
+        """
+        ...
+
     def outstanding_names_referencing(self, store_id: UUID) -> tuple[str, ...]:
         """Return the names of outstanding items assigned to a store.
 

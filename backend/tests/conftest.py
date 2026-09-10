@@ -17,8 +17,13 @@ from pathlib import Path
 import pytest
 from alembic import command
 from alembic.config import Config
+from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.orm import Session
+
+from app.core.config import Settings, get_settings
+from app.db.session import get_session
+from app.main import app
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
@@ -88,3 +93,31 @@ def member_id(session: Session):
             "RETURNING id"
         )
     ).scalar_one()
+
+
+@pytest.fixture
+def client(session: Session) -> Iterator[TestClient]:
+    """Provide an HTTP client whose requests share the test transaction.
+
+    The app's own session dependency commits; the override deliberately does
+    not, so that everything a test writes is rolled back with the rest.
+
+    Args:
+        session: The test session.
+
+    Yields:
+        A test client bound to that session.
+    """
+
+    def override_session() -> Iterator[Session]:
+        yield session
+
+    def override_settings() -> Settings:
+        return Settings(household_timezone="Europe/Budapest")
+
+    app.dependency_overrides[get_session] = override_session
+    app.dependency_overrides[get_settings] = override_settings
+    try:
+        yield TestClient(app)
+    finally:
+        app.dependency_overrides.clear()

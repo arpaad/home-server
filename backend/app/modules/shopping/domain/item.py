@@ -14,6 +14,44 @@ ItemOrigin = Literal["manual", "recipe"]
 """How an item came to be on the list. Only "manual" occurs in this release."""
 
 
+def ensure_valid_name(name: str) -> str:
+    """Return the name, refusing one that carries no content.
+
+    The rule lives here so the dataclass and the service enforce the same
+    thing, rather than each checking in its own way.
+
+    Args:
+        name: The proposed item name.
+
+    Returns:
+        The name with surrounding whitespace removed.
+
+    Raises:
+        EmptyItemNameError: If the name is empty or only whitespace.
+    """
+    stripped = name.strip()
+    if not stripped:
+        raise EmptyItemNameError
+    return stripped
+
+
+def ensure_positive_quantity(quantity: float) -> float:
+    """Return the quantity, refusing one that is not greater than zero.
+
+    Args:
+        quantity: The proposed quantity.
+
+    Returns:
+        The quantity unchanged.
+
+    Raises:
+        NonPositiveQuantityError: If the quantity is not greater than zero.
+    """
+    if quantity <= 0:
+        raise NonPositiveQuantityError(quantity)
+    return quantity
+
+
 @dataclass(frozen=True, slots=True)
 class ShoppingItem:
     """One item on the single shared list.
@@ -36,14 +74,11 @@ class ShoppingItem:
     def __post_init__(self) -> None:
         """Enforce the item invariants.
 
-        Raises:
-            EmptyItemNameError: If the name is empty or only whitespace.
-            NonPositiveQuantityError: If the quantity is not greater than zero.
+        Delegates to `ensure_valid_name` and `ensure_positive_quantity`, which
+        carry the rules and the errors they raise.
         """
-        if not self.name.strip():
-            raise EmptyItemNameError
-        if self.quantity <= 0:
-            raise NonPositiveQuantityError(self.quantity)
+        ensure_valid_name(self.name)
+        ensure_positive_quantity(self.quantity)
 
     @property
     def is_outstanding(self) -> bool:

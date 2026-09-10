@@ -35,20 +35,20 @@
 
 ## 5. Service layer
 
-- [ ] 5.1 Implement the shopping list service for adding, editing and removing items, rejecting references to stores that do not exist; verify tests for the unknown-store rejection and that removal records no purchase
-- [ ] 5.2 Implement marking an item bought and undoing it, with marking made idempotent; verify tests that a second mark does not create a second purchase and that undo leaves no purchase recorded
-- [ ] 5.3 Implement store creation and deletion, refusing deletion while outstanding items reference the store and reporting those items; verify tests for both the refusal and the successful deletion of an unused store
-- [ ] 5.4 Move all business rules out of the API layer so routes call services only; verify a test asserting that no module under `api/` imports anything from `repository/`
+- [x] 5.1 Implement the shopping list service for adding, editing and removing items, rejecting references to stores that do not exist; verify tests for the unknown-store rejection and that removal records no purchase
+- [x] 5.2 Implement marking an item bought and undoing it, with marking made idempotent; verify tests that a second mark does not create a second purchase and that undo leaves no purchase recorded
+- [x] 5.3 Implement store creation and deletion, refusing deletion while outstanding items reference the store and reporting those items; verify tests for both the refusal and the successful deletion of an unused store
+- [x] 5.4 Move all business rules out of the API layer so routes call services only; verify a test asserting that no module under `api/` imports anything from `repository/`
 
 ## 6. API layer
 
-- [ ] 6.1 Add a single `get_current_member` dependency resolving the acting member, documented as trusting its caller until the authentication change; verify a test that a missing or unknown member is rejected
-- [ ] 6.2 Implement the item endpoints — list with optional store filter and upcoming inclusion, create returning the created item, patch, delete; verify contract tests covering the "Store-filtered shopping view" and "Full list view" scenarios
-- [ ] 6.3 Implement purchase and undo as sub-resources of an item; verify a contract test that buying an item assigned to both Lidl and Spar removes it from both views
-- [ ] 6.4 Implement the store endpoints, returning a conflict naming the referencing items when a store in use is deleted; verify a contract test for that response
-- [ ] 6.5 Implement the household members endpoint; verify it returns the seeded members
-- [ ] 6.6 Register the new router and delete the prototype shopping module and its `/shopping-items` routes; verify the old path returns 404 and the whole test suite passes
-- [ ] 6.7 Serve the built client from the API, returning the client's entry document for non-API paths; verify that reloading the page on a client-side route returns the app rather than a 404
+- [x] 6.1 Add a single `get_current_member` dependency resolving the acting member, documented as trusting its caller until the authentication change; verify a test that a missing or unknown member is rejected
+- [x] 6.2 Implement the item endpoints — list with optional store filter and upcoming inclusion, create returning the created item, patch, delete; verify contract tests covering the "Store-filtered shopping view" and "Full list view" scenarios
+- [x] 6.3 Implement purchase and undo as sub-resources of an item; verify a contract test that buying an item assigned to both Lidl and Spar removes it from both views
+- [x] 6.4 Implement the store endpoints, returning a conflict naming the referencing items when a store in use is deleted; verify a contract test for that response
+- [x] 6.5 Implement the household members endpoint; verify it returns the seeded members
+- [x] 6.6 Register the new router and delete the prototype shopping module and its `/shopping-items` routes; verify the old path returns 404 and the whole test suite passes
+- [x] 6.7 Serve the built client from the API, returning the client's entry document for non-API paths; verify that reloading the page on a client-side route returns the app rather than a 404
 
 ## 7. Progressive web client
 

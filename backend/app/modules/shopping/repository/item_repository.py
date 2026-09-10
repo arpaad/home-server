@@ -10,7 +10,7 @@ from collections.abc import Iterable
 from datetime import date
 from uuid import UUID
 
-from sqlalchemy import ColumnElement, Select, and_, exists, or_, select
+from sqlalchemy import ColumnElement, Select, and_, delete, exists, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.clock import now_utc
@@ -165,6 +165,20 @@ class SqlAlchemyShoppingItemRepository:
             .order_by(ShoppingItemORM.name)
         ).all()
         return tuple(names)
+
+    def detach_store_from_bought_items(self, store_id: UUID) -> None:
+        """Drop a store's links to items that have already been bought.
+
+        Args:
+            store_id: The store being deleted.
+        """
+        bought_item_ids = select(ShoppingItemPurchaseORM.item_id)
+        self._session.execute(
+            delete(ShoppingItemStoreORM)
+            .where(ShoppingItemStoreORM.store_id == store_id)
+            .where(ShoppingItemStoreORM.item_id.in_(bought_item_ids))
+        )
+        self._session.flush()
 
     # ---- writes ----
 
