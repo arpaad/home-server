@@ -12,9 +12,9 @@
 - [x] 2.1 Populate the empty `core/config.py` with typed settings (database URL, household timezone, environment) loaded from the environment; verify the app starts with settings injected and pyright reports no errors
 - [x] 2.2 Add the Postgres driver, settings and Alembic dependencies through uv; verify `uv sync` succeeds and `uv.lock` is updated
 - [x] 2.3 Point `db/session.py` at Postgres via settings and remove the import-time `init_tables()` call; verify importing the module creates no tables
-- [ ] 2.4 Write the compose definition with an API service and a Postgres service, a health check on the database, the API depending on it being healthy, restart policies on both, a named volume, and binding to the LAN interface only; verify both start, the API serves its OpenAPI docs, and restarting the API container loses no data
+- [x] 2.4 Write the compose definition with an API service and a Postgres service, a health check on the database, the API depending on it being healthy, restart policies on both, a named volume, and binding to the LAN interface only; verify both start, the API serves its OpenAPI docs, and restarting the API container loses no data
 - [x] 2.5 Initialise Alembic against the configured database URL; verify migrating to head succeeds against the compose Postgres
-- [ ] 2.6 Add the Makefile database targets — `db-up`, `db-down`, `db-reset`, `migrate`, `migration`, `seed`, `up`, `down`, `logs`; verify `make db-reset` produces a migrated and seeded database starting from nothing
+- [x] 2.6 Add the Makefile database targets — `db-up`, `db-down`, `db-reset`, `migrate`, `migration`, `seed`, `up`, `down`, `logs`; verify `make db-reset` produces a migrated and seeded database starting from nothing
 - [x] 2.7 Make the API container entrypoint migrate to head before starting the server; verify a fresh container against an empty database ends up fully migrated with no manual step
 
 ## 3. Domain model and schema

@@ -1,0 +1,15 @@
+# Toolchain for this repository. Pins the versions the backend and client are
+# built and tested against, so a fresh checkout does not depend on whatever
+# happens to be installed globally.
+#
+#   mise install     # get the tools
+#   mise trust       # first time in this directory
+
+[tools]
+node = "24"
+uv = "0.12"
+
+[env]
+# Keep the backend's interpreter choice in one place: backend/.python-version
+# pins 3.14 and uv reads it.
+_.python.venv = { path = "backend/.venv", create = false }
