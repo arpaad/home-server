@@ -1,6 +1,21 @@
-# Build context is the repository root, so that a single image can carry the
-# backend and (from the frontend change onwards) the built client.
+# Build context is the repository root, so one image carries the API and the
+# built client. The client is static files once built, so there is no runtime
+# process to containerise — the API serves it from the same origin, which also
+# removes CORS from the picture rather than configuring it.
 
+# ---- stage 1: build the client ----
+FROM docker.io/library/node:24-slim AS client
+
+WORKDIR /build
+
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
+
+# ---- stage 2: the runtime ----
 FROM docker.io/library/python:3.14-slim AS runtime
 
 COPY --from=ghcr.io/astral-sh/uv:0.12.9 /uv /uvx /bin/
@@ -23,6 +38,10 @@ COPY backend/migrations ./migrations
 COPY backend/alembic.ini ./alembic.ini
 
 RUN uv sync --locked --no-dev
+
+# app/web.py serves whatever is here; without it the API still starts, which
+# is what development relies on.
+COPY --from=client /build/dist ./app/client
 
 COPY deploy/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

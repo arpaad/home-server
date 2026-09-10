@@ -52,18 +52,18 @@
 
 ## 7. Progressive web client
 
-- [ ] 7.1 Scaffold a React and TypeScript workspace under `frontend/` with a production build; verify the build produces servable static assets
-- [ ] 7.2 Build the API client with a query cache exposing explicit loading and error states; verify a test that a failed request surfaces an error rather than a silent empty list
-- [ ] 7.3 Implement member selection persisted on the device; verify that a purchase made from the client is attributed to the selected member
-- [ ] 7.4 Implement the full list view showing each item's stores and availability date; verify against the "Reviewing the whole list at home" scenario
-- [ ] 7.5 Implement the store-filtered shopping view; verify the ketchup case end to end — ketchup assigned to Lidl and Spar and an unassigned milk both appear under Lidl, while an Aldi-only item does not
-- [ ] 7.6 Implement the add and edit form with store selection restricted to existing stores as chips and adding a new store as a separate deliberate action; verify no code path submits a free-text store name
-- [ ] 7.7 Implement marking bought and undoing it; verify the item disappears from every store's view immediately and returns on undo
-- [ ] 7.8 Add the web app manifest and a service worker that precaches the application shell only and never serves cached list data as current; verify installation to a phone home screen and that data requests reach the network
+- [x] 7.1 Scaffold a React and TypeScript workspace under `frontend/` with a production build; verify the build produces servable static assets
+- [x] 7.2 Build the API client with a query cache exposing explicit loading and error states; verify a test that a failed request surfaces an error rather than a silent empty list
+- [x] 7.3 Implement member selection persisted on the device; verify that a purchase made from the client is attributed to the selected member
+- [x] 7.4 Implement the full list view showing each item's stores and availability date; verify against the "Reviewing the whole list at home" scenario
+- [x] 7.5 Implement the store-filtered shopping view; verify the ketchup case end to end — ketchup assigned to Lidl and Spar and an unassigned milk both appear under Lidl, while an Aldi-only item does not
+- [x] 7.6 Implement the add and edit form with store selection restricted to existing stores as chips and adding a new store as a separate deliberate action; verify no code path submits a free-text store name
+- [x] 7.7 Implement marking bought and undoing it; verify the item disappears from every store's view immediately and returns on undo
+- [x] 7.8 Add the web app manifest and a service worker that precaches the application shell only and never serves cached list data as current; verify installation to a phone home screen and that data requests reach the network
 
 ## 8. Deployment, durability and acceptance
 
-- [ ] 8.1 Build a multi-stage image in which Node builds the client and the Python runtime image serves both it and the API; verify one image runs the API and serves the client
+- [x] 8.1 Build a multi-stage image in which Node builds the client and the Python runtime image serves both it and the API; verify one image runs the API and serves the client
 - [ ] 8.2 Build arm64 images in CI so the Pi pulls rather than builds; verify the published image runs on the Pi
 - [ ] 8.3 Place the database volume on external storage rather than the SD card; verify the volume's backing path is on the external device
 - [ ] 8.4 Add systemd units so the stack starts at boot; verify by power-cycling the Pi that the list loads afterwards with no manual step

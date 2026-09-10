@@ -4,7 +4,10 @@ APP_NAME=home-server
 PORT=8080
 
 BACKEND=backend
+FRONTEND=frontend
+TEST_DB=home_test
 COMPOSE=podman compose -f deploy/compose.yaml
+DEPLOY_COMPOSE=podman compose -f deploy/compose.deploy.yaml
 
 # ---- Development ----
 
@@ -36,27 +39,61 @@ type-checker:
 formatter:
 	cd $(BACKEND) && uv run ruff format app tests
 
-# Formatter + linter + type-checker
-lint-all: formatter linter type-checker
+# Formatter + linter + type-checker, both halves of the repository
+lint-all: formatter linter type-checker client-lint
 
-# Run tests
-test:
+# Run tests. Needs the development database: run `make db-up` first (the
+# deploy stack does not publish Postgres, by design).
+test: db-up
 	cd $(BACKEND) && uv run pytest tests
 
 # Make test coverage
-coverage:
+coverage: db-up
 	cd $(BACKEND) && uv run pytest --cov=app --cov-report=term-missing tests
 
 # Run audit
 security-audit:
 	cd $(BACKEND) && uv run safety scan
 
+# ---- Client ----
+
+# Install the client's dependencies
+client-install:
+	cd $(FRONTEND) && npm install
+
+# Run the client's dev server (proxies /api to the backend)
+client-dev:
+	cd $(FRONTEND) && npm run dev
+
+# Build the client into frontend/dist
+client-build:
+	cd $(FRONTEND) && npm run build
+
+# Lint and type-check the client
+client-lint:
+	cd $(FRONTEND) && npm run lint
+	cd $(FRONTEND) && npm run typecheck
+
+# End-to-end tests. Builds the client and drives a real browser against the
+# real API, because the rule under test lives in SQL — a mocked API would only
+# prove the mock agrees with itself.
+#   make e2e                    # starts its own preview server
+#   make e2e-deployed           # against the running stack on :8080
+e2e:
+	cd $(FRONTEND) && npm run test:e2e
+
+e2e-deployed:
+	cd $(FRONTEND) && E2E_BASE_URL=http://127.0.0.1:8080 npm run test:e2e
+
 # ---- Database ----
 
-# Start only Postgres, and wait until it is accepting connections
+# Start only Postgres, wait until it accepts connections, and make sure the
+# test database exists. The test suite runs against real PostgreSQL, so
+# forgetting this database is otherwise a confusing wall of connection errors.
 db-up:
 	$(COMPOSE) up -d db
 	$(COMPOSE) exec db sh -c 'until pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB; do sleep 1; done'
+	$(COMPOSE) exec db sh -c 'psql -U $$POSTGRES_USER -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '"'"'$(TEST_DB)'"'"'" | grep -q 1 || psql -U $$POSTGRES_USER -d postgres -c "CREATE DATABASE $(TEST_DB) OWNER $$POSTGRES_USER"'
 
 # Stop Postgres, keeping its volume
 db-down:
@@ -99,6 +136,27 @@ down:
 logs:
 	$(COMPOSE) logs -f
 
+# ---- Deployment (prebuilt image from GHCR) ----
+#
+# The Pi hosts the image, it does not build it. These targets run the same
+# stack here on a laptop.
+
+# Fetch the published image
+deploy-pull:
+	$(DEPLOY_COMPOSE) pull
+
+# Run the published image
+deploy-up:
+	$(DEPLOY_COMPOSE) up -d
+
+# Stop it, keeping the volume
+deploy-down:
+	$(DEPLOY_COMPOSE) down
+
+# Follow the deployed stack's logs
+deploy-logs:
+	$(DEPLOY_COMPOSE) logs -f
+
 # Run container standalone
 start-container:
 	podman run --rm -d --name $(APP_NAME) -p $(PORT):8080 $(IMAGE_NAME)
@@ -108,5 +166,7 @@ stop:
 	podman stop $(APP_NAME) || true
 
 .PHONY: run install-dev-dependencies linter linter-fix type-checker formatter \
-        lint-all test coverage security-audit db-up db-down migrate migration \
-        seed db-reset build up down logs start-container stop
+        lint-all test coverage security-audit client-install client-dev \
+        client-build client-lint e2e e2e-deployed db-up db-down migrate \
+        migration seed db-reset build up down logs deploy-pull deploy-up \
+        deploy-down deploy-logs start-container stop
