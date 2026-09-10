@@ -1,28 +1,37 @@
-# Byte-compiled / cache
+# The build context is the repository root; keep it to what the image needs.
+
+.git/
+.github/
+.claude/
+.vscode/
+openspec/
+
+# Nothing outside backend/ and deploy/ belongs in the image yet.
+# (The frontend build stage adds frontend/ in a later change.)
+frontend/node_modules/
+frontend/dist/
+
+# Python artefacts
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.swp
-
-# Virtual environments
+.venv/
 venv/
-.env/
-.poetry/
+.env
+*.env
+!deploy/.env.example
 
-# Logs
-*.log
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Test / coverage files
+# Test / coverage artefacts
 .coverage
 htmlcov/
-*.pytest_cache/
+.pytest_cache/
+.ruff_cache/
 .tox/
+*.db
 
-# Poetry lock / config (optional if exporting requirements)
-poetry.lock
-
+# Logs and OS files
+*.log
+.DS_Store
+Thumbs.db

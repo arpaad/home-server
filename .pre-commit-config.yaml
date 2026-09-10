@@ -3,12 +3,17 @@ repos:
     hooks:
       - id: ruff-format
         name: Ruff formatter via uv
-        entry: uv run ruff format
+        entry: uv run --project backend ruff format
         language: system
-        files: ^app/.*\.py$
+        files: ^backend/(app|tests)/.*\.py$
+      - id: ruff-check
+        name: Ruff linter via uv
+        entry: uv run --project backend ruff check --fix
+        language: system
+        files: ^backend/(app|tests)/.*\.py$
       - id: lock-update
         name: Update uv.lock
-        entry: uv lock
+        entry: sh -c 'cd backend && uv lock'
         language: system
-        files: ^pyproject\.toml$
-        pass_filenames: false  
+        files: ^backend/pyproject\.toml$
+        pass_filenames: false

@@ -1,17 +1,17 @@
 ## 1. Repository restructure
 
-- [ ] 1.1 Move `app/`, `tests/` and the Python project files into `backend/`, and create the `frontend/` and `deploy/` directories, leaving the `Makefile`, `README.md`, `AGENTS.md` and `openspec/` at the root; verify `uv sync` and the existing test suite still run from the new location
-- [ ] 1.2 Repoint `pyproject.toml` package discovery and `pyrightconfig.json` at the new layout; verify pyright reports no errors
-- [ ] 1.3 Repoint every Makefile target at `backend/`, keeping the Makefile at the repository root; verify `make lint-all` and `make test` succeed exactly as before
-- [ ] 1.4 Repoint the pre-commit hook that filters on `app/`; verify `pre-commit run --all-files` passes
+- [x] 1.1 Move `app/`, `tests/` and the Python project files into `backend/`, and create the `frontend/` and `deploy/` directories, leaving the `Makefile`, `README.md`, `AGENTS.md` and `openspec/` at the root; verify `uv sync` and the existing test suite still run from the new location
+- [x] 1.2 Repoint `pyproject.toml` package discovery and `pyrightconfig.json` at the new layout; verify pyright reports no errors
+- [x] 1.3 Repoint every Makefile target at `backend/`, keeping the Makefile at the repository root; verify `make lint-all` and `make test` succeed exactly as before
+- [x] 1.4 Repoint the pre-commit hook that filters on `app/`; verify `pre-commit run --all-files` passes
 - [ ] 1.5 Move the container definition into `deploy/` and repoint its copy paths; verify `make build` still produces a runnable image
 - [ ] 1.6 Update both GitHub Actions workflows for the new paths and add path filters so a client-only change does not run pyright; verify the workflow run is green
 
 ## 2. Project foundations
 
-- [ ] 2.1 Populate the empty `core/config.py` with typed settings (database URL, household timezone, environment) loaded from the environment; verify the app starts with settings injected and pyright reports no errors
-- [ ] 2.2 Add the Postgres driver, settings and Alembic dependencies through uv; verify `uv sync` succeeds and `uv.lock` is updated
-- [ ] 2.3 Point `db/session.py` at Postgres via settings and remove the import-time `init_tables()` call; verify importing the module creates no tables
+- [x] 2.1 Populate the empty `core/config.py` with typed settings (database URL, household timezone, environment) loaded from the environment; verify the app starts with settings injected and pyright reports no errors
+- [x] 2.2 Add the Postgres driver, settings and Alembic dependencies through uv; verify `uv sync` succeeds and `uv.lock` is updated
+- [x] 2.3 Point `db/session.py` at Postgres via settings and remove the import-time `init_tables()` call; verify importing the module creates no tables
 - [ ] 2.4 Write the compose definition with an API service and a Postgres service, a health check on the database, the API depending on it being healthy, restart policies on both, a named volume, and binding to the LAN interface only; verify both start, the API serves its OpenAPI docs, and restarting the API container loses no data
 - [ ] 2.5 Initialise Alembic against the configured database URL; verify migrating to head succeeds against the compose Postgres
 - [ ] 2.6 Add the Makefile database targets — `db-up`, `db-down`, `db-reset`, `migrate`, `migration`, `seed`, `up`, `down`, `logs`; verify `make db-reset` produces a migrated and seeded database starting from nothing

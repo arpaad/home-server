@@ -1,48 +1,58 @@
-name: CodeQuuality
+name: Code Quality
 
 on:
   push:
-    branches: 
-      - 'feature/*'
+    branches-ignore:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/code-quality.yml'
   pull_request:
     branches:
       - main
     types: [opened, synchronize, reopened]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/code-quality.yml'
+
+defaults:
+  run:
+    working-directory: backend
 
 jobs:
-  code-quality:
+  backend:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Python 3.13
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
 
-    # Install dependencies via uv
-    - name: Install uv
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
-    - name: Add uv to PATH
-      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - name: Install project dependencies
-      run: uv sync
-        
-    ########################
-    # Code checks
-    ########################
-    - name: Ruff - Static code analysis
-      run: uv run ruff check app
+      - name: Set up Python 3.14
+        run: uv python install
 
-    - name: Pyright - Type checking
-      run: uv run pyright
+      - name: Install project dependencies
+        run: uv sync --locked
 
-    ########################
-    # Tests and coverage
-    ########################
-    - name: Run tests
-      env:
-        PYTHONPATH: ${{ github.workspace }}
-      run: uv run pytest --cov=app --cov-report=term-missing tests/
+      ########################
+      # Code checks
+      ########################
+      - name: Ruff - Formatting
+        run: uv run ruff format --check app tests
+
+      - name: Ruff - Static code analysis
+        run: uv run ruff check app tests
+
+      - name: Pyright - Type checking
+        run: uv run pyright
+
+      ########################
+      # Tests and coverage
+      ########################
+      - name: Run tests
+        run: uv run pytest --cov=app --cov-report=term-missing tests/
