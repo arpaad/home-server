@@ -4,7 +4,7 @@
 - [x] 1.2 Repoint `pyproject.toml` package discovery and `pyrightconfig.json` at the new layout; verify pyright reports no errors
 - [x] 1.3 Repoint every Makefile target at `backend/`, keeping the Makefile at the repository root; verify `make lint-all` and `make test` succeed exactly as before
 - [x] 1.4 Repoint the pre-commit hook that filters on `app/`; verify `pre-commit run --all-files` passes
-- [ ] 1.5 Move the container definition into `deploy/` and repoint its copy paths; verify `make build` still produces a runnable image
+- [x] 1.5 Move the container definition into `deploy/` and repoint its copy paths; verify `make build` still produces a runnable image
 - [ ] 1.6 Update both GitHub Actions workflows for the new paths and add path filters so a client-only change does not run pyright; verify the workflow run is green
 
 ## 2. Project foundations
@@ -15,7 +15,7 @@
 - [ ] 2.4 Write the compose definition with an API service and a Postgres service, a health check on the database, the API depending on it being healthy, restart policies on both, a named volume, and binding to the LAN interface only; verify both start, the API serves its OpenAPI docs, and restarting the API container loses no data
 - [x] 2.5 Initialise Alembic against the configured database URL; verify migrating to head succeeds against the compose Postgres
 - [ ] 2.6 Add the Makefile database targets — `db-up`, `db-down`, `db-reset`, `migrate`, `migration`, `seed`, `up`, `down`, `logs`; verify `make db-reset` produces a migrated and seeded database starting from nothing
-- [ ] 2.7 Make the API container entrypoint migrate to head before starting the server; verify a fresh container against an empty database ends up fully migrated with no manual step
+- [x] 2.7 Make the API container entrypoint migrate to head before starting the server; verify a fresh container against an empty database ends up fully migrated with no manual step
 
 ## 3. Domain model and schema
 
