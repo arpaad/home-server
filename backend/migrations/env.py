@@ -13,8 +13,11 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# The application is the single source of truth for where the database is.
-config.set_main_option("sqlalchemy.url", get_settings().database_url)
+# The application is the single source of truth for where the database is,
+# unless a caller supplied a URL explicitly — which is how the test suite
+# points the migrations at its own database.
+if not config.get_main_option("sqlalchemy.url", None):
+    config.set_main_option("sqlalchemy.url", get_settings().database_url)
 
 target_metadata = Base.metadata
 

@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.core.errors import UnknownTimeZoneError
+from app.core.errors import BlankMemberNameError, UnknownTimeZoneError
 
 Environment = Literal["development", "test", "production"]
 
@@ -37,6 +37,33 @@ class Settings(BaseSettings):
             "dates are compared against the current date in this zone."
         ),
     )
+
+    household_members: tuple[str, ...] = Field(
+        default=("Árpád", "Partner"),
+        description=(
+            "Names of the household members, seeded on a fresh database. Set "
+            'HOME_HOUSEHOLD_MEMBERS to a JSON array, e.g. \'["Árpád","Anna"]\'.'
+        ),
+    )
+
+    @field_validator("household_members")
+    @classmethod
+    def _members_must_be_named(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        """Reject a household with no members, or a member with a blank name.
+
+        Args:
+            value: The configured member names.
+
+        Returns:
+            The names with surrounding whitespace stripped.
+
+        Raises:
+            BlankMemberNameError: If the list is empty or any name is blank.
+        """
+        cleaned = tuple(name.strip() for name in value)
+        if not cleaned or any(not name for name in cleaned):
+            raise BlankMemberNameError
+        return cleaned
 
     @field_validator("household_timezone")
     @classmethod

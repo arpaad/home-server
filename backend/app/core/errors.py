@@ -25,3 +25,11 @@ class UnknownTimeZoneError(ConfigurationError):
         """
         super().__init__(f"unknown household time zone: {name!r}")
         self.name = name
+
+
+class BlankMemberNameError(ConfigurationError):
+    """The configured household member names are empty or contain a blank."""
+
+    def __init__(self) -> None:
+        """State the rule that was broken."""
+        super().__init__("every configured household member must have a non-blank name")

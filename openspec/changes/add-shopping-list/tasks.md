@@ -13,25 +13,25 @@
 - [x] 2.2 Add the Postgres driver, settings and Alembic dependencies through uv; verify `uv sync` succeeds and `uv.lock` is updated
 - [x] 2.3 Point `db/session.py` at Postgres via settings and remove the import-time `init_tables()` call; verify importing the module creates no tables
 - [ ] 2.4 Write the compose definition with an API service and a Postgres service, a health check on the database, the API depending on it being healthy, restart policies on both, a named volume, and binding to the LAN interface only; verify both start, the API serves its OpenAPI docs, and restarting the API container loses no data
-- [ ] 2.5 Initialise Alembic against the configured database URL; verify migrating to head succeeds against the compose Postgres
+- [x] 2.5 Initialise Alembic against the configured database URL; verify migrating to head succeeds against the compose Postgres
 - [ ] 2.6 Add the Makefile database targets — `db-up`, `db-down`, `db-reset`, `migrate`, `migration`, `seed`, `up`, `down`, `logs`; verify `make db-reset` produces a migrated and seeded database starting from nothing
 - [ ] 2.7 Make the API container entrypoint migrate to head before starting the server; verify a fresh container against an empty database ends up fully migrated with no manual step
 
 ## 3. Domain model and schema
 
-- [ ] 3.1 Define ORM-free domain types for household member, store, shopping item and purchase; verify pyright passes and a unit test constructs each
-- [ ] 3.2 Enforce the item invariants in the domain — non-empty name, quantity greater than zero; verify unit tests cover both rejections from the "Adding an item" scenarios
-- [ ] 3.3 Define ORM models: `stores` with a case-insensitively unique name, `shopping_items` with `available_from` and origin, `shopping_item_stores` as a join table with foreign keys, `shopping_item_purchases`, and `household_members`; verify Alembic autogenerate produces a revision matching them
-- [ ] 3.4 Write and apply the initial migration; verify migrating to head and back down to base both succeed
-- [ ] 3.5 Seed the two household members; verify they are readable after a fresh migration on an empty database
+- [x] 3.1 Define ORM-free domain types for household member, store, shopping item and purchase; verify pyright passes and a unit test constructs each
+- [x] 3.2 Enforce the item invariants in the domain — non-empty name, quantity greater than zero; verify unit tests cover both rejections from the "Adding an item" scenarios
+- [x] 3.3 Define ORM models: `stores` with a case-insensitively unique name, `shopping_items` with `available_from` and origin, `shopping_item_stores` as a join table with foreign keys, `shopping_item_purchases`, and `household_members`; verify Alembic autogenerate produces a revision matching them
+- [x] 3.4 Write and apply the initial migration; verify migrating to head and back down to base both succeed
+- [x] 3.5 Seed the two household members; verify they are readable after a fresh migration on an empty database
 
 ## 4. Repository layer
 
-- [ ] 4.1 Declare `Protocol` repository interfaces for items and stores; verify pyright accepts the SQLAlchemy implementations as satisfying them
-- [ ] 4.2 Implement the store repository including case-insensitive name uniqueness; verify a test that adding "lidl" when "Lidl" exists is rejected and leaves one store
-- [ ] 4.3 Implement the store-and-availability filter as a single SQL query in the item repository; verify tests that an item with no stores appears for every store, an item restricted to Lidl and Spar appears for neither Aldi nor Auchan, an item with a future `available_from` is excluded, and a purchased item is excluded
-- [ ] 4.4 Compute "today" for the availability comparison in the configured household timezone, never from a naive clock; verify a test at the date boundary and that ruff's `DTZ` rules pass
-- [ ] 4.5 Implement the lookup for outstanding items referencing a given store; verify a test returns exactly the referencing items
+- [x] 4.1 Declare `Protocol` repository interfaces for items and stores; verify pyright accepts the SQLAlchemy implementations as satisfying them
+- [x] 4.2 Implement the store repository including case-insensitive name uniqueness; verify a test that adding "lidl" when "Lidl" exists is rejected and leaves one store
+- [x] 4.3 Implement the store-and-availability filter as a single SQL query in the item repository; verify tests that an item with no stores appears for every store, an item restricted to Lidl and Spar appears for neither Aldi nor Auchan, an item with a future `available_from` is excluded, and a purchased item is excluded
+- [x] 4.4 Compute "today" for the availability comparison in the configured household timezone, never from a naive clock; verify a test at the date boundary and that ruff's `DTZ` rules pass
+- [x] 4.5 Implement the lookup for outstanding items referencing a given store; verify a test returns exactly the referencing items
 
 ## 5. Service layer
 
