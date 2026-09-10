@@ -34,9 +34,9 @@ The user's decision on stack was explicit: the household project stays Python pr
 
 ## Decisions
 
-### Python 3.13 + FastAPI, continuing the H.O.M.E. repository
+### Python 3.14 + FastAPI, continuing the H.O.M.E. repository
 
-**Chosen because** the repository already has the architecture, tooling, CI and container setup this change needs, and because the user wants a Python reference project alongside Go professional work.
+**Chosen because** the repository already has the architecture, tooling, CI and container setup this change needs, and because the user wants a Python reference project alongside Go professional work. The interpreter was moved from 3.13 to 3.14 and every dependency relocked against it as part of this change, while the repository was still small enough for that to be free.
 
 **Alternatives considered.** *Go + Gin*: genuinely lower memory on a Pi (roughly 20 MB versus 100+ MB) and a single static binary, but at two users and a few dozen requests a day the performance argument is irrelevant, and it would discard the existing investment. *A fresh Python repository*: rejected — the existing layering is sound; what is wrong is that the shopping module does not follow it, which this change fixes anyway.
 
