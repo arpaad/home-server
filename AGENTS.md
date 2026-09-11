@@ -53,8 +53,9 @@ skips one.
   and `DOC` (docstrings must match signatures).
 - **Tests against real infrastructure.** Backend tests use real PostgreSQL
   and build their schema by running the migrations. End-to-end tests drive a
-  real browser against the real API. Mocks that only agree with themselves
-  prove nothing about the rules this project cares about.
+  real browser against the real API — including with the network cut
+  (`context.setOffline`) for the offline scenarios. Mocks that only agree
+  with themselves prove nothing about the rules this project cares about.
 - Comments explain *why*, especially where a decision looks arbitrary or a
   simpler-looking alternative is wrong.
 
@@ -93,7 +94,22 @@ Treat these as invariants, not preferences. Each one has tests.
 10. **An item with no category is still shown**, in a final Uncategorised
     group. Grouping changes arrangement, never membership. The failure mode
     is silent, so it has its own end-to-end test.
-11. **Clearing never deletes a purchase.** A bought item stays listed,
+11. **The service worker never serves API data.** It precaches the app
+    shell only. The local copy is the persisted TanStack Query cache, in the
+    layer that renders it — so the app *knows* whether what it shows is
+    current, and says "last confirmed at …" when it is not. A worker-served
+    response cannot say that.
+12. **Every list operation is idempotent on replay.** Create carries a
+    client id; edit carries `edited_at` and the server refuses an older one
+    (later edit wins, answered `applied: false`, never an error); remove of
+    a missing item is 204. Offline changes are paused mutations, persisted
+    with the cache, resumed *in series* (one mutation scope) so "buy the item
+    I just added" reaches the server after the add.
+13. **A pending change is shown as pending, never as saved.** The mark comes
+    from the mutation being in flight or paused, not from anything on the
+    item. A permanent refusal (4xx other than 408/429) drops the mutation
+    and pushes a notice; anything else keeps retrying.
+14. **Clearing never deletes a purchase.** A bought item stays listed,
     dimmed, until the household clears it; clearing sets `cleared_at` on the
     item and leaves the purchase row exactly as recorded. The outstanding
     query is untouched by any of this — bought items come from a second

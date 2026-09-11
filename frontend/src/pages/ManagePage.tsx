@@ -18,6 +18,7 @@ import {
 } from '../api/queries'
 import type { Category } from '../api/types'
 import { StatusBanner } from '../components/StatusBanner'
+import { useIsOnline } from '../net/connectivity'
 
 const PRESET_COLOURS = [
   '#4c9a2a',
@@ -33,6 +34,7 @@ const PRESET_COLOURS = [
 ]
 
 export function ManagePage() {
+  const online = useIsOnline()
   const [error, setError] = useState<unknown>(null)
   const run = (promise: Promise<unknown>) => {
     setError(null)
@@ -49,9 +51,19 @@ export function ManagePage() {
       </header>
 
       <StatusBanner error={error} />
+      {!online && (
+        // Tidying up is done at home, with the server. Nothing here is
+        // queued: a rename versus a delete on the other phone is a conflict
+        // worth avoiding, not merging.
+        <p className="offline-note" data-testid="offline-note">
+          Cannot reach the server — stores and categories can be changed once it is back.
+        </p>
+      )}
 
-      <StoresSection run={run} />
-      <CategoriesSection run={run} />
+      <fieldset className="offline-guard" disabled={!online} data-testid="manage-controls">
+        <StoresSection run={run} />
+        <CategoriesSection run={run} />
+      </fieldset>
     </section>
   )
 }

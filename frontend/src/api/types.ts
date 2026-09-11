@@ -76,9 +76,20 @@ export interface Item {
   category: Category | null
   /** Set once the household cleared this bought item away. Listed items never have it. */
   cleared_at: string | null
+  /** When the last applied edit was made. Compared by the server, not shown. */
+  updated_at: string | null
+}
+
+/** What an edit did: the item as it now stands, and whether the edit took. */
+export interface ItemEditResult {
+  item: Item
+  /** False when a newer edit had already been applied. Not an error. */
+  applied: boolean
 }
 
 export interface ItemCreate {
+  /** Chosen by the client, so an offline add can be referred to and replayed. */
+  id?: string
   name: string
   quantity?: number
   unit?: Unit
@@ -94,6 +105,8 @@ export interface ItemCreate {
 }
 
 export interface ItemUpdate {
+  /** When the edit was made, by this phone's clock. Later edit wins. */
+  edited_at?: string
   name?: string
   quantity?: number
   unit?: Unit

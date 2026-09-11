@@ -6,6 +6,7 @@
  * saved, so nothing here swallows an error or substitutes an empty result.
  */
 
+import { markOffline, markOnline } from '../net/connectivity'
 import type {
   CatalogueEntry,
   CatalogueEntryCreate,
@@ -15,6 +16,7 @@ import type {
   CategoryUpdate,
   Item,
   ItemCreate,
+  ItemEditResult,
   ItemUpdate,
   Member,
   Purchase,
@@ -43,9 +45,21 @@ export class ApiError extends Error {
 /** Thrown when the server could not be reached at all. */
 export class OfflineError extends ApiError {
   constructor() {
-    super(0, 'Could not reach the server. Your change was not saved.')
+    super(0, 'Could not reach the server.')
     this.name = 'OfflineError'
   }
+}
+
+/**
+ * Whether a failure will not change on retry. A refused change (4xx, other
+ * than "try again later") is dropped and reported; everything else — no
+ * network, 5xx, 408, 429 — stays queued.
+ */
+export function isPermanentFailure(error: unknown): boolean {
+  if (error instanceof OfflineError) return false
+  if (!(error instanceof ApiError)) return false
+  if (error.status === 408 || error.status === 429) return false
+  return error.status >= 400 && error.status < 500
 }
 
 interface ErrorBody {
@@ -61,9 +75,15 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       ...init,
       headers: { 'content-type': 'application/json', ...(init.headers ?? {}) },
     })
-  } catch {
+  } catch (caught) {
+    // An aborted request says nothing about the server; a network failure
+    // does, and it is the only signal we trust for "offline".
+    if (caught instanceof DOMException && caught.name === 'AbortError') throw caught
+    markOffline()
     throw new OfflineError()
   }
+  // Any answer at all — even an error — means the server is reachable.
+  markOnline()
 
   if (!response.ok) {
     let body: ErrorBody = {}
@@ -114,7 +134,7 @@ export const api = {
     request<Item>('/shopping/items', { method: 'POST', body: JSON.stringify(payload) }),
 
   updateItem: (itemId: string, payload: ItemUpdate) =>
-    request<Item>(`/shopping/items/${itemId}`, {
+    request<ItemEditResult>(`/shopping/items/${itemId}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
     }),

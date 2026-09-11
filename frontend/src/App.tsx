@@ -3,6 +3,7 @@ import { NavLink, Route, Routes } from 'react-router'
 import { useMembers } from './api/queries'
 import { MemberPicker } from './components/MemberPicker'
 import { useCurrentMember } from './member/MemberContext'
+import { dismissNotice, useNotices } from './net/notices'
 import { AddPage } from './pages/AddPage'
 import { CataloguePage } from './pages/CataloguePage'
 import { ListPage } from './pages/ListPage'
@@ -16,6 +17,7 @@ import { ManagePage } from './pages/ManagePage'
 export default function App() {
   const { memberId, setMemberId } = useCurrentMember()
   const members = useMembers()
+  const notices = useNotices()
 
   return (
     <div className="app">
@@ -40,6 +42,16 @@ export default function App() {
         </div>
         <MemberPicker members={members.data ?? []} memberId={memberId} onChange={setMemberId} />
       </header>
+
+      {/* What did not go through, and why. Dismissible; never silent. */}
+      {notices.map((notice) => (
+        <div key={notice.id} className="banner banner--error" role="alert" data-testid="sync-notice">
+          <span>{notice.text}</span>
+          <button type="button" className="banner__action" onClick={() => dismissNotice(notice.id)}>
+            Dismiss
+          </button>
+        </div>
+      ))}
 
       <Routes>
         <Route path="/" element={<ListPage />} />

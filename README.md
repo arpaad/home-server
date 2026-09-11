@@ -20,6 +20,15 @@ caused the same item to be bought twice.
 Items can also carry a date they become worth buying, so "it's on sale next
 week" stops being something anyone has to remember.
 
+The list works without the server. Away from home, or in a shop with no
+signal, you see the phone's copy — with the time it was last confirmed — and
+anything you add, edit, buy or undo is saved on the phone at once, marked
+*pending*, and sent the moment the server is reachable again. If both phones
+changed the same thing while apart, the later edit stands; nobody is asked.
+A change the server refuses for good (the store was deleted meanwhile) is
+dropped and you're told why, so nothing stays stuck. Stores, categories and
+the catalogue can be read offline but changed only with the server.
+
 Ticking something off doesn't make it vanish. It drops to a dimmed *Bought*
 group at the bottom, where you can see what's in the basket and tap the tick
 again to undo. **Clear bought** at the top tidies them away in one go — it

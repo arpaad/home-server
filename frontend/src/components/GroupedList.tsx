@@ -9,6 +9,7 @@ export function GroupedList({
   today,
   busy,
   canBuy,
+  pendingIds,
   onBuy,
   onUndo,
   onEdit,
@@ -18,6 +19,7 @@ export function GroupedList({
   today: string
   busy: boolean
   canBuy: boolean
+  pendingIds: Set<string>
   onBuy: (item: Item) => void
   onUndo: (item: Item) => void
   onEdit: (item: Item) => void
@@ -52,6 +54,7 @@ export function GroupedList({
                 today={today}
                 busy={busy}
                 canBuy={canBuy}
+                pending={pendingIds.has(item.id)}
                 onBuy={() => onBuy(item)}
                 onUndo={() => onUndo(item)}
                 onEdit={() => onEdit(item)}

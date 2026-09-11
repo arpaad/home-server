@@ -6,13 +6,13 @@
  * "we normally get it at Lidl but we are in Spar now" has to stay possible).
  */
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 
 import { useCategories, useCreateItem, useItems, useStores, useUpdateItem } from '../api/queries'
 import type { CatalogueEntry, Category, Item, Store, Unit } from '../api/types'
 import { UNITS } from '../api/types'
-import { StatusBanner } from '../components/StatusBanner'
 import { Typeahead } from '../components/Typeahead'
 
 export function AddPage() {
@@ -20,22 +20,29 @@ export function AddPage() {
   const editId = params.get('edit')
 
   const stores = useStores()
-  // The full list, so an item being edited can be found whatever its store
-  // or date. Cached, so this costs nothing when arriving from the list.
-  const allItems = useItems(null, true)
+  const queryClient = useQueryClient()
 
-  const editing: Item | undefined = editId
-    ? allItems.data?.find((item) => item.id === editId)
+  // Look for the item being edited in any list view already in the cache —
+  // the member almost always arrives from one, and offline that copy is
+  // all there is. Only fetch the full list when nothing cached has it.
+  const cached: Item | undefined = editId
+    ? queryClient
+        .getQueriesData<Item[]>({ queryKey: ['items'] })
+        .flatMap(([, data]) => data ?? [])
+        .find((item) => item.id === editId)
     : undefined
+  const allItems = useItems(null, true, editId !== null && cached === undefined)
 
-  if (editId && allItems.isPending) {
+  const editing: Item | undefined = cached ?? (editId ? allItems.data?.find((item) => item.id === editId) : undefined)
+
+  if (editId && !editing && allItems.isPending && allItems.fetchStatus === 'fetching') {
     return <p className="empty">Loading…</p>
   }
 
   return (
     <section className="page" data-testid="add-page">
-      {editId && allItems.isSuccess && !editing && (
-        <div className="banner banner--error">That item is no longer on the list.</div>
+      {editId && !editing && (
+        <div className="banner banner--error">That item is not in this phone's copy of the list.</div>
       )}
       {/* Keyed so a different item gets a fresh form, initialised from props. */}
       <ItemEditor key={editing?.id ?? 'new'} editing={editing} stores={stores.data ?? []} />
@@ -57,7 +64,6 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
   // Only a deliberate choice is sent. Leaving the picker alone must never
   // uncategorise a known item that was typed without choosing a suggestion.
   const [categoryTouched, setCategoryTouched] = useState(false)
-  const [error, setError] = useState<unknown>(null)
   const categories = useCategories()
 
   const toggleStore = (storeId: string) =>
@@ -81,7 +87,6 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault()
-    setError(null)
     const parsed = Number(quantity)
     const payload = {
       name: name.trim(),
@@ -94,13 +99,22 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
       ...(category ? { category_id: category.id } : {}),
       ...(categoryTouched && !category ? { clear_category: true } : {}),
     }
-    const request = editing
-      ? updateItem.mutateAsync({
-          itemId: editing.id,
-          payload: { ...payload, clear_available_from: availableFrom === '' },
-        })
-      : createItem.mutateAsync(payload)
-    request.then(back).catch((caught: unknown) => setError(caught))
+    // Local-first: the change applies to the phone's copy at once and is
+    // queued; we return to the list without waiting for the server. A
+    // refusal surfaces later as a notice, an outage as a pending mark.
+    if (editing) {
+      updateItem.mutate({
+        itemId: editing.id,
+        // Later edit wins, by the time this edit was made.
+        payload: { ...payload, clear_available_from: availableFrom === '', edited_at: new Date().toISOString() },
+      })
+    } else {
+      // The id is chosen here so an item added offline can be edited or
+      // bought before the server has seen it, and replayed without landing
+      // twice.
+      createItem.mutate({ ...payload, id: crypto.randomUUID() })
+    }
+    back()
   }
 
   const busy = createItem.isPending || updateItem.isPending
@@ -113,8 +127,6 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
         </button>
         <h1 className="page__title">{editing ? `Edit ${editing.name}` : 'Add to the list'}</h1>
       </header>
-
-      <StatusBanner error={error} />
 
       <form className="item-form" onSubmit={submit} data-testid="item-form">
         {editing ? (

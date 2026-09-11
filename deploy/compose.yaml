@@ -40,7 +40,9 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
-    image: ${HOME_IMAGE:-localhost/home-server:latest}
+    # Fixed: the development stack must never pick up HOME_IMAGE from
+    # deploy/.env and tag a local build with the published image's name.
+    image: localhost/home-server:dev
     restart: unless-stopped
     depends_on:
       db:

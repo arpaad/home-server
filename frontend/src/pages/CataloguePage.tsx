@@ -22,8 +22,10 @@ import {
 } from '../api/queries'
 import type { CatalogueEntry } from '../api/types'
 import { StatusBanner } from '../components/StatusBanner'
+import { useIsOnline } from '../net/connectivity'
 
 export function CataloguePage() {
+  const online = useIsOnline()
   const catalogue = useCatalogue()
   const categories = useCategories()
   const stores = useStores()
@@ -49,13 +51,20 @@ export function CataloguePage() {
       </p>
 
       <StatusBanner error={error} />
-      <StatusBanner error={catalogue.error} onRetry={() => void catalogue.refetch()} />
+      {online && <StatusBanner error={catalogue.error} onRetry={() => void catalogue.refetch()} />}
+      {!online && (
+        <p className="offline-note" data-testid="offline-note">
+          Cannot reach the server — the catalogue can be read but not changed until it is back.
+        </p>
+      )}
 
-      <NewEntryForm
-        categories={categories.data ?? []}
-        stores={stores.data ?? []}
-        onError={setError}
-      />
+      <fieldset className="offline-guard" disabled={!online}>
+        <NewEntryForm
+          categories={categories.data ?? []}
+          stores={stores.data ?? []}
+          onError={setError}
+        />
+      </fieldset>
 
       <input
         className="catalogue-filter"
@@ -69,6 +78,7 @@ export function CataloguePage() {
         <p className="empty">Nothing in the catalogue yet — it fills itself as you add items.</p>
       )}
 
+      <fieldset className="offline-guard" disabled={!online} data-testid="catalogue-controls">
       <ul className="manage-list">
         {entries.map((entry) => (
           <EntryRow
@@ -81,6 +91,7 @@ export function CataloguePage() {
           />
         ))}
       </ul>
+      </fieldset>
     </section>
   )
 }

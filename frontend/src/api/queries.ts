@@ -15,6 +15,8 @@ import {
 } from '@tanstack/react-query'
 
 import { api } from './client'
+import { keys } from './keys'
+import { mutationKeys, type BuyVariables, type UpdateVariables } from './mutations'
 import type {
   CatalogueEntry,
   CatalogueEntryCreate,
@@ -24,19 +26,12 @@ import type {
   CategoryUpdate,
   Item,
   ItemCreate,
-  ItemUpdate,
+  ItemEditResult,
   Member,
   Store,
 } from './types'
 
-export const keys = {
-  members: ['members'] as const,
-  stores: ['stores'] as const,
-  categories: ['categories'] as const,
-  catalogue: ['catalogue'] as const,
-  items: (storeId: string | null, includeUpcoming: boolean) =>
-    ['items', storeId ?? 'all', includeUpcoming] as const,
-}
+export { keys } from './keys'
 
 export function useMembers(): UseQueryResult<Member[]> {
   return useQuery({ queryKey: keys.members, queryFn: api.listMembers })
@@ -49,10 +44,12 @@ export function useStores(): UseQueryResult<Store[]> {
 export function useItems(
   storeId: string | null,
   includeUpcoming: boolean,
+  enabled = true,
 ): UseQueryResult<Item[]> {
   return useQuery({
     queryKey: keys.items(storeId, includeUpcoming),
     queryFn: () => api.listItems({ storeId, includeUpcoming }),
+    enabled,
   })
 }
 
@@ -80,46 +77,32 @@ function useInvalidateLists() {
   }
 }
 
+// List mutations are keyed and carry no inline callbacks: their function,
+// optimistic update and error handling live in mutations.ts, registered as
+// defaults, so a mutation paused offline can be resumed after a restart.
+
 export function useCreateItem(): UseMutationResult<Item, Error, ItemCreate> {
-  const invalidate = useInvalidateLists()
-  return useMutation({ mutationFn: api.createItem, onSuccess: invalidate })
+  return useMutation({ mutationKey: mutationKeys.createItem })
 }
 
-export function useUpdateItem(): UseMutationResult<
-  Item,
-  Error,
-  { itemId: string; payload: ItemUpdate }
-> {
-  const invalidate = useInvalidateLists()
-  return useMutation({
-    mutationFn: ({ itemId, payload }) => api.updateItem(itemId, payload),
-    onSuccess: invalidate,
-  })
+export function useUpdateItem(): UseMutationResult<ItemEditResult, Error, UpdateVariables> {
+  return useMutation({ mutationKey: mutationKeys.updateItem })
 }
 
 export function useDeleteItem(): UseMutationResult<void, Error, string> {
-  const invalidate = useInvalidateLists()
-  return useMutation({ mutationFn: api.deleteItem, onSuccess: invalidate })
+  return useMutation({ mutationKey: mutationKeys.deleteItem })
 }
 
-export function useBuyItem(
-  memberId: string | null,
-): UseMutationResult<unknown, Error, string> {
-  const invalidate = useInvalidateLists()
-  return useMutation({
-    mutationFn: (itemId: string) => api.buyItem(itemId, memberId),
-    onSuccess: invalidate,
-  })
+export function useBuyItem(): UseMutationResult<unknown, Error, BuyVariables> {
+  return useMutation({ mutationKey: mutationKeys.buyItem })
 }
 
 export function useUndoPurchase(): UseMutationResult<Item, Error, string> {
-  const invalidate = useInvalidateLists()
-  return useMutation({ mutationFn: api.undoPurchase, onSuccess: invalidate })
+  return useMutation({ mutationKey: mutationKeys.undoPurchase })
 }
 
 export function useClearBought(): UseMutationResult<{ cleared: number }, Error, void> {
-  const invalidate = useInvalidateLists()
-  return useMutation({ mutationFn: () => api.clearBought(), onSuccess: invalidate })
+  return useMutation({ mutationKey: mutationKeys.clearBought })
 }
 
 export function useCreateStore(): UseMutationResult<Store, Error, string> {
