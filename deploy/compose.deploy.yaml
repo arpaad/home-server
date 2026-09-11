@@ -1,0 +1,56 @@
+# Deployment stack: pulls a prebuilt image, never builds.
+#
+# This is what runs on the Raspberry Pi, and what `make deploy-up` runs here.
+# The Pi is a small machine; building a Python and Node image on it would take
+# far longer than pulling one that CI already built for arm64.
+#
+#   make deploy-pull      # fetch the published image
+#   make deploy-up        # run it
+#
+# Copy deploy/.env.example to deploy/.env and set HOME_BIND_ADDRESS. There is
+# no authentication in this release: bind it to the LAN, never to a public
+# interface, and do not port-forward it.
+
+name: home
+
+services:
+  db:
+    image: docker.io/library/postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-home}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+      POSTGRES_DB: ${POSTGRES_DB:-home}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      # On the Pi this named volume is backed by external storage rather than
+      # the SD card, which corrupts under write-loss. See the durability
+      # decision in the change's design.
+      - home-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-home} -d ${POSTGRES_DB:-home}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  api:
+    image: ${HOME_IMAGE:-ghcr.io/arpaad/home-server:latest}
+    # Updating is a deliberate step (`make deploy-pull`), not something that
+    # happens whenever the stack restarts — a Pi coming back from a power cut
+    # should return to the version it was running, not to whatever is newest.
+    pull_policy: missing
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HOME_ENVIRONMENT: production
+      HOME_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-home}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-home}
+      HOME_HOUSEHOLD_TIMEZONE: ${HOME_HOUSEHOLD_TIMEZONE:-Europe/Budapest}
+      HOME_HOUSEHOLD_MEMBERS: ${HOME_HOUSEHOLD_MEMBERS:-["Árpád","Partner"]}
+    ports:
+      - "${HOME_BIND_ADDRESS:-127.0.0.1}:${HOME_PORT:-8080}:8080"
+
+volumes:
+  home-db:

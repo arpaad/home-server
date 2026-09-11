@@ -1,28 +1,41 @@
-# Byte-compiled / cache
+# The build context is the repository root; keep it to what the image needs.
+
+.git/
+.github/
+.claude/
+.vscode/
+openspec/
+
+# The client is built inside the image, from source. Never copy in a local
+# build or a local node_modules: they may not match this lock file, and
+# node_modules is platform-specific.
+frontend/node_modules/
+frontend/dist/
+frontend/dev-dist/
+frontend/test-results/
+frontend/playwright-report/
+
+# Python artefacts
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.swp
-
-# Virtual environments
+.venv/
 venv/
-.env/
-.poetry/
+.env
+*.env
+!deploy/.env.example
 
-# Logs
-*.log
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Test / coverage files
+# Test / coverage artefacts
 .coverage
 htmlcov/
-*.pytest_cache/
+.pytest_cache/
+.ruff_cache/
 .tox/
+*.db
 
-# Poetry lock / config (optional if exporting requirements)
-poetry.lock
-
+# Logs and OS files
+*.log
+.DS_Store
+Thumbs.db

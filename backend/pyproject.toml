@@ -1,0 +1,100 @@
+[project]
+name = "home-server"
+version = "0.1.0"
+description = "Modular H.O.M.E. automation backend"
+requires-python = "==3.14.*"
+license = {text = "MIT"}
+authors = [
+    { name = "Arpad Szabo", email = "arpad2000@gmail.com" }
+]
+
+dependencies = [
+    "alembic>=1.16.6",
+    "fastapi>=0.121.2",
+    "psycopg[binary]>=3.2.12",
+    "pydantic>=2.12.4",
+    "pydantic-settings>=2.13.0",
+    "sqlalchemy>=2.0.45",
+    "uvicorn[standard]>=0.38.0",
+]
+
+
+[tool.setuptools.packages.find]
+include = ["app"]
+
+# ---- UV CONFIG ----
+[tool.uv]
+package = true
+
+[dependency-groups]
+dev = [
+    "httpx2>=0.29.0",
+    "pre-commit>=4.4.0",
+    "pyright>=1.1.407",
+    "pytest>=9.0.1",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.6",
+    "safety>=3.7.0",
+]
+
+
+###############################################
+#                 RUFF CONFIG                 #
+###############################################
+
+[tool.ruff]
+preview = true
+target-version = "py314"
+line-length = 100
+exclude = [
+    ".vscode",
+    ".git",
+    ".github",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "migrations",
+    ".pytest_cache",
+    ".ruff_cache",
+]
+
+[tool.ruff.lint]
+select = [
+    "F",     # Pyflakes
+    "E","W", # Pycodestyle
+    "N",     # Pep8-naming
+    "I",     # isort
+    "A",     # flake8-builtins
+    "UP",    # pyupgrade
+
+    "B",     # Bugbear
+    "S",     # flake8-bandit
+    "TRY",   # tryceratops
+
+    "SIM",   # flake8-simplify
+    "RET",   # flake8-return
+    "ARG",   # flake8-unused-arguments
+    "DTZ",   # flake8-datetimez
+    "DOC",   # pydoclint
+    "RUF",   # Ruff-specific
+]
+
+ignore = [
+    "E501",   # Ruff formatter & readability handles long lines
+    "S101",   # Allow assert (useful in tests)
+    "ARG002", # FastAPI dependency injection pattern
+]
+
+[tool.pydoclint]
+style = "google"
+ignore-private = true
+ignore = [
+  "missing-module-docstring",
+  "missing-package-docstring",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

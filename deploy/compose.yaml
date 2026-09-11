@@ -1,0 +1,56 @@
+# Development stack: the API (which also serves the built client) and Postgres.
+#
+# Credentials here are fixed, not read from deploy/.env. They are throwaway
+# local-development values, and making them configurable would silently couple
+# this stack to the deployment's settings — which breaks `make test`, since
+# the test suite connects with these credentials.
+#
+# For deployment use deploy/compose.deploy.yaml, which pulls a prebuilt image
+# and takes its settings from deploy/.env.
+#
+# The published port defaults to loopback. This release has no authentication:
+# do not bind it to a public interface.
+
+name: home
+
+services:
+  db:
+    image: docker.io/library/postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      # Fixed local-development credentials; see the note at the top.
+      POSTGRES_USER: home
+      POSTGRES_PASSWORD: home
+      POSTGRES_DB: home
+      # Keep the cluster in a subdirectory so the volume root may hold a
+      # lost+found, as it does on an external ext4 disk.
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - home-db:/var/lib/postgresql/data
+    ports:
+      - "${HOME_DB_BIND_ADDRESS:-127.0.0.1}:${HOME_DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U home -d home"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: ${HOME_IMAGE:-localhost/home-server:latest}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HOME_ENVIRONMENT: development
+      HOME_DATABASE_URL: postgresql+psycopg://home:home@db:5432/home
+      HOME_HOUSEHOLD_TIMEZONE: ${HOME_HOUSEHOLD_TIMEZONE:-Europe/Budapest}
+    ports:
+      - "${HOME_BIND_ADDRESS:-127.0.0.1}:${HOME_PORT:-8080}:8080"
+
+volumes:
+  home-db:

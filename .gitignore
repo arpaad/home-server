@@ -216,3 +216,19 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ---- H.O.M.E. ----
+# The interpreter pin must travel with the repo: CI and the image both read it.
+!backend/.python-version
+
+# Local SQLite scratch databases (the project runs on Postgres)
+*.db
+*.sqlite
+*.sqlite3
+
+# Local deployment settings; deploy/.env.example is the template
+deploy/.env
+
+# Frontend workspace
+frontend/node_modules/
+frontend/dist/

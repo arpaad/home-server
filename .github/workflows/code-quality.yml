@@ -1,48 +1,115 @@
-name: CodeQuuality
+name: Code Quality
 
 on:
   push:
-    branches: 
-      - 'feature/*'
+    branches-ignore:
+      - main
   pull_request:
     branches:
       - main
     types: [opened, synchronize, reopened]
 
 jobs:
-  code-quality:
+  backend:
     runs-on: ubuntu-latest
+    # Path filters live on the steps, not the workflow: a client-only change
+    # must not run pyright, but the job still has to report a result so a
+    # required check never hangs pending.
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: home
+          POSTGRES_PASSWORD: home
+          POSTGRES_DB: home_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U home -d home_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Python 3.13
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - '.github/workflows/code-quality.yml'
 
-    # Install dependencies via uv
-    - name: Install uv
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
-    - name: Add uv to PATH
-      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - name: Install project dependencies
-      run: uv sync
-        
-    ########################
-    # Code checks
-    ########################
-    - name: Ruff - Static code analysis
-      run: uv run ruff check app
+      - name: Install uv
+        if: steps.changes.outputs.backend == 'true'
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
 
-    - name: Pyright - Type checking
-      run: uv run pyright
+      - name: Set up Python 3.14
+        if: steps.changes.outputs.backend == 'true'
+        run: uv python install
 
-    ########################
-    # Tests and coverage
-    ########################
-    - name: Run tests
-      env:
-        PYTHONPATH: ${{ github.workspace }}
-      run: uv run pytest --cov=app --cov-report=term-missing tests/
+      - name: Install dependencies
+        if: steps.changes.outputs.backend == 'true'
+        run: uv sync --locked
+
+      - name: Ruff - Formatting
+        if: steps.changes.outputs.backend == 'true'
+        run: uv run ruff format --check app tests
+
+      - name: Ruff - Static analysis
+        if: steps.changes.outputs.backend == 'true'
+        run: uv run ruff check app tests
+
+      - name: Pyright - Type checking
+        if: steps.changes.outputs.backend == 'true'
+        run: uv run pyright
+
+      - name: Tests
+        if: steps.changes.outputs.backend == 'true'
+        env:
+          HOME_TEST_DATABASE_URL: postgresql+psycopg://home:home@127.0.0.1:5432/home_test
+        run: uv run pytest --cov=app --cov-report=term-missing tests/
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+              - '.github/workflows/code-quality.yml'
+
+      - uses: actions/setup-node@v4
+        if: steps.changes.outputs.frontend == 'true'
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        if: steps.changes.outputs.frontend == 'true'
+        run: npm ci
+
+      - name: Lint
+        if: steps.changes.outputs.frontend == 'true'
+        run: npm run lint
+
+      - name: Type check and build
+        if: steps.changes.outputs.frontend == 'true'
+        run: npm run build
