@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from app.modules.shopping.domain.item import ItemOrigin, ShoppingItem
 from app.modules.shopping.domain.purchase import Purchase
 from app.modules.shopping.domain.units import DEFAULT_QUANTITY, DEFAULT_UNIT, Unit
+from app.modules.shopping.dto.category_dto import CategoryResponse
 from app.modules.shopping.dto.store_dto import StoreResponse
 
 
@@ -18,11 +19,13 @@ class ItemCreateRequest(BaseModel):
     name: str = Field(min_length=1, max_length=200, examples=["ketchup"])
     quantity: float = Field(default=DEFAULT_QUANTITY, gt=0, examples=[2.0])
     unit: Unit = Field(default=DEFAULT_UNIT, examples=["piece"])
-    store_ids: list[UUID] = Field(
-        default_factory=list[UUID],
+    store_ids: list[UUID] | None = Field(
+        default=None,
         description=(
-            "Stores the item may be bought at. Leave empty to mean anywhere, "
-            "which makes the item appear under every store's filter."
+            "Stores the item may be bought at. An explicit list — even an "
+            "empty one — is used as given; empty means anywhere. Omit it to "
+            "take the stores this item is usually bought at from the "
+            "catalogue, as a prefill."
         ),
     )
     available_from: date | None = Field(
@@ -89,6 +92,16 @@ class ItemResponse(BaseModel):
     purchase: PurchaseResponse | None = Field(
         default=None, description="The purchase, when the item has been bought."
     )
+    catalogue_entry_id: UUID | None = Field(
+        default=None, description="The catalogue entry this item is an instance of."
+    )
+    category: CategoryResponse | None = Field(
+        default=None,
+        description=(
+            "The item's category, derived from its catalogue entry. None means "
+            "uncategorised; the item still appears, in the uncategorised group."
+        ),
+    )
 
     @classmethod
     def from_domain(cls, item: ShoppingItem) -> Self:
@@ -110,5 +123,9 @@ class ItemResponse(BaseModel):
             origin=item.origin,
             purchase=(
                 PurchaseResponse.from_domain(item.purchase) if item.purchase is not None else None
+            ),
+            catalogue_entry_id=item.catalogue_entry_id,
+            category=(
+                CategoryResponse.from_domain(item.category) if item.category is not None else None
             ),
         )

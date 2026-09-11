@@ -39,11 +39,11 @@
 
 ## 6. API
 
-- [ ] 6.1 Add category endpoints — list, create, update, reorder, delete — with the delete reporting how many entries become uncategorised; verify contract tests for the ordering and for the delete report
-- [ ] 6.2 Add catalogue endpoints — list, update, rename, merge, delete — mapping the refusals to their status codes through the existing error handler table; verify contract tests for rename collision (rejected) and merge (items repointed)
-- [ ] 6.3 Add the suggestion endpoint taking a name prefix; verify a contract test covering the spec's ordering and matching scenarios
-- [ ] 6.4 Extend the item representation with its catalogue entry and derived category; verify a contract test that an item whose entry is uncategorised reports no category rather than failing
-- [ ] 6.5 Verify the layering test still passes — no module under `api/` imports a repository, and nothing new under `domain/` imports SQLAlchemy
+- [x] 6.1 Add category endpoints — list, create, update, reorder, delete — with the delete reporting how many entries become uncategorised; verify contract tests for the ordering and for the delete report
+- [x] 6.2 Add catalogue endpoints — list, update, rename, merge, delete — mapping the refusals to their status codes through the existing error handler table; verify contract tests for rename collision (rejected) and merge (items repointed)
+- [x] 6.3 Add the suggestion endpoint taking a name prefix; verify a contract test covering the spec's ordering and matching scenarios
+- [x] 6.4 Extend the item representation with its catalogue entry and derived category; verify a contract test that an item whose entry is uncategorised reports no category rather than failing
+- [x] 6.5 Verify the layering test still passes — no module under `api/` imports a repository, and nothing new under `domain/` imports SQLAlchemy
 
 ## 7. Client: routing and the read-first main screen
 

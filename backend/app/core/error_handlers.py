@@ -10,10 +10,20 @@ from fastapi.responses import JSONResponse
 
 from app.modules.household.errors import UnknownMemberError
 from app.modules.shopping.errors import (
+    CategoryNotFoundError,
+    DuplicateCategoryNameError,
+    DuplicateEntryNameError,
     DuplicateStoreNameError,
+    EmptyCategoryIconError,
+    EmptyCategoryNameError,
+    EmptyEntryNameError,
     EmptyItemNameError,
     EmptyStoreNameError,
+    EntryInUseError,
+    EntryNotFoundError,
+    InvalidCategoryColourError,
     ItemNotFoundError,
+    MergeIntoSelfError,
     NonPositiveQuantityError,
     StoreInUseError,
     StoreNotFoundError,
@@ -23,11 +33,19 @@ from app.modules.shopping.errors import (
 STATUS_BY_ERROR: dict[type[Exception], int] = {
     ItemNotFoundError: status.HTTP_404_NOT_FOUND,
     StoreNotFoundError: status.HTTP_404_NOT_FOUND,
+    CategoryNotFoundError: status.HTTP_404_NOT_FOUND,
+    EntryNotFoundError: status.HTTP_404_NOT_FOUND,
     EmptyItemNameError: status.HTTP_422_UNPROCESSABLE_CONTENT,
     EmptyStoreNameError: status.HTTP_422_UNPROCESSABLE_CONTENT,
+    EmptyCategoryNameError: status.HTTP_422_UNPROCESSABLE_CONTENT,
+    EmptyCategoryIconError: status.HTTP_422_UNPROCESSABLE_CONTENT,
+    InvalidCategoryColourError: status.HTTP_422_UNPROCESSABLE_CONTENT,
+    EmptyEntryNameError: status.HTTP_422_UNPROCESSABLE_CONTENT,
     NonPositiveQuantityError: status.HTTP_422_UNPROCESSABLE_CONTENT,
     UnknownStoresError: status.HTTP_422_UNPROCESSABLE_CONTENT,
+    MergeIntoSelfError: status.HTTP_422_UNPROCESSABLE_CONTENT,
     DuplicateStoreNameError: status.HTTP_409_CONFLICT,
+    DuplicateCategoryNameError: status.HTTP_409_CONFLICT,
     # Identified, not authenticated: a missing header is a malformed request,
     # not a failed login.
     UnknownMemberError: status.HTTP_400_BAD_REQUEST,
@@ -69,6 +87,43 @@ def _store_in_use(_: Request, exc: Exception) -> JSONResponse:
     )
 
 
+def _entry_in_use(_: Request, exc: Exception) -> JSONResponse:
+    """Answer a refused entry removal, naming the items in the way.
+
+    Args:
+        _: The request, unused.
+        exc: The raised EntryInUseError.
+
+    Returns:
+        A 409 carrying the referring items' names.
+    """
+    names = exc.item_names if isinstance(exc, EntryInUseError) else ()
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content={"detail": str(exc), "items": list(names)},
+    )
+
+
+def _rename_collision(_: Request, exc: Exception) -> JSONResponse:
+    """Answer a refused rename with the entry to merge into instead.
+
+    A member who hits this almost always wants the merge, so the response
+    carries what the client needs to offer it in one tap.
+
+    Args:
+        _: The request, unused.
+        exc: The raised DuplicateEntryNameError.
+
+    Returns:
+        A 409 carrying the colliding entry's id.
+    """
+    existing = str(exc.existing_id) if isinstance(exc, DuplicateEntryNameError) else None
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content={"detail": str(exc), "existing_id": existing},
+    )
+
+
 def register_error_handlers(app: FastAPI) -> None:
     """Install the handlers translating domain errors into responses.
 
@@ -79,3 +134,5 @@ def register_error_handlers(app: FastAPI) -> None:
         app.add_exception_handler(error, _plain(status_code))
 
     app.add_exception_handler(StoreInUseError, _store_in_use)
+    app.add_exception_handler(EntryInUseError, _entry_in_use)
+    app.add_exception_handler(DuplicateEntryNameError, _rename_collision)
