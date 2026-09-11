@@ -453,7 +453,7 @@ body {
 
 /* ---- offline ---- */
 
-.banner--offline { background: var(--warn-soft); color: inherit; font-size: 0.85rem; }
+.banner--offline { background: var(--warn-soft); color: inherit; font-size: 0.85rem; display: block; line-height: 1.4; }
 .item--pending { border-style: dashed; }
 .tag--pending { background: var(--warn-soft); color: inherit; font-style: italic; }
 .offline-note { font-size: 0.8rem; color: var(--ink-soft); font-style: italic; }
