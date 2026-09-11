@@ -110,28 +110,30 @@ class ShoppingListService:
         return self._require_item(item_id)
 
     def shopping_view(self, store_id: UUID) -> list[ShoppingItem]:
-        """Return what to put in the basket in a given store.
+        """Return what to put in the basket in a given store, then what was.
 
         Args:
             store_id: The store being shopped in.
 
         Returns:
             The outstanding, currently available items buyable at that store,
-            including those assigned to no store at all.
+            including those assigned to no store at all — followed by the
+            bought, uncleared items for that store, most recent first.
         """
-        return self._items.list_outstanding(store_id=store_id, today=self._today())
+        return self.list_items(store_id=store_id)
 
     def full_list(self, *, include_upcoming: bool = True) -> list[ShoppingItem]:
-        """Return every outstanding item, for reviewing the list at home.
+        """Return every outstanding item, then every bought one, for review at home.
 
         Args:
             include_upcoming: Include items whose availability date has not
                 yet arrived.
 
         Returns:
-            The outstanding items across every store.
+            The outstanding items across every store, followed by the bought,
+            uncleared ones.
         """
-        return self._items.list_outstanding(today=self._today(), include_upcoming=include_upcoming)
+        return self.list_items(include_upcoming=include_upcoming)
 
     def list_items(
         self,
@@ -139,21 +141,38 @@ class ShoppingListService:
         store_id: UUID | None = None,
         include_upcoming: bool = False,
     ) -> list[ShoppingItem]:
-        """Return outstanding items, optionally filtered to one store.
+        """Return outstanding items followed by bought, uncleared ones.
+
+        Two queries, deliberately: the outstanding predicate is the
+        correctness core and stays exactly as it is. Bought items come after
+        it so the client can put them in a final group without reordering.
 
         Args:
             store_id: Restrict to items buyable at this store, or None for
                 every store.
-            include_upcoming: Include items not yet available.
+            include_upcoming: Include outstanding items not yet available.
 
         Returns:
-            The matching items.
+            The outstanding items, then the bought ones.
         """
-        return self._items.list_outstanding(
+        outstanding = self._items.list_outstanding(
             store_id=store_id,
             today=self._today(),
             include_upcoming=include_upcoming,
         )
+        bought = self._items.list_bought_uncleared(store_id=store_id)
+        return [*outstanding, *bought]
+
+    def clear_bought(self) -> int:
+        """Take every bought item out of view, household-wide.
+
+        Marks them cleared; deletes nothing. A shopping trip is over when it
+        is over, so this is not scoped to the store being viewed.
+
+        Returns:
+            How many items were cleared.
+        """
+        return self._items.clear_bought()
 
     # ---- writes ----
 

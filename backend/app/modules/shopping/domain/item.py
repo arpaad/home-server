@@ -1,7 +1,7 @@
 """An item on the household's shared shopping list."""
 
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 from uuid import UUID
 
@@ -77,6 +77,9 @@ class ShoppingItem:
     # uncategorised item is still shown — in the uncategorised group.
     catalogue_entry_id: UUID | None = None
     category: Category | None = None
+    # When the household cleared this bought item away. Clearing is what
+    # happens to the item's place on the list; the purchase stays as recorded.
+    cleared_at: datetime | None = None
 
     def __post_init__(self) -> None:
         """Enforce the item invariants.
@@ -86,6 +89,16 @@ class ShoppingItem:
         """
         ensure_valid_name(self.name)
         ensure_positive_quantity(self.quantity)
+
+    @property
+    def is_cleared(self) -> bool:
+        """Whether the household has cleared this bought item away.
+
+        Returns:
+            True when a clearing time is recorded. Only a bought item can be
+            cleared; undoing a purchase un-clears it.
+        """
+        return self.cleared_at is not None
 
     @property
     def is_outstanding(self) -> bool:

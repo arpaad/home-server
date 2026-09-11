@@ -12,6 +12,7 @@ from fastapi import APIRouter, Query, Response, status
 
 from app.modules.household.providers import CurrentMember
 from app.modules.shopping.dto.item_dto import (
+    ClearBoughtResponse,
     ItemCreateRequest,
     ItemResponse,
     ItemUpdateRequest,
@@ -30,7 +31,20 @@ router = APIRouter(prefix="/api/shopping", tags=["shopping"])
 # ---- items ----
 
 
-@router.get("/items", summary="List outstanding items")
+@router.post("/items/clear-bought", summary="Take every bought item out of view")
+def clear_bought(shopping: ShoppingListServiceDep) -> ClearBoughtResponse:
+    """Clear the bought items, household-wide. Marks them; deletes nothing.
+
+    Args:
+        shopping: The shopping list service.
+
+    Returns:
+        How many were cleared.
+    """
+    return ClearBoughtResponse(cleared=shopping.clear_bought())
+
+
+@router.get("/items", summary="List outstanding items, then bought ones")
 def list_items(
     shopping: ShoppingListServiceDep,
     store_id: Annotated[
@@ -52,15 +66,18 @@ def list_items(
         ),
     ] = False,
 ) -> list[ItemResponse]:
-    """Return the outstanding items, optionally filtered to one store.
+    """Return the outstanding items, then the bought ones, for one store or all.
+
+    Outstanding items come first in category order; bought, uncleared items
+    follow, most recent first. Tell them apart by `purchase`.
 
     Args:
         shopping: The shopping list service.
         store_id: Restrict to items buyable at this store.
-        include_upcoming: Include items not yet available.
+        include_upcoming: Include outstanding items not yet available.
 
     Returns:
-        The matching items, ordered by name.
+        The matching items.
     """
     items = shopping.list_items(store_id=store_id, include_upcoming=include_upcoming)
     return [ItemResponse.from_domain(item) for item in items]

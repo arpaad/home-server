@@ -182,6 +182,12 @@ class ShoppingItemORM(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
 
+    # Set when the household clears a bought item away. Clearing happens to
+    # the item's place on the list, not to the purchase, which stays exactly
+    # as recorded. NULL means still shown (outstanding, or bought and not yet
+    # cleared).
+    cleared_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     # Nullable so the migration cannot fail on data it does not understand;
     # the backfill fills it, and a null reads as uncategorised, not as an
     # error. RESTRICT: an entry items still refer to cannot vanish except

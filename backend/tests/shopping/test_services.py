@@ -186,8 +186,11 @@ class TestBuying:
 
         shopping.mark_bought(item.id, member_id)
 
-        assert shopping.shopping_view(lidl.id) == []
-        assert shopping.shopping_view(spar.id) == []
+        # Gone from the outstanding items in both views, shown as bought in both.
+        for store in (lidl, spar):
+            view = shopping.shopping_view(store.id)
+            assert [i.name for i in view if i.is_outstanding] == []
+            assert [i.name for i in view if not i.is_outstanding] == ["ketchup"]
 
 
 class TestStores:

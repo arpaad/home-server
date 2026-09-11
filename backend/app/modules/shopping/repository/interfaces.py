@@ -202,6 +202,8 @@ class ShoppingItemRepository(Protocol):
     def remove_purchase(self, item_id: UUID) -> None:
         """Undo a purchase, returning the item to the outstanding list.
 
+        Also un-clears the item, so "no purchase but cleared" can never exist.
+
         Args:
             item_id: The item whose purchase should be removed.
         """
@@ -218,6 +220,32 @@ class ShoppingItemRepository(Protocol):
 
         Args:
             store_id: The store being deleted.
+        """
+        ...
+
+    def list_bought_uncleared(self, *, store_id: UUID | None = None) -> list[ShoppingItem]:
+        """Return bought items the household has not yet cleared away.
+
+        Filtered by store on the same terms as the outstanding list — an item
+        with no store belongs to every store — but not by availability: that
+        is about whether to buy something, and these already were.
+
+        Args:
+            store_id: Restrict to items buyable at this store, or None for all.
+
+        Returns:
+            The bought, uncleared items, most recently bought first.
+        """
+        ...
+
+    def clear_bought(self) -> int:
+        """Mark every bought, uncleared item as cleared.
+
+        Marks, never deletes: the purchase rows are what a later history
+        attaches to. Idempotent — a second call clears nothing.
+
+        Returns:
+            How many items were cleared.
         """
         ...
 

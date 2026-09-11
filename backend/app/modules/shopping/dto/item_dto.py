@@ -96,6 +96,12 @@ class PurchaseResponse(BaseModel):
         return cls(member_id=purchase.member_id, bought_at=purchase.bought_at)
 
 
+class ClearBoughtResponse(BaseModel):
+    """What clearing the bought items did."""
+
+    cleared: int = Field(description="How many bought items were taken out of view.")
+
+
 class ItemResponse(BaseModel):
     """An item as returned to a client."""
 
@@ -110,6 +116,14 @@ class ItemResponse(BaseModel):
     origin: ItemOrigin = Field(description="How the item came to be on the list.")
     purchase: PurchaseResponse | None = Field(
         default=None, description="The purchase, when the item has been bought."
+    )
+    cleared_at: datetime | None = Field(
+        default=None,
+        description=(
+            "When the household cleared this bought item away. A listed item "
+            "is never cleared; this is null for outstanding and for bought-but-"
+            "still-shown items alike."
+        ),
     )
     catalogue_entry_id: UUID | None = Field(
         default=None, description="The catalogue entry this item is an instance of."
@@ -143,6 +157,7 @@ class ItemResponse(BaseModel):
             purchase=(
                 PurchaseResponse.from_domain(item.purchase) if item.purchase is not None else None
             ),
+            cleared_at=item.cleared_at,
             catalogue_entry_id=item.catalogue_entry_id,
             category=(
                 CategoryResponse.from_domain(item.category) if item.category is not None else None

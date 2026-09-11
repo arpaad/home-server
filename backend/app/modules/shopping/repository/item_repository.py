@@ -10,7 +10,7 @@ from collections.abc import Iterable
 from datetime import date
 from uuid import UUID
 
-from sqlalchemy import ColumnElement, Select, and_, delete, exists, or_, select
+from sqlalchemy import ColumnElement, Select, and_, delete, exists, or_, select, update
 from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.core.clock import now_utc
@@ -171,6 +171,48 @@ class SqlAlchemyShoppingItemRepository:
             )
         )
         return [to_item(row) for row in self._session.scalars(statement).unique().all()]
+
+    def list_bought_uncleared(self, *, store_id: UUID | None = None) -> list[ShoppingItem]:
+        """Return bought items the household has not yet cleared away.
+
+        A separate query, not a widening of the outstanding one: that
+        predicate is the correctness core and its tests assert exactly which
+        items appear. This one reuses the store rule and nothing else.
+
+        Args:
+            store_id: Restrict to items buyable at this store, or None for all.
+
+        Returns:
+            The bought, uncleared items, most recently bought first.
+        """
+        statement = (
+            select(ShoppingItemORM)
+            .join(ShoppingItemPurchaseORM, ShoppingItemPurchaseORM.item_id == ShoppingItemORM.id)
+            .where(ShoppingItemORM.cleared_at.is_(None))
+        )
+        if store_id is not None:
+            statement = statement.where(_belongs_to_store(store_id))
+        statement = self._with_relations(statement).order_by(
+            ShoppingItemPurchaseORM.bought_at.desc(), ShoppingItemORM.name
+        )
+        return [to_item(row) for row in self._session.scalars(statement).unique().all()]
+
+    def clear_bought(self) -> int:
+        """Mark every bought, uncleared item as cleared.
+
+        Returns:
+            How many items were cleared.
+        """
+        bought = select(ShoppingItemPurchaseORM.item_id)
+        result = self._session.execute(
+            update(ShoppingItemORM)
+            .where(ShoppingItemORM.id.in_(bought))
+            .where(ShoppingItemORM.cleared_at.is_(None))
+            .values(cleared_at=now_utc())
+        )
+        self._session.flush()
+        self._session.expire_all()
+        return int(getattr(result, "rowcount", 0))
 
     def outstanding_names_referencing(self, store_id: UUID) -> tuple[str, ...]:
         """Return the names of outstanding items assigned to a store.
@@ -391,4 +433,8 @@ class SqlAlchemyShoppingItemRepository:
         ).one_or_none()
         if existing is not None:
             self._session.delete(existing)
-            self._session.flush()
+        # Un-clear as well: an outstanding item is never a cleared one.
+        row = self._session.get(ShoppingItemORM, item_id)
+        if row is not None:
+            row.cleared_at = None
+        self._session.flush()

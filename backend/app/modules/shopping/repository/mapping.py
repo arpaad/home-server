@@ -75,6 +75,7 @@ def to_item(row: ShoppingItemORM) -> ShoppingItem:
         purchase=purchase,
         catalogue_entry_id=row.catalogue_entry_id,
         category=category,
+        cleared_at=row.cleared_at,
     )
 
 

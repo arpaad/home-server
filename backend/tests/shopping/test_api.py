@@ -179,8 +179,13 @@ class TestBuying:
 
         assert response.status_code == 200
         assert response.json()["member_id"] == str(member_id)
-        assert names_in(client, store_id=lidl) == []
-        assert names_in(client, store_id=spar) == []
+        # Still listed in both views, but as bought — never as outstanding.
+        for store in (lidl, spar):
+            listed: list[dict[str, Any]] = client.get(
+                "/api/shopping/items", params={"store_id": store}
+            ).json()
+            assert [i["name"] for i in listed if i["purchase"] is None] == []
+            assert [i["name"] for i in listed if i["purchase"] is not None] == ["ketchup"]
 
     def test_buying_twice_records_one_purchase(
         self, client: TestClient, member_id: UUID, session: Session
