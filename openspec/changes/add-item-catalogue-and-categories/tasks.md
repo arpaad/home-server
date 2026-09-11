@@ -67,4 +67,4 @@
 - [ ] 9.1 Rehearse the migration against a dump of the live household database, take a fresh dump first, then apply it; verify the item count, every item's stores, and every recorded purchase are identical before and after
 - [ ] 9.2 Walk through every scenario in this change's three spec files against the deployed stack on a phone; verify each behaves as specified and record any that do not
 - [ ] 9.3 Confirm the shopping flow is faster for a repeat item than before the change, by adding the same five items twice — once cold, once from suggestions — and comparing the number of taps
-- [ ] 9.4 Update `README.md` and `AGENTS.md` for categories, the catalogue and the new screens, adding the catalogue-and-category rules to the list of invariants the codebase protects; verify the documented flows match what the app does
+- [x] 9.4 Update `README.md` and `AGENTS.md` for categories, the catalogue and the new screens, adding the catalogue-and-category rules to the list of invariants the codebase protects; verify the documented flows match what the app does

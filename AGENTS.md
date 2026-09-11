@@ -22,10 +22,10 @@ is information; a falsely ticked one is a lie the next session will believe.
 
 - **Backend**: Python 3.14, FastAPI, SQLAlchemy 2.0, Alembic, PostgreSQL.
   Managed with uv; the interpreter is pinned in `backend/.python-version`.
-- **Frontend**: React 19 and TypeScript on Vite, TanStack Query, a PWA
-  service worker. Plain SPA — deliberately not Next.js, because the API
-  serves the built files from its own origin and there is no server slot for
-  a Node framework.
+- **Frontend**: React 19 and TypeScript on Vite, TanStack Query, React
+  Router (four routes, no nesting), a PWA service worker. Plain SPA —
+  deliberately not Next.js, because the API serves the built files from its
+  own origin and there is no server slot for a Node framework.
 - **Toolchain**: mise pins node and uv (`mise.toml`).
 
 ## Layering, and the test that enforces it
@@ -79,6 +79,20 @@ Treat these as invariants, not preferences. Each one has tests.
    appear everywhere — the exact bug being fixed.
 6. **A failed request is never shown as saved**, and cached list data is
    never presented as current.
+7. **An item's category is its catalogue entry's, never its own.** Items
+   have no `category_id`; they derive it through `catalogue_entry_id`.
+   Correcting a category on the entry regroups every item, including ones
+   already on the list. That is the whole point of "fix it once".
+8. **The catalogue fills itself.** Every add finds or creates an entry by
+   case-insensitive name, in the same transaction. A member never creates an
+   entry by hand, and adding is never blocked by the catalogue.
+9. **Suggestions are a prefix match, not fuzzy.** `mlik` must not silently
+   match `milk`: the duplicate is what merge exists to surface. Remembered
+   stores are a prefill the form always sends explicitly; the chips are the
+   truth, never the catalogue.
+10. **An item with no category is still shown**, in a final Uncategorised
+    group. Grouping changes arrangement, never membership. The failure mode
+    is silent, so it has its own end-to-end test.
 
 ## Security posture
 

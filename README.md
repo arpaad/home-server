@@ -20,6 +20,13 @@ caused the same item to be bought twice.
 Items can also carry a date they become worth buying, so "it's on sale next
 week" stops being something anyone has to remember.
 
+The list remembers what you buy. Typing a few letters offers what was bought
+before, and choosing it brings the category and the usual stores along. The
+list is grouped by category — produce, bakery, dairy and so on, in an order
+you set — so a shop is walked once, not criss-crossed. A name typed in a
+hurry lands under *Uncategorised* and gets its category later, once, on the
+catalogue page; every future add of it carries that category.
+
 Planned modules — recipes, tasks, calendar, finance — are not built. The data
 model is shaped so they can attach later without a migration that loses
 history.
@@ -52,8 +59,8 @@ make db-reset                    # Postgres from nothing: migrate + seed
 make up                          # the whole stack on http://127.0.0.1:8080
 ```
 
-`make up` builds an image that serves the API *and* the built client on one
-port. For working on the client, run the two separately:
+`make up` rebuilds the image from source and serves the API *and* the built
+client on one port. For working on the client, run the two separately:
 
 ```bash
 make db-up && make run           # API on :8080
@@ -66,6 +73,18 @@ Set the household's members before first use — the seed defaults to
 ```bash
 export HOME_HOUSEHOLD_MEMBERS='["Árpád","<the other name>"]'
 ```
+
+## Screens
+
+| Route        | For                                                        |
+| ------------ | ---------------------------------------------------------- |
+| `/`          | The list, filtered by store. Taking things off. The `+` adds. |
+| `/add`       | Adding an item, with suggestions from the catalogue        |
+| `/catalogue` | Everything ever added; fix a category or usual stores once |
+| `/manage`    | Stores and categories, including the category order        |
+
+The main screen deliberately has no entry form. In a shop the common action
+is removing, and a form under tap-target rows is a mis-tap surface.
 
 ## Database and migrations
 
