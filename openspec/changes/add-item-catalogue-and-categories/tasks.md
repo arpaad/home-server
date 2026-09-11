@@ -6,28 +6,28 @@
 
 - [x] 2.1 Define the `CategoryORM` model — name unique case-insensitively, icon, colour, and a position for ordering; verify pyright passes and Alembic autogenerate produces a revision matching it
 - [x] 2.2 Define the `CatalogueEntryORM` model — name unique case-insensitively, nullable `category_id`, `last_used_at` — plus `catalogue_entry_stores` joining entries to stores; verify autogenerate matches the models
-- [ ] 2.3 Add the nullable `shopping_items.catalogue_entry_id` foreign key, with `ON DELETE RESTRICT` so an entry in use cannot vanish; verify a test that deleting a referenced entry is refused by the database
-- [ ] 2.4 Add an index on `lower(catalogue_entries.name)` supporting both the uniqueness rule and the prefix search; verify the suggestion query uses it via `EXPLAIN`
+- [x] 2.3 Add the nullable `shopping_items.catalogue_entry_id` foreign key, with `ON DELETE RESTRICT` so an entry in use cannot vanish; verify a test that deleting a referenced entry is refused by the database
+- [x] 2.4 Add an index on `lower(catalogue_entries.name)` supporting both the uniqueness rule and the prefix search; verify the suggestion query uses it via `EXPLAIN`
 - [x] 2.5 Write the migration including the backfill — one entry per distinct case-insensitive existing item name, every existing item linked to its entry, `last_used_at` from the newest item that used it; verify on a copy of the real database that every item ends up linked and no item's name, stores, dates or purchases changed
 - [x] 2.6 Verify the migration reverses: `alembic downgrade` drops the new tables and column and leaves `shopping_items` byte-identical to its pre-upgrade state on the same copy
 - [x] 2.7 Seed the default categories (produce, dairy, bakery, meat, frozen, household, drinks, other) with icons, colours and positions, idempotently like the member seed; verify running the seed twice leaves exactly one of each
 
 ## 3. Categories: domain, repository, service
 
-- [ ] 3.1 Define the ORM-free `Category` domain type with its invariants — non-empty name, an icon, a colour; verify unit tests cover each rejection
-- [ ] 3.2 Implement the category repository behind a `Protocol`, including case-insensitive name uniqueness; verify a test that adding "bakery" when "Bakery" exists is rejected and leaves one category
-- [ ] 3.3 Implement listing categories in configured order and reordering them; verify a test that reordering changes the sequence returned and persists
-- [ ] 3.4 Implement category removal that leaves referring catalogue entries uncategorised and reports how many were affected; verify a test that the count is right, the entries become uncategorised, and no item disappears from any list
+- [x] 3.1 Define the ORM-free `Category` domain type with its invariants — non-empty name, an icon, a colour; verify unit tests cover each rejection
+- [x] 3.2 Implement the category repository behind a `Protocol`, including case-insensitive name uniqueness; verify a test that adding "bakery" when "Bakery" exists is rejected and leaves one category
+- [x] 3.3 Implement listing categories in configured order and reordering them; verify a test that reordering changes the sequence returned and persists
+- [x] 3.4 Implement category removal that leaves referring catalogue entries uncategorised and reports how many were affected; verify a test that the count is right, the entries become uncategorised, and no item disappears from any list
 
 ## 4. Catalogue: domain, repository, service
 
-- [ ] 4.1 Define the ORM-free `CatalogueEntry` domain type; verify pyright passes and a unit test constructs one with and without a category
-- [ ] 4.2 Implement find-or-create by case-insensitive name, updating `last_used_at`; verify tests that a new name creates exactly one entry and that "Sourdough" reuses the entry for "sourdough" without creating a second
-- [ ] 4.3 Implement the prefix suggestion query, ordered by `last_used_at` descending; verify tests for the spec's scenarios — "mil" offers "milk" and "mild cheddar" but not "bread", and the more recently used comes first
-- [ ] 4.4 Implement setting an entry's category and its remembered stores, rejecting unknown stores as the item service already does; verify tests for both the update and the unknown-store rejection
-- [ ] 4.5 Implement rename, refusing a name that collides with an existing entry; verify tests for the successful rename and for the refusal leaving both entries unchanged
-- [ ] 4.6 Implement merge in one transaction — repoint every referring item, then delete the losing entry; verify tests that only the survivor remains, that every previously-referring item now points at it, and that a failure mid-way leaves neither entry changed
-- [ ] 4.7 Implement removal that refuses while items refer to the entry and names them; verify tests for the refusal and for the successful removal of an unreferenced entry
+- [x] 4.1 Define the ORM-free `CatalogueEntry` domain type; verify pyright passes and a unit test constructs one with and without a category
+- [x] 4.2 Implement find-or-create by case-insensitive name, updating `last_used_at`; verify tests that a new name creates exactly one entry and that "Sourdough" reuses the entry for "sourdough" without creating a second
+- [x] 4.3 Implement the prefix suggestion query, ordered by `last_used_at` descending; verify tests for the spec's scenarios — "mil" offers "milk" and "mild cheddar" but not "bread", and the more recently used comes first
+- [x] 4.4 Implement setting an entry's category and its remembered stores, rejecting unknown stores as the item service already does; verify tests for both the update and the unknown-store rejection
+- [x] 4.5 Implement rename, refusing a name that collides with an existing entry; verify tests for the successful rename and for the refusal leaving both entries unchanged
+- [x] 4.6 Implement merge in one transaction — repoint every referring item, then delete the losing entry; verify tests that only the survivor remains, that every previously-referring item now points at it, and that a failure mid-way leaves neither entry changed
+- [x] 4.7 Implement removal that refuses while items refer to the entry and names them; verify tests for the refusal and for the successful removal of an unreferenced entry
 
 ## 5. Shopping list integration
 

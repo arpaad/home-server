@@ -4,11 +4,13 @@ These are `Protocol`s so the service layer depends on behaviour rather than on
 SQLAlchemy, and so a fake can satisfy them without inheriting anything.
 """
 
-from collections.abc import Iterable
-from datetime import date
+from collections.abc import Iterable, Sequence
+from datetime import date, datetime
 from typing import Protocol
 from uuid import UUID
 
+from app.modules.shopping.domain.catalogue import CatalogueEntry
+from app.modules.shopping.domain.category import Category
 from app.modules.shopping.domain.item import ItemOrigin, ShoppingItem
 from app.modules.shopping.domain.purchase import Purchase
 from app.modules.shopping.domain.store import Store
@@ -227,5 +229,229 @@ class ShoppingItemRepository(Protocol):
 
         Returns:
             The referencing items' names, ordered, empty when none.
+        """
+        ...
+
+
+class CategoryRepository(Protocol):
+    """Persistence for the household's category registry."""
+
+    def list_all(self) -> list[Category]:
+        """Return every category in configured order.
+
+        Returns:
+            The categories, ordered by position then name.
+        """
+        ...
+
+    def get(self, category_id: UUID) -> Category | None:
+        """Return one category.
+
+        Args:
+            category_id: The category to look up.
+
+        Returns:
+            The category, or None when no category has that id.
+        """
+        ...
+
+    def find_by_name(self, name: str) -> Category | None:
+        """Return the category with this name, compared case-insensitively.
+
+        Args:
+            name: The name to look for.
+
+        Returns:
+            The matching category, or None.
+        """
+        ...
+
+    def add(self, *, name: str, icon: str, colour: str, position: int) -> Category:
+        """Add a category.
+
+        Args:
+            name: The category's name.
+            icon: Its emoji icon.
+            colour: Its colour as #rrggbb.
+            position: Its place in the household-wide order.
+
+        Returns:
+            The created category.
+        """
+        ...
+
+    def update(
+        self,
+        category_id: UUID,
+        *,
+        name: str | None = None,
+        icon: str | None = None,
+        colour: str | None = None,
+    ) -> Category:
+        """Change a category's appearance, leaving unsupplied fields untouched.
+
+        Args:
+            category_id: The category to change.
+            name: A new name, or None to leave it.
+            icon: A new icon, or None to leave it.
+            colour: A new colour, or None to leave it.
+
+        Returns:
+            The updated category.
+        """
+        ...
+
+    def reorder(self, ordered_ids: Sequence[UUID]) -> list[Category]:
+        """Set the household-wide order to the given sequence.
+
+        Args:
+            ordered_ids: Every category id, in the desired order.
+
+        Returns:
+            The categories in their new order.
+        """
+        ...
+
+    def count_entries_referencing(self, category_id: UUID) -> int:
+        """Return how many catalogue entries carry this category.
+
+        Args:
+            category_id: The category being removed.
+
+        Returns:
+            The number of entries that would become uncategorised.
+        """
+        ...
+
+    def delete(self, category_id: UUID) -> None:
+        """Remove a category; referring entries become uncategorised.
+
+        Args:
+            category_id: The category to remove.
+        """
+        ...
+
+
+class CatalogueRepository(Protocol):
+    """Persistence for the household's catalogue of what it buys."""
+
+    def get(self, entry_id: UUID) -> CatalogueEntry | None:
+        """Return one entry with its category and remembered stores.
+
+        Args:
+            entry_id: The entry to look up.
+
+        Returns:
+            The entry, or None when no entry has that id.
+        """
+        ...
+
+    def list_all(self) -> list[CatalogueEntry]:
+        """Return every entry, ordered by name.
+
+        Returns:
+            The catalogue.
+        """
+        ...
+
+    def find_by_name(self, name: str) -> CatalogueEntry | None:
+        """Return the entry with this name, compared case-insensitively.
+
+        Args:
+            name: The name to look for.
+
+        Returns:
+            The matching entry, or None.
+        """
+        ...
+
+    def find_or_create(self, name: str, *, used_at: datetime) -> CatalogueEntry:
+        """Return the entry for a name, creating it when none matches.
+
+        Either way, the entry's ``last_used_at`` is moved to ``used_at``.
+
+        Args:
+            name: The item name, compared case-insensitively.
+            used_at: When the name was used, for ordering suggestions.
+
+        Returns:
+            The matching or newly created entry.
+        """
+        ...
+
+    def suggest(self, prefix: str, *, limit: int) -> list[CatalogueEntry]:
+        """Return entries whose name starts with the prefix, most recent first.
+
+        Args:
+            prefix: The start of a name, compared case-insensitively.
+            limit: The most entries to return.
+
+        Returns:
+            Matching entries, most recently used first.
+        """
+        ...
+
+    def update(
+        self,
+        entry_id: UUID,
+        *,
+        category_id: UUID | None = None,
+        clear_category: bool = False,
+        store_ids: Iterable[UUID] | None = None,
+    ) -> CatalogueEntry:
+        """Change an entry's category or remembered stores.
+
+        Args:
+            entry_id: The entry to change.
+            category_id: A new category, or None to leave it.
+            clear_category: Make the entry uncategorised. Takes precedence.
+            store_ids: The complete new set of remembered stores, or None to
+                leave them.
+
+        Returns:
+            The updated entry.
+        """
+        ...
+
+    def rename(self, entry_id: UUID, name: str) -> CatalogueEntry:
+        """Change an entry's name.
+
+        Args:
+            entry_id: The entry to rename.
+            name: The new name.
+
+        Returns:
+            The renamed entry.
+        """
+        ...
+
+    def merge(self, *, source_id: UUID, target_id: UUID) -> CatalogueEntry:
+        """Move every item from the source entry to the target, then delete the source.
+
+        Args:
+            source_id: The entry being merged away.
+            target_id: The entry that survives.
+
+        Returns:
+            The surviving entry.
+        """
+        ...
+
+    def item_names_referencing(self, entry_id: UUID) -> tuple[str, ...]:
+        """Return the names of items referring to an entry.
+
+        Args:
+            entry_id: The entry.
+
+        Returns:
+            The referring items' names, ordered, empty when none.
+        """
+        ...
+
+    def delete(self, entry_id: UUID) -> None:
+        """Remove an entry that nothing refers to.
+
+        Args:
+            entry_id: The entry to remove.
         """
         ...

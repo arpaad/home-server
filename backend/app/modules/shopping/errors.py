@@ -118,3 +118,131 @@ class StoreInUseError(ShoppingError):
         super().__init__(f"store {store_id} is still referenced by outstanding items: {listed}")
         self.store_id = store_id
         self.item_names = item_names
+
+
+# ---- categories ----
+
+
+class EmptyCategoryNameError(ShoppingError):
+    """A category was given a name that is empty or only whitespace."""
+
+    def __init__(self) -> None:
+        """State the rule that was broken."""
+        super().__init__("a category name must contain at least one non-whitespace character")
+
+
+class EmptyCategoryIconError(ShoppingError):
+    """A category was given no icon."""
+
+    def __init__(self) -> None:
+        """State the rule that was broken."""
+        super().__init__("a category must have an icon")
+
+
+class InvalidCategoryColourError(ShoppingError):
+    """A category colour was not a six-digit hex colour like #4c9a2a."""
+
+    def __init__(self, colour: str) -> None:
+        """Record the rejected colour.
+
+        Args:
+            colour: The value that was not a hex colour.
+        """
+        super().__init__(f"a category colour must look like #rrggbb, got {colour!r}")
+        self.colour = colour
+
+
+class DuplicateCategoryNameError(ShoppingError):
+    """A category with this name already exists, compared case-insensitively."""
+
+    def __init__(self, name: str) -> None:
+        """Record the name that collided.
+
+        Args:
+            name: The category name that already exists.
+        """
+        super().__init__(f"a category named {name!r} already exists")
+        self.name = name
+
+
+class CategoryNotFoundError(ShoppingError):
+    """The referenced category is not in the registry."""
+
+    def __init__(self, category_id: UUID) -> None:
+        """Record which category could not be found.
+
+        Args:
+            category_id: The identifier that matched no category.
+        """
+        super().__init__(f"no category with id {category_id}")
+        self.category_id = category_id
+
+
+# ---- catalogue ----
+
+
+class EmptyEntryNameError(ShoppingError):
+    """A catalogue entry was given a name that is empty or only whitespace."""
+
+    def __init__(self) -> None:
+        """State the rule that was broken."""
+        super().__init__(
+            "a catalogue entry name must contain at least one non-whitespace character"
+        )
+
+
+class EntryNotFoundError(ShoppingError):
+    """The referenced catalogue entry does not exist."""
+
+    def __init__(self, entry_id: UUID) -> None:
+        """Record which entry could not be found.
+
+        Args:
+            entry_id: The identifier that matched no entry.
+        """
+        super().__init__(f"no catalogue entry with id {entry_id}")
+        self.entry_id = entry_id
+
+
+class DuplicateEntryNameError(ShoppingError):
+    """Renaming would collide with an existing entry; merging is the way to unify them."""
+
+    def __init__(self, name: str, existing_id: UUID) -> None:
+        """Record the collision and which entry it collides with.
+
+        Args:
+            name: The name that already exists.
+            existing_id: The entry that already carries it, offered for merging.
+        """
+        super().__init__(f"a catalogue entry named {name!r} already exists; merge into it instead")
+        self.name = name
+        self.existing_id = existing_id
+
+
+class EntryInUseError(ShoppingError):
+    """A catalogue entry cannot be removed while items still refer to it."""
+
+    def __init__(self, entry_id: UUID, item_names: tuple[str, ...]) -> None:
+        """Record the entry and the items that keep it in use.
+
+        Args:
+            entry_id: The entry that cannot be removed.
+            item_names: Names of the items referring to it.
+        """
+        listed = ", ".join(item_names)
+        super().__init__(f"catalogue entry {entry_id} is still referenced by items: {listed}")
+        self.entry_id = entry_id
+        self.item_names = item_names
+
+
+class MergeIntoSelfError(ShoppingError):
+    """An entry cannot be merged into itself."""
+
+    def __init__(self, entry_id: UUID) -> None:
+        """Record the entry.
+
+        Args:
+            entry_id: The entry named as both source and target.
+        """
+        super().__init__(f"catalogue entry {entry_id} cannot be merged into itself")
+        self.entry_id = entry_id
