@@ -77,6 +77,34 @@ Every added item SHALL be linked to a catalogue entry matching its name, creatin
 - **AND** no item is created
 - **AND** no catalogue entry is created
 
+#### Scenario: Choosing a category while adding
+
+- **WHEN** a member adds "ketchup" and chooses the category Household
+- **THEN** the catalogue entry for "ketchup" is categorised as Household
+- **AND** the new item, and every other item named "ketchup" on the list, appears under Household
+
+### Requirement: Editing an item
+
+The system SHALL allow a member to change an outstanding item's name, quantity, unit, assigned stores and availability date. Changes SHALL apply to the single shared item and SHALL therefore be visible to every member.
+
+A member MAY also choose a category while editing. Because an item's category is its catalogue entry's, that choice SHALL be recorded on the entry and SHALL therefore apply to every item of that name; the system SHALL make this visible at the point of choosing, so a member is not surprised by other items moving.
+
+#### Scenario: Correcting which stores an item belongs to
+
+- **WHEN** a member changes an item's stores from "Lidl" to "Lidl" and "Spar"
+- **THEN** the item subsequently appears in the shopping views for both stores
+
+#### Scenario: An edit is visible to the other member
+
+- **WHEN** one member changes an item's quantity
+- **THEN** the other member sees the updated quantity on the same item
+
+#### Scenario: Choosing a category while editing applies to the entry
+
+- **WHEN** a member edits one "milk" item and chooses the category Dairy
+- **THEN** the catalogue entry for "milk" is categorised as Dairy
+- **AND** every "milk" item on the list appears under Dairy
+
 ### Requirement: Store-filtered shopping view
 
 Given a selected store, the system SHALL present exactly those items that are still outstanding, that are available on the current date, and that either have no store assigned or include the selected store.

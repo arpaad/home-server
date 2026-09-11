@@ -166,6 +166,8 @@ class ShoppingListService:
         store_ids: Iterable[UUID] | None = None,
         available_from: date | None = None,
         origin: ItemOrigin = "manual",
+        category_id: UUID | None = None,
+        clear_category: bool = False,
     ) -> ShoppingItem:
         """Put an item on the shared list, remembering its name in the catalogue.
 
@@ -183,6 +185,10 @@ class ShoppingListService:
                 as a prefill; the item owns its copy from then on.
             available_from: When it becomes worth buying, or None for now.
             origin: How it came to be on the list.
+            category_id: A category to record on the item's catalogue entry.
+                The item has no category of its own, so this applies to
+                every item of that name. None leaves the entry as it is.
+            clear_category: Make the entry uncategorised. Takes precedence.
 
         Returns:
             The created item.
@@ -194,6 +200,10 @@ class ShoppingListService:
         explicit = list(store_ids) if store_ids is not None else None
 
         entry = self._catalogue.remember(cleaned)
+        if clear_category:
+            entry = self._catalogue.set_category(entry.id, None)
+        elif category_id is not None:
+            entry = self._catalogue.set_category(entry.id, category_id)
         chosen = explicit if explicit is not None else [store.id for store in entry.stores]
 
         return self._items.add(
@@ -216,6 +226,8 @@ class ShoppingListService:
         store_ids: Iterable[UUID] | None = None,
         available_from: date | None = None,
         clear_available_from: bool = False,
+        category_id: UUID | None = None,
+        clear_category: bool = False,
     ) -> ShoppingItem:
         """Change an item, leaving unsupplied fields untouched.
 
@@ -227,11 +239,20 @@ class ShoppingListService:
             store_ids: The complete new set of stores, or None to leave them.
             available_from: A new availability date, or None to leave it.
             clear_available_from: Remove the availability date entirely.
+            category_id: A category to record on the item's catalogue entry,
+                and so on every item of that name. None leaves it.
+            clear_category: Make the entry uncategorised. Takes precedence.
 
         Returns:
             The updated item.
         """
-        self._require_item(item_id)
+        item = self._require_item(item_id)
+
+        if item.catalogue_entry_id is not None:
+            if clear_category:
+                self._catalogue.set_category(item.catalogue_entry_id, None)
+            elif category_id is not None:
+                self._catalogue.set_category(item.catalogue_entry_id, category_id)
 
         return self._items.update(
             item_id,

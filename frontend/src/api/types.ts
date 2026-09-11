@@ -86,6 +86,9 @@ export interface ItemCreate {
    */
   store_ids: string[]
   available_from?: string | null
+  /** Recorded on the catalogue entry, so it applies to every item of this name. */
+  category_id?: string
+  clear_category?: boolean
 }
 
 export interface ItemUpdate {
@@ -95,4 +98,12 @@ export interface ItemUpdate {
   store_ids?: string[]
   available_from?: string | null
   clear_available_from?: boolean
+  category_id?: string
+  clear_category?: boolean
+}
+
+export interface CatalogueEntryCreate {
+  name: string
+  category_id?: string | null
+  store_ids: string[]
 }

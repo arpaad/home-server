@@ -6,6 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, Query, Response, status
 
 from app.modules.shopping.dto.catalogue_dto import (
+    CatalogueEntryCreateRequest,
     CatalogueEntryMergeRequest,
     CatalogueEntryRenameRequest,
     CatalogueEntryResponse,
@@ -29,6 +30,35 @@ def list_entries(catalogue: CatalogueServiceDep) -> list[CatalogueEntryResponse]
         The catalogue.
     """
     return [CatalogueEntryResponse.from_domain(e) for e in catalogue.list_entries()]
+
+
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    summary="Add an entry directly, without adding an item",
+    responses={
+        status.HTTP_409_CONFLICT: {
+            "model": RenameCollisionResponse,
+            "description": "An entry with that name exists; it is identified.",
+        }
+    },
+)
+def create_entry(
+    payload: CatalogueEntryCreateRequest, catalogue: CatalogueServiceDep
+) -> CatalogueEntryResponse:
+    """Add an entry with a category and stores, ahead of needing it.
+
+    Args:
+        payload: The entry to create.
+        catalogue: The catalogue service.
+
+    Returns:
+        The created entry.
+    """
+    created = catalogue.create(
+        name=payload.name, category_id=payload.category_id, store_ids=payload.store_ids
+    )
+    return CatalogueEntryResponse.from_domain(created)
 
 
 @router.get("/suggest", summary="Offer entries matching what is being typed")

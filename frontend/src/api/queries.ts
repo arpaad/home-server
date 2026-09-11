@@ -17,6 +17,7 @@ import {
 import { api } from './client'
 import type {
   CatalogueEntry,
+  CatalogueEntryCreate,
   CatalogueEntryUpdate,
   Category,
   CategoryCreate,
@@ -160,6 +161,11 @@ export function useDeleteCategory(): UseMutationResult<
 }
 
 // ---- catalogue ----
+
+export function useCreateEntry(): UseMutationResult<CatalogueEntry, Error, CatalogueEntryCreate> {
+  const invalidate = useInvalidateLists()
+  return useMutation({ mutationFn: api.createEntry, onSuccess: invalidate })
+}
 
 export function useUpdateEntry(): UseMutationResult<
   CatalogueEntry,

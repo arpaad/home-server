@@ -101,6 +101,8 @@ def create_item(payload: ItemCreateRequest, shopping: ShoppingListServiceDep) ->
         unit=payload.unit,
         store_ids=payload.store_ids,
         available_from=payload.available_from,
+        category_id=payload.category_id,
+        clear_category=payload.clear_category,
     )
     return ItemResponse.from_domain(item)
 
@@ -127,6 +129,8 @@ def update_item(
         store_ids=payload.store_ids,
         available_from=payload.available_from,
         clear_available_from=payload.clear_available_from,
+        category_id=payload.category_id,
+        clear_category=payload.clear_category,
     )
     return ItemResponse.from_domain(item)
 

@@ -13,6 +13,7 @@ import { ApiError } from '../api/client'
 import {
   useCatalogue,
   useCategories,
+  useCreateEntry,
   useDeleteEntry,
   useMergeEntry,
   useRenameEntry,
@@ -50,6 +51,12 @@ export function CataloguePage() {
       <StatusBanner error={error} />
       <StatusBanner error={catalogue.error} onRetry={() => void catalogue.refetch()} />
 
+      <NewEntryForm
+        categories={categories.data ?? []}
+        stores={stores.data ?? []}
+        onError={setError}
+      />
+
       <input
         className="catalogue-filter"
         data-testid="catalogue-filter"
@@ -75,6 +82,146 @@ export function CataloguePage() {
         ))}
       </ul>
     </section>
+  )
+}
+
+/**
+ * Adding an entry ahead of needing it, with its category and stores, so the
+ * first time it is typed on the add page it already comes with both.
+ */
+function NewEntryForm({
+  categories,
+  stores,
+  onError,
+}: {
+  categories: { id: string; name: string; icon: string }[]
+  stores: { id: string; name: string }[]
+  onError: (error: unknown) => void
+}) {
+  const create = useCreateEntry()
+  const [open, setOpen] = useState(false)
+  const [name, setName] = useState('')
+  const [categoryId, setCategoryId] = useState('')
+  const [storeIds, setStoreIds] = useState<string[]>([])
+  const [collision, setCollision] = useState<string | null>(null)
+
+  const reset = () => {
+    setName('')
+    setCategoryId('')
+    setStoreIds([])
+    setCollision(null)
+  }
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault()
+    onError(null)
+    setCollision(null)
+    create
+      .mutateAsync({
+        name: name.trim(),
+        category_id: categoryId === '' ? null : categoryId,
+        store_ids: storeIds,
+      })
+      .then(() => {
+        reset()
+        setOpen(false)
+      })
+      .catch((caught: unknown) => {
+        if (caught instanceof ApiError && caught.status === 409) {
+          setCollision(caught.message)
+        } else {
+          onError(caught)
+        }
+      })
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        className="button"
+        data-testid="new-entry-button"
+        onClick={() => setOpen(true)}
+      >
+        + New entry
+      </button>
+    )
+  }
+
+  return (
+    <form className="catalogue-row catalogue-new" onSubmit={submit} data-testid="new-entry-form">
+      <input
+        data-testid="new-entry-name"
+        placeholder="Name"
+        value={name}
+        autoFocus
+        onChange={(event) => setName(event.target.value)}
+      />
+      {collision && (
+        <div className="banner banner--info" data-testid="new-entry-collision">
+          {collision}
+        </div>
+      )}
+      <label className="catalogue-row__field">
+        <span className="hint">Category</span>
+        <select
+          data-testid="new-entry-category"
+          value={categoryId}
+          onChange={(event) => setCategoryId(event.target.value)}
+        >
+          <option value="">Uncategorised</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.icon} {category.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <div className="catalogue-row__field">
+        <span className="hint">Usually bought at</span>
+        <div className="chips chips--small">
+          {stores.map((store) => {
+            const on = storeIds.includes(store.id)
+            return (
+              <button
+                key={store.id}
+                type="button"
+                className={`chip chip--small ${on ? 'chip--on' : ''}`}
+                aria-pressed={on}
+                data-testid={`new-entry-store-${store.name}`}
+                onClick={() =>
+                  setStoreIds((current) =>
+                    on ? current.filter((id) => id !== store.id) : [...current, store.id],
+                  )
+                }
+              >
+                {store.name}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+      <div className="item-form__actions">
+        <button
+          type="button"
+          className="button button--quiet"
+          onClick={() => {
+            reset()
+            setOpen(false)
+          }}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="button button--primary"
+          data-testid="new-entry-submit"
+          disabled={create.isPending || !name.trim()}
+        >
+          Add to catalogue
+        </button>
+      </div>
+    </form>
   )
 }
 

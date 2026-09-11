@@ -24,6 +24,8 @@ Finally, the client is shaped for the wrong task. The add form is permanently on
 
 - **The catalogue can be tidied**: entries can be renamed and merged. Without this it accumulates every typo forever, and a suggestion list full of `mlik` is worse than no suggestions at all.
 
+- **A category can be chosen where an item is added or edited**, not only on the catalogue page. The choice is recorded on the item's catalogue entry — the item still owns no category of its own — so it applies to every item of that name, and the form says so. The catalogue page also gains a way to add an entry directly, with a category and stores, without putting anything on the list.
+
 ### Out of Scope
 
 - **Aisle ordering per store.** Category order is one household-wide sequence, not a different one per shop. A per-store aisle map is a plausible later change; it is not worth its complexity until the single ordering proves insufficient.

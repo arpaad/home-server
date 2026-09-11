@@ -52,6 +52,8 @@ An item has no `category_id`. Its category is read through `catalogue_entry → 
 
 **Alternatives considered.** *Copy on add, with the entry as a template*: allows per-item override, rejected above. *Copy on add but re-sync on entry edit*: the worst of both — it looks like an override until something silently overwrites it.
 
+**Convenience without a second source of truth.** The add and edit forms offer a category picker, because making a member visit the catalogue page to categorise something they are holding in their hand is the wrong trip. The picker writes through to the entry — the API accepts an optional `category_id` on item create and update and applies it to the item's entry — and the form says "applies to every *ketchup*" beside it. The item still has no `category_id` column; nothing about the invariant changes, only where it can be set from.
+
 ### Remembered stores are a prefill, and the item still owns its own
 
 The entry holds remembered stores in `catalogue_entry_stores`; adding an item copies them onto the item's own `shopping_item_stores`, after which the two are independent.

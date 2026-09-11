@@ -9,7 +9,7 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 
-import { useCreateItem, useItems, useStores, useUpdateItem } from '../api/queries'
+import { useCategories, useCreateItem, useItems, useStores, useUpdateItem } from '../api/queries'
 import type { CatalogueEntry, Category, Item, Store, Unit } from '../api/types'
 import { UNITS } from '../api/types'
 import { StatusBanner } from '../components/StatusBanner'
@@ -54,7 +54,11 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
   const [storeIds, setStoreIds] = useState<string[]>(editing?.stores.map((s) => s.id) ?? [])
   const [availableFrom, setAvailableFrom] = useState(editing?.available_from ?? '')
   const [category, setCategory] = useState<Category | null>(editing?.category ?? null)
+  // Only a deliberate choice is sent. Leaving the picker alone must never
+  // uncategorise a known item that was typed without choosing a suggestion.
+  const [categoryTouched, setCategoryTouched] = useState(false)
   const [error, setError] = useState<unknown>(null)
+  const categories = useCategories()
 
   const toggleStore = (storeId: string) =>
     setStoreIds((current) =>
@@ -64,7 +68,13 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
   const applySuggestion = (entry: CatalogueEntry) => {
     setName(entry.name)
     setCategory(entry.category)
+    setCategoryTouched(false)
     setStoreIds(entry.stores.map((s) => s.id))
+  }
+
+  const chooseCategory = (categoryId: string) => {
+    setCategory((categories.data ?? []).find((c) => c.id === categoryId) ?? null)
+    setCategoryTouched(true)
   }
 
   const back = () => void navigate('/')
@@ -80,6 +90,9 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
       // Always explicit: the chips are the truth, never the catalogue.
       store_ids: storeIds,
       available_from: availableFrom === '' ? null : availableFrom,
+      // The category goes to the entry, so only a deliberate choice is sent.
+      ...(category ? { category_id: category.id } : {}),
+      ...(categoryTouched && !category ? { clear_category: true } : {}),
     }
     const request = editing
       ? updateItem.mutateAsync({
@@ -117,9 +130,10 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
             value={name}
             onChange={(next) => {
               setName(next)
-              // Typing past a chosen suggestion drops its category: the
-              // category belongs to the entry, and this may be a new one.
-              setCategory(null)
+              // Typing past a chosen suggestion drops its prefilled category:
+              // this may be a different thing. A category the member picked
+              // themselves stays.
+              if (!categoryTouched) setCategory(null)
             }}
             onChoose={applySuggestion}
             inputTestId="item-name"
@@ -149,6 +163,31 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
               </option>
             ))}
           </select>
+        </div>
+
+        <label className="item-form__category">
+          <span className="hint">
+            Category
+            {name.trim() !== '' && (
+              <>
+                {' '}
+                — applies to every <em>{name.trim()}</em>
+              </>
+            )}
+          </span>
+          <select
+            data-testid="item-category"
+            value={category?.id ?? ''}
+            onChange={(event) => chooseCategory(event.target.value)}
+            style={category ? ({ '--group-colour': category.colour } as React.CSSProperties) : undefined}
+          >
+            <option value="">Uncategorised</option>
+            {(categories.data ?? []).map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.icon} {option.name}
+              </option>
+            ))}
+          </select>
           {category && (
             <span
               className="tag tag--category"
@@ -158,7 +197,7 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
               {category.icon} {category.name}
             </span>
           )}
-        </div>
+        </label>
 
         <fieldset className="item-form__stores">
           <legend>

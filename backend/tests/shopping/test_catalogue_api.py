@@ -282,3 +282,78 @@ class TestItemRepresentation:
         names = [i["name"] for i in client.get(f"{API}/items").json()]
 
         assert names == ["apples", "cheese", "mystery"]
+
+
+class TestCategoryFromTheItemForms:
+    def test_choosing_a_category_while_adding_categorises_the_entry_and_regroups_every_item(
+        self, client: TestClient
+    ):
+        household = add_category(client, "Household")
+        earlier = add_item(client, "ketchup")
+        assert earlier["category"] is None
+
+        later = add_item(client, "ketchup", category_id=household)
+
+        assert later["category"]["name"] == "Household"
+        # The earlier ketchup, already on the list, moved too.
+        items = {i["id"]: i for i in client.get(f"{API}/items").json()}
+        assert items[earlier["id"]]["category"]["name"] == "Household"
+
+    def test_choosing_a_category_while_editing_applies_to_the_entry(self, client: TestClient):
+        dairy = add_category(client, "Dairy")
+        one = add_item(client, "milk")
+        other = add_item(client, "milk")
+
+        r = client.patch(f"{API}/items/{one['id']}", json={"category_id": dairy})
+
+        assert r.status_code == 200
+        items = {i["id"]: i for i in client.get(f"{API}/items").json()}
+        assert items[other["id"]]["category"]["name"] == "Dairy"
+
+    def test_clearing_the_category_from_the_form(self, client: TestClient):
+        dairy = add_category(client, "Dairy")
+        item = add_item(client, "milk", category_id=dairy)
+
+        r = client.patch(f"{API}/items/{item['id']}", json={"clear_category": True})
+
+        assert r.json()["category"] is None
+
+    def test_an_unknown_category_on_add_is_a_404_and_creates_nothing(self, client: TestClient):
+        r = client.post(f"{API}/items", json={"name": "ghost", "category_id": str(uuid4())})
+
+        assert r.status_code == 404
+        assert client.get(f"{API}/items").json() == []
+
+
+class TestDirectEntryCreation:
+    def test_an_entry_can_be_added_ahead_of_needing_it(self, client: TestClient):
+        dairy = add_category(client, "Dairy")
+        lidl = add_store(client, "Lidl")
+
+        r = client.post(
+            f"{API}/catalogue",
+            json={"name": "oat milk", "category_id": dairy, "store_ids": [lidl]},
+        )
+
+        assert r.status_code == 201, r.text
+        assert r.json()["category"]["name"] == "Dairy"
+        assert [s["name"] for s in r.json()["stores"]] == ["Lidl"]
+        assert client.get(f"{API}/items").json() == []
+        [offered] = client.get(f"{API}/catalogue/suggest", params={"q": "oat"}).json()
+        assert offered["category"]["name"] == "Dairy"
+
+    def test_a_duplicate_name_is_refused_naming_the_existing_entry(self, client: TestClient):
+        add_item(client, "milk")
+        milk = entry_id_for(client, "milk")
+
+        r = client.post(f"{API}/catalogue", json={"name": "Milk"})
+
+        assert r.status_code == 409
+        assert r.json()["existing_id"] == milk
+        assert len(client.get(f"{API}/catalogue").json()) == 1
+
+    def test_an_unknown_store_is_refused(self, client: TestClient):
+        r = client.post(f"{API}/catalogue", json={"name": "oat milk", "store_ids": [str(uuid4())]})
+
+        assert r.status_code == 422
+        assert client.get(f"{API}/catalogue").json() == []

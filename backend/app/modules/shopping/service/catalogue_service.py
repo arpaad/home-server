@@ -112,6 +112,46 @@ class CatalogueService:
         """
         return self._catalogue.find_or_create(ensure_valid_entry_name(name), used_at=now_utc())
 
+    def create(
+        self,
+        *,
+        name: str,
+        category_id: UUID | None = None,
+        store_ids: Iterable[UUID] = (),
+    ) -> CatalogueEntry:
+        """Add an entry directly, without putting anything on the list.
+
+        For setting up the things the household knows it buys before the
+        first time they are needed. Refuses a name another entry already
+        carries, naming it, so the client can point at the existing one.
+
+        Args:
+            name: The entry's name.
+            category_id: Its category, or None for uncategorised.
+            store_ids: The stores it is usually bought at.
+
+        Returns:
+            The created entry.
+
+        Raises:
+            DuplicateEntryNameError: If an entry already has that name.
+            CategoryNotFoundError: If the category does not exist.
+            UnknownStoresError: If any store id matches no store.
+        """
+        cleaned = ensure_valid_entry_name(name)
+        existing = self._catalogue.find_by_name(cleaned)
+        if existing is not None:
+            raise DuplicateEntryNameError(cleaned, existing.id)
+        if category_id is not None and self._categories.get(category_id) is None:
+            raise CategoryNotFoundError(category_id)
+        wanted = list(dict.fromkeys(store_ids))
+        unknown = self._stores.unknown_ids(wanted)
+        if unknown:
+            raise UnknownStoresError(unknown)
+
+        entry = self._catalogue.find_or_create(cleaned, used_at=now_utc())
+        return self._catalogue.update(entry.id, category_id=category_id, store_ids=wanted)
+
     def set_category(self, entry_id: UUID, category_id: UUID | None) -> CatalogueEntry:
         """Set or clear an entry's category.
 

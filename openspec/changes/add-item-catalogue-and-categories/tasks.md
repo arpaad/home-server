@@ -44,6 +44,7 @@
 - [x] 6.3 Add the suggestion endpoint taking a name prefix; verify a contract test covering the spec's ordering and matching scenarios
 - [x] 6.4 Extend the item representation with its catalogue entry and derived category; verify a contract test that an item whose entry is uncategorised reports no category rather than failing
 - [x] 6.5 Verify the layering test still passes — no module under `api/` imports a repository, and nothing new under `domain/` imports SQLAlchemy
+- [x] 6.6 Accept an optional `category_id` on item create and update, applying it to the item's catalogue entry rather than the item; add a create-entry endpoint that takes name, category and stores and refuses a duplicate name naming the existing entry; verify contract tests that creating "ketchup" with Household categorises the entry and regroups every ketchup, and that the direct create is refused on collision
 
 ## 7. Client: routing and the read-first main screen
 
@@ -61,6 +62,8 @@
 - [x] 8.5 Build the stores and categories management page, including reordering categories and choosing an emoji icon and colour; verify by end-to-end test that a reorder changes the grouping on the list
 - [x] 8.6 Build the catalogue management page — set category and stores, rename, merge, delete; verify an end-to-end test of the correct-it-later flow: type a new name in a hurry, categorise it afterwards, and see the next add of that name carry the category
 - [x] 8.7 Verify by end-to-end test that a rename collision offers merging rather than silently failing
+- [x] 8.8 Add a category picker to the add and edit forms that writes through to the entry, labelled so it is clear it applies to every item of that name; verify an end-to-end test that choosing a category while adding regroups an existing item of the same name already on the list
+- [x] 8.9 Add a way to create an entry directly on the catalogue page, with category and stores; verify an end-to-end test that the new entry is offered as a suggestion carrying both, and that no item was added to the list
 
 ## 9. Acceptance
 

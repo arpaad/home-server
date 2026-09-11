@@ -36,6 +36,16 @@ class ItemCreateRequest(BaseModel):
         ),
         examples=["2026-09-15"],
     )
+    category_id: UUID | None = Field(
+        default=None,
+        description=(
+            "A category to record on the item's catalogue entry. The item has "
+            "no category of its own, so this applies to every item of that name."
+        ),
+    )
+    clear_category: bool = Field(
+        default=False, description="Make the entry uncategorised. Takes precedence."
+    )
 
 
 class ItemUpdateRequest(BaseModel):
@@ -55,6 +65,15 @@ class ItemUpdateRequest(BaseModel):
     clear_available_from: bool = Field(
         default=False,
         description="Remove the availability date. Takes precedence over available_from.",
+    )
+    category_id: UUID | None = Field(
+        default=None,
+        description=(
+            "A category to record on the item's catalogue entry, and so on every item of that name."
+        ),
+    )
+    clear_category: bool = Field(
+        default=False, description="Make the entry uncategorised. Takes precedence."
     )
 
 

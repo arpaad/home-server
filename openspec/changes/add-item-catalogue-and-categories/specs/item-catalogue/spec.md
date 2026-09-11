@@ -27,6 +27,23 @@ This is what makes the catalogue worth having: it is a by-product of using the l
 - **WHEN** a member types a name that has never been used and adds it
 - **THEN** the item is added with no extra step, prompt or confirmation
 
+### Requirement: Adding an entry directly
+
+The system SHALL also allow a member to add a catalogue entry on its own, with a name, an optional category and remembered stores, without putting an item on the list. This is for setting up the things the household knows it buys, before the first time they are needed. The name SHALL be subject to the same case-insensitive uniqueness as any other entry.
+
+#### Scenario: Adding an entry ahead of needing it
+
+- **WHEN** a member adds the entry "oat milk" with the category Dairy and the store Lidl, from the catalogue page
+- **THEN** the entry exists with that category and store
+- **AND** no item is added to the list
+- **AND** typing "oat" afterwards offers it, carrying Dairy and Lidl
+
+#### Scenario: A duplicate name is refused
+
+- **WHEN** a member adds an entry named "Milk" while "milk" already exists
+- **THEN** the system rejects the request and identifies the existing entry
+- **AND** no second entry is created
+
 ### Requirement: Suggestions while typing
 
 While a member is typing an item name, the system SHALL offer matching catalogue entries. A match SHALL be on the beginning of the name, compared case-insensitively. Suggestions SHALL be ordered with the most recently used first, so the things bought often are reached first.

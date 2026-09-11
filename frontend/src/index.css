@@ -377,3 +377,17 @@ body {
 
 .chips--small { gap: 6px; }
 .chip--small { padding: 4px 10px; font-size: 0.8rem; min-height: 30px; }
+
+.item-form__category { display: flex; flex-direction: column; gap: 6px; }
+.item-form__category select {
+  font: inherit; color: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--group-colour, var(--line));
+  border-radius: 8px;
+  background: var(--surface);
+  min-height: 40px;
+}
+.item-form__category .tag { align-self: flex-start; }
+.catalogue-new { gap: 10px; }
+.catalogue-new input { font: inherit; color: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); min-height: 40px; }

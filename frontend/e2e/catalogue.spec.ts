@@ -313,3 +313,102 @@ test.afterAll(async ({ request }) => {
     if (c.name.startsWith('E2E ')) await request.delete(`${API}/shopping/categories/${c.id}`)
   }
 })
+
+// ---- 8.8 / 8.9: category from the item forms, and direct entry creation ----
+
+test('choosing a category while adding regroups an existing item of that name', async ({
+  page,
+  request,
+}) => {
+  const household = await seededCategory(request, 'Household')
+  await createItem(request, 'ketchup')
+
+  await page.goto('/')
+  await expect(page.locator('[data-category="Uncategorised"]').getByTestId('item-name-text')).toHaveText(['ketchup'])
+
+  await page.getByTestId('add-button').click()
+  await page.getByTestId('item-name').fill('ketchup')
+  await expect(page.locator('.item-form__category .hint')).toContainText('applies to every')
+  await page.getByTestId('item-category').selectOption(household.id)
+  await page.getByTestId('item-submit').click()
+
+  await expect(page).toHaveURL(/\/$/)
+  // Both ketchups — the one added now and the one already there — moved.
+  await expect(page.locator('[data-category="Household"]').getByTestId('item-name-text')).toHaveText(['ketchup', 'ketchup'])
+  await expect(page.locator('[data-category="Uncategorised"]')).toHaveCount(0)
+})
+
+test('typing a known name without touching the category does not uncategorise it', async ({
+  page,
+  request,
+}) => {
+  const dairy = await seededCategory(request, 'Dairy')
+  await createItem(request, 'milk')
+  await setEntry(request, 'milk', { category_id: dairy.id })
+
+  await page.goto('/add')
+  // Typed in full, no suggestion chosen, picker left alone.
+  await page.getByTestId('item-name').fill('milk')
+  await page.getByTestId('item-submit').click()
+
+  await expect(page).toHaveURL(/\/$/)
+  await expect(page.locator('[data-category="Dairy"]').getByTestId('item-name-text')).toHaveText(['milk', 'milk'])
+})
+
+test('choosing a category while editing applies to every item of that name', async ({
+  page,
+  request,
+}) => {
+  const dairy = await seededCategory(request, 'Dairy')
+  const one = await createItem(request, 'milk')
+  await createItem(request, 'milk')
+
+  await page.goto(`/add?edit=${one.id}`)
+  await page.getByTestId('item-category').selectOption(dairy.id)
+  await page.getByTestId('item-submit').click()
+
+  await expect(page).toHaveURL(/\/$/)
+  await expect(page.locator('[data-category="Dairy"]').getByTestId('item-name-text')).toHaveText(['milk', 'milk'])
+})
+
+test('an entry can be added on the catalogue page ahead of needing it', async ({
+  page,
+  request,
+}) => {
+  const dairy = await seededCategory(request, 'Dairy')
+  await createStore(request, 'Lidl')
+
+  await page.goto('/catalogue')
+  await page.getByTestId('new-entry-button').click()
+  await page.getByTestId('new-entry-name').fill('oat milk')
+  await page.getByTestId('new-entry-category').selectOption(dairy.id)
+  await page.getByTestId('new-entry-store-Lidl').click()
+  await page.getByTestId('new-entry-submit').click()
+
+  await expect(page.getByTestId('entry-row-oat milk')).toBeVisible()
+  await expect(page.getByTestId('category-select-oat milk')).toHaveValue(dairy.id)
+
+  // Nothing landed on the list.
+  const items: unknown[] = await (await request.get(`${API}/shopping/items`)).json()
+  expect(items).toEqual([])
+
+  // But the suggestion carries both.
+  await page.getByTestId('nav-manage').click()
+  await page.goto('/add')
+  await page.getByTestId('item-name').fill('oat')
+  await page.getByTestId('suggest-oat milk').click()
+  await expect(page.getByTestId('prefilled-category')).toContainText('Dairy')
+  await expect(page.getByTestId('pick-store-Lidl')).toHaveAttribute('aria-pressed', 'true')
+})
+
+test('adding an entry with a name that exists is refused and says so', async ({ page, request }) => {
+  await createItem(request, 'milk')
+
+  await page.goto('/catalogue')
+  await page.getByTestId('new-entry-button').click()
+  await page.getByTestId('new-entry-name').fill('Milk')
+  await page.getByTestId('new-entry-submit').click()
+
+  await expect(page.getByTestId('new-entry-collision')).toContainText('already exists')
+  await expect(page.getByTestId('entry-row-milk')).toHaveCount(1)
+})

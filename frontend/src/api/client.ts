@@ -8,6 +8,7 @@
 
 import type {
   CatalogueEntry,
+  CatalogueEntryCreate,
   CatalogueEntryUpdate,
   Category,
   CategoryCreate,
@@ -162,6 +163,12 @@ export const api = {
   // ---- catalogue ----
 
   listCatalogue: () => request<CatalogueEntry[]>('/shopping/catalogue'),
+
+  createEntry: (payload: CatalogueEntryCreate) =>
+    request<CatalogueEntry>('/shopping/catalogue', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 
   suggest: (prefix: string, signal?: AbortSignal) =>
     request<CatalogueEntry[]>(

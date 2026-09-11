@@ -45,6 +45,16 @@ class CatalogueEntryResponse(BaseModel):
         )
 
 
+class CatalogueEntryCreateRequest(BaseModel):
+    """A request to add an entry directly, without adding an item."""
+
+    name: str = Field(min_length=1, max_length=200, examples=["oat milk"])
+    category_id: UUID | None = Field(default=None, description="None means uncategorised.")
+    store_ids: list[UUID] = Field(
+        default_factory=list[UUID], description="The stores this is usually bought at."
+    )
+
+
 class CatalogueEntryUpdateRequest(BaseModel):
     """A request to correct an entry. Unsupplied fields are left alone."""
 
