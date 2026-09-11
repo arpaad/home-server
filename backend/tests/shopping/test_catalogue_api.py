@@ -316,7 +316,8 @@ class TestCategoryFromTheItemForms:
 
         r = client.patch(f"{API}/items/{item['id']}", json={"clear_category": True})
 
-        assert r.json()["category"] is None
+        assert r.json()["applied"] is True
+        assert r.json()["item"]["category"] is None
 
     def test_an_unknown_category_on_add_is_a_404_and_creates_nothing(self, client: TestClient):
         r = client.post(f"{API}/items", json={"name": "ghost", "category_id": str(uuid4())})

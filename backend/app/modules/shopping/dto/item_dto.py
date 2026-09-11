@@ -16,6 +16,14 @@ from app.modules.shopping.dto.store_dto import StoreResponse
 class ItemCreateRequest(BaseModel):
     """A request to put an item on the shared list."""
 
+    id: UUID | None = Field(
+        default=None,
+        description=(
+            "An identifier chosen by the client. If an item with it already "
+            "exists, that item is returned unchanged — so a create sent twice "
+            "lands once. Omit to let the server choose."
+        ),
+    )
     name: str = Field(min_length=1, max_length=200, examples=["ketchup"])
     quantity: float = Field(default=DEFAULT_QUANTITY, gt=0, examples=[2.0])
     unit: Unit = Field(default=DEFAULT_UNIT, examples=["piece"])
@@ -74,6 +82,14 @@ class ItemUpdateRequest(BaseModel):
     )
     clear_category: bool = Field(
         default=False, description="Make the entry uncategorised. Takes precedence."
+    )
+    edited_at: datetime | None = Field(
+        default=None,
+        description=(
+            "When this edit was made, by the editing client's clock. An edit "
+            "older than the item's last applied edit is not applied (later "
+            "edit wins); the response says whether it was. Omit to always apply."
+        ),
     )
 
 
@@ -163,3 +179,15 @@ class ItemResponse(BaseModel):
                 CategoryResponse.from_domain(item.category) if item.category is not None else None
             ),
         )
+
+
+class ItemEditResponse(BaseModel):
+    """The item after an edit, and whether the edit took."""
+
+    item: ItemResponse
+    applied: bool = Field(
+        description=(
+            "False when the edit was older than the item's last applied edit "
+            "and was therefore not applied. Not an error: drop it, keep the item."
+        )
+    )

@@ -142,9 +142,10 @@ class TestRemovingItems:
             session.execute(text("SELECT count(*) FROM shopping_item_purchases")).scalar_one() == 0
         )
 
-    def test_removing_an_unknown_item_is_refused(self, shopping: ShoppingListService):
-        with pytest.raises(ItemNotFoundError):
-            shopping.remove_item(uuid4())
+    def test_removing_an_unknown_item_succeeds(self, shopping: ShoppingListService):
+        # A removal sent twice, or of something the other member removed
+        # first, is not an error: there is nothing to do, and that is fine.
+        shopping.remove_item(uuid4())
 
 
 class TestBuying:

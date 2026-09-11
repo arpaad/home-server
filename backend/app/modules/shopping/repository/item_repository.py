@@ -7,8 +7,8 @@ leaving each client to reimplement "no store means every store".
 """
 
 from collections.abc import Iterable
-from datetime import date
-from uuid import UUID
+from datetime import date, datetime
+from uuid import UUID, uuid4
 
 from sqlalchemy import ColumnElement, Select, and_, delete, exists, or_, select, update
 from sqlalchemy.orm import Session, joinedload, selectinload
@@ -305,6 +305,7 @@ class SqlAlchemyShoppingItemRepository:
         available_from: date | None,
         origin: ItemOrigin,
         catalogue_entry_id: UUID | None = None,
+        item_id: UUID | None = None,
     ) -> ShoppingItem:
         """Add an item to the list.
 
@@ -317,11 +318,15 @@ class SqlAlchemyShoppingItemRepository:
             origin: How the item came to be on the list.
             catalogue_entry_id: The catalogue entry this item is an instance
                 of, from which it derives its category.
+            item_id: An identifier chosen by the client, so an item added
+                offline can be referred to before the server has seen it and
+                replayed without landing twice. None lets the server mint one.
 
         Returns:
             The created item.
         """
         row = ShoppingItemORM(
+            id=item_id if item_id is not None else uuid4(),
             name=name.strip(),
             quantity=quantity,
             unit=unit,
@@ -345,6 +350,7 @@ class SqlAlchemyShoppingItemRepository:
         store_ids: Iterable[UUID] | None = None,
         available_from: date | None = None,
         clear_available_from: bool = False,
+        edited_at: datetime | None = None,
     ) -> ShoppingItem:
         """Change an item's fields, leaving unsupplied ones untouched.
 
@@ -358,12 +364,16 @@ class SqlAlchemyShoppingItemRepository:
             available_from: A new availability date, or None to leave it.
             clear_available_from: Remove the availability date. Takes
                 precedence over available_from.
+            edited_at: When the editing client made this edit. Recorded as
+                the item's `updated_at`; None leaves it as it was.
 
         Returns:
             The updated item.
         """
         row = self._require_row(item_id)
 
+        if edited_at is not None:
+            row.updated_at = edited_at
         if name is not None:
             row.name = name.strip()
         if quantity is not None:

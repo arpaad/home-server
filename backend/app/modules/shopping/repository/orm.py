@@ -182,6 +182,12 @@ class ShoppingItemORM(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
 
+    # When the last applied edit was made — the *editing phone's* time, not
+    # the server's — so that of two edits made while apart, the later one
+    # stands whichever reaches the server first. NULL means never edited,
+    # which loses to any edit. Compared, never displayed.
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     # Set when the household clears a bought item away. Clearing happens to
     # the item's place on the list, not to the purchase, which stays exactly
     # as recorded. NULL means still shown (outstanding, or bought and not yet

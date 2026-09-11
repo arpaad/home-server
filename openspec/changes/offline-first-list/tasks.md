@@ -1,10 +1,10 @@
 ## 1. Backend: make every list operation safe to replay
 
-- [ ] 1.1 Add `shopping_items.updated_at` (nullable timestamp) and its migration with no backfill; verify autogenerate matches and the migration round-trips on a copy of the database with the item tables byte-identical
-- [ ] 1.2 Accept an optional client-supplied `id` on item create, returning the existing item when it already exists; verify a contract test that the same create sent twice yields exactly one item and both responses succeed, and that a create without an id still mints one
-- [ ] 1.3 Accept an optional `edited_at` on item update; refuse to apply an edit older than the item's `updated_at`, answering 200 with the current item and `applied: false`; set `updated_at` on every applied edit; verify contract tests for the older-edit-loses scenario, for an edit without `edited_at` always applying, and for the response shape
-- [ ] 1.4 Make deleting a missing item answer 204; verify a contract test and that the existing delete tests still pass
-- [ ] 1.5 Verify every existing backend test still passes with no edit to what it asserts
+- [x] 1.1 Add `shopping_items.updated_at` (nullable timestamp) and its migration with no backfill; verify autogenerate matches and the migration round-trips on a copy of the database with the item tables byte-identical
+- [x] 1.2 Accept an optional client-supplied `id` on item create, returning the existing item when it already exists; verify a contract test that the same create sent twice yields exactly one item and both responses succeed, and that a create without an id still mints one
+- [x] 1.3 Accept an optional `edited_at` on item update; refuse to apply an edit older than the item's `updated_at`, answering 200 with the current item and `applied: false`; set `updated_at` on every applied edit; verify contract tests for the older-edit-loses scenario, for an edit without `edited_at` always applying, and for the response shape
+- [x] 1.4 Make deleting a missing item answer 204; verify a contract test and that the existing delete tests still pass
+- [x] 1.5 Verify every existing backend test still passes with no edit to what it asserts
 
 ## 2. Client: the local copy
 

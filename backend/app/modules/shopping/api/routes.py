@@ -14,6 +14,7 @@ from app.modules.household.providers import CurrentMember
 from app.modules.shopping.dto.item_dto import (
     ClearBoughtResponse,
     ItemCreateRequest,
+    ItemEditResponse,
     ItemResponse,
     ItemUpdateRequest,
     PurchaseResponse,
@@ -120,6 +121,7 @@ def create_item(payload: ItemCreateRequest, shopping: ShoppingListServiceDep) ->
         available_from=payload.available_from,
         category_id=payload.category_id,
         clear_category=payload.clear_category,
+        item_id=payload.id,
     )
     return ItemResponse.from_domain(item)
 
@@ -127,8 +129,12 @@ def create_item(payload: ItemCreateRequest, shopping: ShoppingListServiceDep) ->
 @router.patch("/items/{item_id}", summary="Change an item")
 def update_item(
     item_id: UUID, payload: ItemUpdateRequest, shopping: ShoppingListServiceDep
-) -> ItemResponse:
+) -> ItemEditResponse:
     """Change an item, leaving unsupplied fields alone.
+
+    Later edit wins: an edit older than the item's last applied edit is not
+    applied, and the response says so — `applied: false`, with the current
+    item — rather than failing, so a replaying client drops it quietly.
 
     Args:
         item_id: The item to change.
@@ -136,9 +142,9 @@ def update_item(
         shopping: The shopping list service.
 
     Returns:
-        The updated item.
+        The item as it now stands, and whether the edit was applied.
     """
-    item = shopping.edit_item(
+    outcome = shopping.edit_item(
         item_id,
         name=payload.name,
         quantity=payload.quantity,
@@ -148,8 +154,9 @@ def update_item(
         clear_available_from=payload.clear_available_from,
         category_id=payload.category_id,
         clear_category=payload.clear_category,
+        edited_at=payload.edited_at,
     )
-    return ItemResponse.from_domain(item)
+    return ItemEditResponse(item=ItemResponse.from_domain(outcome.item), applied=outcome.applied)
 
 
 @router.delete(
@@ -159,6 +166,9 @@ def update_item(
 )
 def delete_item(item_id: UUID, shopping: ShoppingListServiceDep) -> Response:
     """Take an item off the list without recording a purchase.
+
+    Removing something already gone is a 204 too: a removal sent twice, or of
+    an item the other member removed first, is not an error.
 
     Args:
         item_id: The item to remove.

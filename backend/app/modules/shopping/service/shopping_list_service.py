@@ -6,7 +6,8 @@ by a path that skips a rule.
 """
 
 from collections.abc import Iterable
-from datetime import date
+from dataclasses import dataclass
+from datetime import date, datetime
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -25,6 +26,14 @@ from app.modules.shopping.repository.interfaces import (
     StoreRepository,
 )
 from app.modules.shopping.service.catalogue_service import CatalogueService
+
+
+@dataclass(frozen=True, slots=True)
+class EditOutcome:
+    """What an edit did: the item as it now stands, and whether the edit took."""
+
+    item: ShoppingItem
+    applied: bool
 
 
 class ShoppingListService:
@@ -187,12 +196,17 @@ class ShoppingListService:
         origin: ItemOrigin = "manual",
         category_id: UUID | None = None,
         clear_category: bool = False,
+        item_id: UUID | None = None,
     ) -> ShoppingItem:
         """Put an item on the shared list, remembering its name in the catalogue.
 
         The catalogue entry is found or created in the same transaction as
         the item, so a rejected add leaves no stray entry behind and a
         successful one never leaves an item unlinked.
+
+        With a client-chosen `item_id`, adding is idempotent: if that item
+        already exists it is returned unchanged, so a create that reached the
+        server but whose response was lost lands once on replay.
 
         Args:
             name: The item's name.
@@ -208,10 +222,16 @@ class ShoppingListService:
                 The item has no category of its own, so this applies to
                 every item of that name. None leaves the entry as it is.
             clear_category: Make the entry uncategorised. Takes precedence.
+            item_id: A client-chosen identifier, or None to mint one.
 
         Returns:
-            The created item.
+            The created item — or the existing one, when the id is known.
         """
+        if item_id is not None:
+            existing = self._items.get(item_id)
+            if existing is not None:
+                return existing
+
         # Validate before touching the catalogue: a rejected name or
         # quantity must not leave an entry behind.
         cleaned = ensure_valid_name(name)
@@ -233,6 +253,7 @@ class ShoppingListService:
             available_from=available_from,
             origin=origin,
             catalogue_entry_id=entry.id,
+            item_id=item_id,
         )
 
     def edit_item(
@@ -247,8 +268,15 @@ class ShoppingListService:
         clear_available_from: bool = False,
         category_id: UUID | None = None,
         clear_category: bool = False,
-    ) -> ShoppingItem:
+        edited_at: datetime | None = None,
+    ) -> EditOutcome:
         """Change an item, leaving unsupplied fields untouched.
+
+        Later edit wins: an edit made earlier than the item's last applied
+        edit is not applied, so that of two members' edits made while apart,
+        the later one stands whichever reaches the server first. It is
+        answered with the current item and `applied=False`, not an error, so
+        a replaying client drops it quietly rather than retrying it.
 
         Args:
             item_id: The item to change.
@@ -261,11 +289,16 @@ class ShoppingListService:
             category_id: A category to record on the item's catalogue entry,
                 and so on every item of that name. None leaves it.
             clear_category: Make the entry uncategorised. Takes precedence.
+            edited_at: When the editing client made this edit. None always
+                applies.
 
         Returns:
-            The updated item.
+            The item as it now stands, and whether this edit was applied.
         """
         item = self._require_item(item_id)
+
+        if edited_at is not None and item.updated_at is not None and edited_at < item.updated_at:
+            return EditOutcome(item=item, applied=False)
 
         if item.catalogue_entry_id is not None:
             if clear_category:
@@ -273,7 +306,7 @@ class ShoppingListService:
             elif category_id is not None:
                 self._catalogue.set_category(item.catalogue_entry_id, category_id)
 
-        return self._items.update(
+        updated = self._items.update(
             item_id,
             name=ensure_valid_name(name) if name is not None else None,
             quantity=ensure_positive_quantity(quantity) if quantity is not None else None,
@@ -281,7 +314,9 @@ class ShoppingListService:
             store_ids=(self._require_known_stores(store_ids) if store_ids is not None else None),
             available_from=available_from,
             clear_available_from=clear_available_from,
+            edited_at=edited_at,
         )
+        return EditOutcome(item=updated, applied=True)
 
     def remove_item(self, item_id: UUID) -> None:
         """Take an item off the list because nobody wants it any more.
@@ -289,10 +324,12 @@ class ShoppingListService:
         This is not a purchase: nothing is recorded against the item, so later
         reporting cannot mistake a discarded item for something bought.
 
+        Removing something already gone succeeds: a removal sent twice, or of
+        an item the other member removed first, is not an error.
+
         Args:
             item_id: The item to remove.
         """
-        self._require_item(item_id)
         self._items.delete(item_id)
 
     def mark_bought(self, item_id: UUID, member_id: UUID) -> Purchase:
