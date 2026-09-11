@@ -86,23 +86,6 @@ export function ListPage() {
         </label>
       )}
 
-      {boughtCount > 0 && (
-        <div className="banner banner--undo" data-testid="clear-bought-banner">
-          <span>
-            {boughtCount} bought {boughtCount === 1 ? 'item' : 'items'} on the list.
-          </span>
-          <button
-            type="button"
-            className="banner__action"
-            data-testid="clear-bought"
-            disabled={clearBought.isPending}
-            onClick={clear}
-          >
-            Clear bought ({boughtCount})
-          </button>
-        </div>
-      )}
-
       <main className="app__list">
         {items.isPending ? (
           <p className="empty" data-testid="loading">
@@ -127,6 +110,23 @@ export function ListPage() {
             onEdit={(item) => void navigate(`/add?edit=${item.id}`)}
             onDelete={(item) => run(deleteItem.mutateAsync(item.id))}
           />
+        )}
+
+        {/* Below everything, and quiet: clearing is the last thing done on a
+            trip, and a prominent control at the top was getting tapped by
+            accident on the way to something else. */}
+        {boughtCount > 0 && (
+          <div className="clear-bought" data-testid="clear-bought-banner">
+            <button
+              type="button"
+              className="button button--quiet clear-bought__button"
+              data-testid="clear-bought"
+              disabled={clearBought.isPending}
+              onClick={clear}
+            >
+              Clear {boughtCount} bought {boughtCount === 1 ? 'item' : 'items'}
+            </button>
+          </div>
         )}
       </main>
 

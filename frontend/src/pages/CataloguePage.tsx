@@ -178,7 +178,7 @@ function NewEntryForm({
         </select>
       </label>
       <div className="catalogue-row__field">
-        <span className="hint">Usually bought at</span>
+        <span className="hint">Shop</span>
         <div className="chips chips--small">
           {stores.map((store) => {
             const on = storeIds.includes(store.id)
@@ -355,25 +355,30 @@ function EntryRow({
         </div>
       )}
 
-      <div className="catalogue-row__body">
-        <label className="catalogue-row__field">
-          <span className="hint">Category</span>
-          <select
-            data-testid={`category-select-${entry.name}`}
-            value={entry.category?.id ?? ''}
-            onChange={(event) => setCategory(event.target.value)}
-          >
-            <option value="">Uncategorised</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.icon} {category.name}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div className="catalogue-row__body catalogue-row__body--compact">
+        {/* The category is the chip itself: tap it to change it. No label. */}
+        <select
+          className="category-chip"
+          aria-label={`Category of ${entry.name}`}
+          data-testid={`category-select-${entry.name}`}
+          value={entry.category?.id ?? ''}
+          style={
+            entry.category
+              ? ({ '--group-colour': entry.category.colour } as React.CSSProperties)
+              : undefined
+          }
+          onChange={(event) => setCategory(event.target.value)}
+        >
+          <option value="">· Uncategorised</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.icon} {category.name}
+            </option>
+          ))}
+        </select>
 
-        <div className="catalogue-row__field">
-          <span className="hint">Usually bought at</span>
+        <div className="catalogue-row__shops">
+          <span className="hint">Shop</span>
           <div className="chips chips--small">
             {stores.map((store) => {
               const on = entry.stores.some((s) => s.id === store.id)

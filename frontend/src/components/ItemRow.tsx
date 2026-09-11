@@ -66,15 +66,12 @@ export function ItemRow({
         </div>
 
         <div className="item__meta">
-          {item.stores.length === 0 ? (
-            <span className="tag tag--anywhere">anywhere</span>
-          ) : (
-            item.stores.map((store) => (
-              <span key={store.id} className="tag">
-                {store.name}
-              </span>
-            ))
-          )}
+          {/* No store means anywhere; saying so on every such row is noise. */}
+          {item.stores.map((store) => (
+            <span key={store.id} className="tag">
+              {store.name}
+            </span>
+          ))}
           {item.available_from !== null && (
             <span className={`tag ${upcoming ? 'tag--later' : ''}`}>
               {upcoming ? `from ${formatDate(item.available_from)}` : 'available'}

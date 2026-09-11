@@ -405,3 +405,40 @@ body {
   line-height: 1;
 }
 .item__check--done:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent); }
+
+/* ---- compaction ---- */
+
+.catalogue-row { padding: 8px 10px; gap: 6px; }
+.catalogue-row__body--compact {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+.catalogue-row__shops { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.catalogue-row__shops .hint { font-size: 0.75rem; }
+
+/* A select dressed as the category chip: the value is the label, tapping
+   it is the edit. */
+.category-chip {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--group-colour, var(--line));
+  background: color-mix(in srgb, var(--group-colour, var(--line)) 16%, var(--surface));
+  color: var(--group-colour, var(--ink-soft));
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.manage-row { padding: 6px 10px; }
+.item { padding: 10px 12px; }
+.item__meta:empty { display: none; }
+
+.clear-bought { display: flex; justify-content: center; padding: 18px 0 8px; }
+.clear-bought__button { font-size: 0.85rem; color: var(--ink-soft); }
+.clear-bought__button:hover { color: var(--danger); }
+.catalogue-filter { flex: none; width: 100%; }

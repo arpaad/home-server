@@ -71,7 +71,7 @@ test('clear bought removes every bought item from every store, and says how many
 
   await page.getByTestId('store-chip-Lidl').click()
   await expect(bought(page).getByTestId('item-name-text')).toHaveText(['lidl thing'])
-  await expect(page.getByTestId('clear-bought')).toContainText('(1)')
+  await expect(page.getByTestId('clear-bought')).toContainText('1 bought item')
 
   await page.getByTestId('clear-bought').click()
 
