@@ -124,9 +124,11 @@ db-reset:
 build:
 	podman build -f deploy/Dockerfile -t $(IMAGE_NAME) .
 
-# Bring the whole stack up
+# Bring the whole stack up, rebuilding the image from source. Layer caching
+# makes this cheap when nothing changed; without --build, compose would keep
+# running whatever image it built last time, however stale.
 up:
-	$(COMPOSE) up -d
+	$(COMPOSE) up -d --build --force-recreate
 
 # Bring the whole stack down, keeping the volume
 down:

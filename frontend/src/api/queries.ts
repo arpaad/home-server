@@ -15,11 +15,24 @@ import {
 } from '@tanstack/react-query'
 
 import { api } from './client'
-import type { Item, ItemCreate, ItemUpdate, Member, Store } from './types'
+import type {
+  CatalogueEntry,
+  CatalogueEntryUpdate,
+  Category,
+  CategoryCreate,
+  CategoryUpdate,
+  Item,
+  ItemCreate,
+  ItemUpdate,
+  Member,
+  Store,
+} from './types'
 
 export const keys = {
   members: ['members'] as const,
   stores: ['stores'] as const,
+  categories: ['categories'] as const,
+  catalogue: ['catalogue'] as const,
   items: (storeId: string | null, includeUpcoming: boolean) =>
     ['items', storeId ?? 'all', includeUpcoming] as const,
 }
@@ -42,12 +55,27 @@ export function useItems(
   })
 }
 
-/** Every mutation invalidates the lists, so both views agree immediately. */
+export function useCategories(): UseQueryResult<Category[]> {
+  return useQuery({ queryKey: keys.categories, queryFn: api.listCategories })
+}
+
+export function useCatalogue(): UseQueryResult<CatalogueEntry[]> {
+  return useQuery({ queryKey: keys.catalogue, queryFn: api.listCatalogue })
+}
+
+/**
+ * Every mutation invalidates everything derived from the list. Categories
+ * decide grouping and the catalogue decides prefills, so a change to either
+ * has to reach the list too — and at this data size, refetching a few small
+ * lists is cheaper than reasoning about which one changed.
+ */
 function useInvalidateLists() {
   const client = useQueryClient()
   return () => {
     void client.invalidateQueries({ queryKey: ['items'] })
     void client.invalidateQueries({ queryKey: keys.stores })
+    void client.invalidateQueries({ queryKey: keys.categories })
+    void client.invalidateQueries({ queryKey: keys.catalogue })
   }
 }
 
@@ -96,4 +124,80 @@ export function useCreateStore(): UseMutationResult<Store, Error, string> {
 export function useDeleteStore(): UseMutationResult<void, Error, string> {
   const invalidate = useInvalidateLists()
   return useMutation({ mutationFn: api.deleteStore, onSuccess: invalidate })
+}
+
+// ---- categories ----
+
+export function useCreateCategory(): UseMutationResult<Category, Error, CategoryCreate> {
+  const invalidate = useInvalidateLists()
+  return useMutation({ mutationFn: api.createCategory, onSuccess: invalidate })
+}
+
+export function useUpdateCategory(): UseMutationResult<
+  Category,
+  Error,
+  { categoryId: string; payload: CategoryUpdate }
+> {
+  const invalidate = useInvalidateLists()
+  return useMutation({
+    mutationFn: ({ categoryId, payload }) => api.updateCategory(categoryId, payload),
+    onSuccess: invalidate,
+  })
+}
+
+export function useReorderCategories(): UseMutationResult<Category[], Error, string[]> {
+  const invalidate = useInvalidateLists()
+  return useMutation({ mutationFn: api.reorderCategories, onSuccess: invalidate })
+}
+
+export function useDeleteCategory(): UseMutationResult<
+  { entries_uncategorised: number },
+  Error,
+  string
+> {
+  const invalidate = useInvalidateLists()
+  return useMutation({ mutationFn: api.deleteCategory, onSuccess: invalidate })
+}
+
+// ---- catalogue ----
+
+export function useUpdateEntry(): UseMutationResult<
+  CatalogueEntry,
+  Error,
+  { entryId: string; payload: CatalogueEntryUpdate }
+> {
+  const invalidate = useInvalidateLists()
+  return useMutation({
+    mutationFn: ({ entryId, payload }) => api.updateEntry(entryId, payload),
+    onSuccess: invalidate,
+  })
+}
+
+export function useRenameEntry(): UseMutationResult<
+  CatalogueEntry,
+  Error,
+  { entryId: string; name: string }
+> {
+  const invalidate = useInvalidateLists()
+  return useMutation({
+    mutationFn: ({ entryId, name }) => api.renameEntry(entryId, name),
+    onSuccess: invalidate,
+  })
+}
+
+export function useMergeEntry(): UseMutationResult<
+  CatalogueEntry,
+  Error,
+  { entryId: string; intoId: string }
+> {
+  const invalidate = useInvalidateLists()
+  return useMutation({
+    mutationFn: ({ entryId, intoId }) => api.mergeEntry(entryId, intoId),
+    onSuccess: invalidate,
+  })
+}
+
+export function useDeleteEntry(): UseMutationResult<void, Error, string> {
+  const invalidate = useInvalidateLists()
+  return useMutation({ mutationFn: api.deleteEntry, onSuccess: invalidate })
 }

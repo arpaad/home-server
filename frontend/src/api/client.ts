@@ -6,21 +6,36 @@
  * saved, so nothing here swallows an error or substitutes an empty result.
  */
 
-import type { Item, ItemCreate, ItemUpdate, Member, Purchase, Store } from './types'
+import type {
+  CatalogueEntry,
+  CatalogueEntryUpdate,
+  Category,
+  CategoryCreate,
+  CategoryUpdate,
+  Item,
+  ItemCreate,
+  ItemUpdate,
+  Member,
+  Purchase,
+  Store,
+} from './types'
 
 /** Same origin in production; Vite proxies this to the backend in dev. */
 const BASE = '/api'
 
 export class ApiError extends Error {
   readonly status: number
-  /** Items blocking a store deletion, when the server named them. */
+  /** Items blocking a deletion, when the server named them. */
   readonly items: string[]
+  /** On a rename collision: the entry already carrying that name. */
+  readonly existingId: string | null
 
-  constructor(status: number, message: string, items: string[] = []) {
+  constructor(status: number, message: string, items: string[] = [], existingId: string | null = null) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.items = items
+    this.existingId = existingId
   }
 }
 
@@ -35,6 +50,7 @@ export class OfflineError extends ApiError {
 interface ErrorBody {
   detail?: string
   items?: string[]
+  existing_id?: string | null
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -59,6 +75,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       response.status,
       body.detail ?? `Request failed with status ${response.status}`,
       body.items ?? [],
+      body.existing_id ?? null,
     )
   }
 
@@ -112,4 +129,64 @@ export const api = {
 
   undoPurchase: (itemId: string) =>
     request<Item>(`/shopping/items/${itemId}/purchase`, { method: 'DELETE' }),
+
+  // ---- categories ----
+
+  listCategories: () => request<Category[]>('/shopping/categories'),
+
+  createCategory: (payload: CategoryCreate) =>
+    request<Category>('/shopping/categories', { method: 'POST', body: JSON.stringify(payload) }),
+
+  updateCategory: (categoryId: string, payload: CategoryUpdate) =>
+    request<Category>(`/shopping/categories/${categoryId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  reorderCategories: (orderedIds: string[]) =>
+    request<Category[]>('/shopping/categories/order', {
+      method: 'PUT',
+      body: JSON.stringify({ ordered_ids: orderedIds }),
+    }),
+
+  previewCategoryRemoval: (categoryId: string) =>
+    request<{ entries_uncategorised: number }>(
+      `/shopping/categories/${categoryId}/removal-preview`,
+    ),
+
+  deleteCategory: (categoryId: string) =>
+    request<{ entries_uncategorised: number }>(`/shopping/categories/${categoryId}`, {
+      method: 'DELETE',
+    }),
+
+  // ---- catalogue ----
+
+  listCatalogue: () => request<CatalogueEntry[]>('/shopping/catalogue'),
+
+  suggest: (prefix: string, signal?: AbortSignal) =>
+    request<CatalogueEntry[]>(
+      `/shopping/catalogue/suggest?q=${encodeURIComponent(prefix)}`,
+      { signal },
+    ),
+
+  updateEntry: (entryId: string, payload: CatalogueEntryUpdate) =>
+    request<CatalogueEntry>(`/shopping/catalogue/${entryId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  renameEntry: (entryId: string, name: string) =>
+    request<CatalogueEntry>(`/shopping/catalogue/${entryId}/rename`, {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    }),
+
+  mergeEntry: (entryId: string, intoId: string) =>
+    request<CatalogueEntry>(`/shopping/catalogue/${entryId}/merge`, {
+      method: 'POST',
+      body: JSON.stringify({ into_id: intoId }),
+    }),
+
+  deleteEntry: (entryId: string) =>
+    request<void>(`/shopping/catalogue/${entryId}`, { method: 'DELETE' }),
 }

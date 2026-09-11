@@ -21,6 +21,45 @@ export interface Purchase {
   bought_at: string
 }
 
+export interface Category {
+  id: string
+  name: string
+  /** An emoji. */
+  icon: string
+  /** #rrggbb */
+  colour: string
+  /** Sort key for the household-wide order. */
+  position: number
+}
+
+export interface CategoryCreate {
+  name: string
+  icon: string
+  colour: string
+}
+
+export interface CategoryUpdate {
+  name?: string
+  icon?: string
+  colour?: string
+}
+
+export interface CatalogueEntry {
+  id: string
+  name: string
+  /** null means uncategorised. */
+  category: Category | null
+  /** Where this is usually bought; offered as a prefill, never a rule. */
+  stores: Store[]
+  last_used_at: string | null
+}
+
+export interface CatalogueEntryUpdate {
+  category_id?: string
+  clear_category?: boolean
+  store_ids?: string[]
+}
+
 export interface Item {
   id: string
   name: string
@@ -32,13 +71,20 @@ export interface Item {
   available_from: string | null
   origin: ItemOrigin
   purchase: Purchase | null
+  catalogue_entry_id: string | null
+  /** Derived from the catalogue entry; null means uncategorised. */
+  category: Category | null
 }
 
 export interface ItemCreate {
   name: string
   quantity?: number
   unit?: Unit
-  store_ids?: string[]
+  /**
+   * Explicit, even when empty. Omitting it would make the server apply the
+   * catalogue's prefill, and the form always knows what its chips show.
+   */
+  store_ids: string[]
   available_from?: string | null
 }
 

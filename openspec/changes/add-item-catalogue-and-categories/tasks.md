@@ -47,20 +47,20 @@
 
 ## 7. Client: routing and the read-first main screen
 
-- [ ] 7.1 Add a router with `/`, `/add`, `/manage` and `/catalogue`; verify each route survives a full page reload when served by the API container, not only by the dev server
-- [ ] 7.2 Reduce the main screen to the list, the store filter and an add control, removing the inline form; verify an end-to-end test that no item entry form is present on `/`
-- [ ] 7.3 Move adding onto `/add`, returning to the list on both add and cancel; verify an end-to-end test covering both paths
-- [ ] 7.4 Verify by end-to-end test that the system back gesture leaves `/add` and returns to the list, rather than leaving the app
+- [x] 7.1 Add a router with `/`, `/add`, `/manage` and `/catalogue`; verify each route survives a full page reload when served by the API container, not only by the dev server
+- [x] 7.2 Reduce the main screen to the list, the store filter and an add control, removing the inline form; verify an end-to-end test that no item entry form is present on `/`
+- [x] 7.3 Move adding onto `/add`, returning to the list on both add and cancel; verify an end-to-end test covering both paths
+- [x] 7.4 Verify by end-to-end test that the system back gesture leaves `/add` and returns to the list, rather than leaving the app
 
 ## 8. Client: categories, catalogue and grouping
 
-- [ ] 8.1 Render the list grouped by category with each group's icon, colour and name, in configured order; verify an end-to-end test that groups appear in the configured order for a store-filtered view
-- [ ] 8.2 Render an uncategorised group for items whose entry has no category; verify an end-to-end test that a freshly typed item is visible under it rather than absent — the failure here is silent, so this test is the guard
-- [ ] 8.3 Build the typeahead on the add page, debounced and never blocking the add button; verify an end-to-end test that a name matching nothing can still be added while a suggestion request is outstanding
-- [ ] 8.4 Apply a chosen suggestion's category and remembered stores as an editable prefill; verify the spec's scenario end to end — choosing "ketchup" prefills Lidl and Spar, clearing them adds an unrestricted item, and the entry still remembers both
-- [ ] 8.5 Build the stores and categories management page, including reordering categories and choosing an emoji icon and colour; verify by end-to-end test that a reorder changes the grouping on the list
-- [ ] 8.6 Build the catalogue management page — set category and stores, rename, merge, delete; verify an end-to-end test of the correct-it-later flow: type a new name in a hurry, categorise it afterwards, and see the next add of that name carry the category
-- [ ] 8.7 Verify by end-to-end test that a rename collision offers merging rather than silently failing
+- [x] 8.1 Render the list grouped by category with each group's icon, colour and name, in configured order; verify an end-to-end test that groups appear in the configured order for a store-filtered view
+- [x] 8.2 Render an uncategorised group for items whose entry has no category; verify an end-to-end test that a freshly typed item is visible under it rather than absent — the failure here is silent, so this test is the guard
+- [x] 8.3 Build the typeahead on the add page, debounced and never blocking the add button; verify an end-to-end test that a name matching nothing can still be added while a suggestion request is outstanding
+- [x] 8.4 Apply a chosen suggestion's category and remembered stores as an editable prefill; verify the spec's scenario end to end — choosing "ketchup" prefills Lidl and Spar, clearing them adds an unrestricted item, and the entry still remembers both
+- [x] 8.5 Build the stores and categories management page, including reordering categories and choosing an emoji icon and colour; verify by end-to-end test that a reorder changes the grouping on the list
+- [x] 8.6 Build the catalogue management page — set category and stores, rename, merge, delete; verify an end-to-end test of the correct-it-later flow: type a new name in a hurry, categorise it afterwards, and see the next add of that name carry the category
+- [x] 8.7 Verify by end-to-end test that a rename collision offers merging rather than silently failing
 
 ## 9. Acceptance
 
