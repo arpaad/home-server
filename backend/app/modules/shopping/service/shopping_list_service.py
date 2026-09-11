@@ -24,6 +24,7 @@ from app.modules.shopping.repository.interfaces import (
     ShoppingItemRepository,
     StoreRepository,
 )
+from app.modules.shopping.service.catalogue_service import CatalogueService
 
 
 class ShoppingListService:
@@ -33,6 +34,7 @@ class ShoppingListService:
         self,
         items: ShoppingItemRepository,
         stores: StoreRepository,
+        catalogue: CatalogueService,
         timezone: ZoneInfo,
     ) -> None:
         """Bind the service to its repositories and the household's zone.
@@ -40,10 +42,12 @@ class ShoppingListService:
         Args:
             items: The shopping list.
             stores: The store registry, used to validate assignments.
+            catalogue: The catalogue, which remembers every name added.
             timezone: The household's time zone, deciding what "today" means.
         """
         self._items = items
         self._stores = stores
+        self._catalogue = catalogue
         self._timezone = timezone
 
     def _today(self) -> date:
@@ -159,30 +163,47 @@ class ShoppingListService:
         name: str,
         quantity: float = DEFAULT_QUANTITY,
         unit: Unit = DEFAULT_UNIT,
-        store_ids: Iterable[UUID] = (),
+        store_ids: Iterable[UUID] | None = None,
         available_from: date | None = None,
         origin: ItemOrigin = "manual",
     ) -> ShoppingItem:
-        """Put an item on the shared list.
+        """Put an item on the shared list, remembering its name in the catalogue.
+
+        The catalogue entry is found or created in the same transaction as
+        the item, so a rejected add leaves no stray entry behind and a
+        successful one never leaves an item unlinked.
 
         Args:
             name: The item's name.
             quantity: How much is needed; defaults to one.
             unit: The unit of measure; defaults to pieces.
-            store_ids: Stores it may be bought at; empty means anywhere.
+            store_ids: Stores it may be bought at. An explicit list — even an
+                empty one — is used as given. None means "the stores this
+                thing is usually bought at", copied from the catalogue entry
+                as a prefill; the item owns its copy from then on.
             available_from: When it becomes worth buying, or None for now.
             origin: How it came to be on the list.
 
         Returns:
             The created item.
         """
+        # Validate before touching the catalogue: a rejected name or
+        # quantity must not leave an entry behind.
+        cleaned = ensure_valid_name(name)
+        checked_quantity = ensure_positive_quantity(quantity)
+        explicit = list(store_ids) if store_ids is not None else None
+
+        entry = self._catalogue.remember(cleaned)
+        chosen = explicit if explicit is not None else [store.id for store in entry.stores]
+
         return self._items.add(
-            name=ensure_valid_name(name),
-            quantity=ensure_positive_quantity(quantity),
+            name=cleaned,
+            quantity=checked_quantity,
             unit=unit,
-            store_ids=self._require_known_stores(store_ids),
+            store_ids=self._require_known_stores(chosen),
             available_from=available_from,
             origin=origin,
+            catalogue_entry_id=entry.id,
         )
 
     def edit_item(

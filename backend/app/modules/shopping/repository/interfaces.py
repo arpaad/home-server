@@ -126,6 +126,7 @@ class ShoppingItemRepository(Protocol):
         store_ids: Iterable[UUID],
         available_from: date | None,
         origin: ItemOrigin,
+        catalogue_entry_id: UUID | None = None,
     ) -> ShoppingItem:
         """Add an item to the list.
 
@@ -136,6 +137,8 @@ class ShoppingItemRepository(Protocol):
             store_ids: Stores the item may be bought at; empty means anywhere.
             available_from: The date the item becomes worth buying, or None.
             origin: How the item came to be on the list.
+            catalogue_entry_id: The catalogue entry this item is an instance
+                of, from which it derives its category.
 
         Returns:
             The created item.

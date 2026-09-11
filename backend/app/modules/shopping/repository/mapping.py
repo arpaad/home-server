@@ -54,13 +54,16 @@ def to_item(row: ShoppingItemORM) -> ShoppingItem:
     outside them cannot be stored in the first place.
 
     Args:
-        row: The item row, with its stores and purchases loaded.
+        row: The item row, with its stores, purchases and catalogue entry
+            (and the entry's category) loaded.
 
     Returns:
         The domain item.
     """
     stores = tuple(sorted((to_store(link.store) for link in row.stores), key=lambda s: s.name))
     purchase = to_purchase(row.purchases[0]) if row.purchases else None
+    entry = row.catalogue_entry
+    category = to_category(entry.category) if entry is not None and entry.category else None
     return ShoppingItem(
         id=row.id,
         name=row.name,
@@ -70,6 +73,8 @@ def to_item(row: ShoppingItemORM) -> ShoppingItem:
         available_from=row.available_from,
         origin=cast(ItemOrigin, row.origin),
         purchase=purchase,
+        catalogue_entry_id=row.catalogue_entry_id,
+        category=category,
     )
 
 

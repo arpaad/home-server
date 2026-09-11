@@ -11,7 +11,7 @@ from datetime import date
 from uuid import UUID
 
 from sqlalchemy import ColumnElement, Select, and_, delete, exists, or_, select
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.core.clock import now_utc
 from app.modules.shopping.domain.item import ItemOrigin, ShoppingItem
@@ -20,6 +20,8 @@ from app.modules.shopping.domain.units import Unit
 from app.modules.shopping.errors import ItemNotFoundError
 from app.modules.shopping.repository.mapping import to_item, to_purchase
 from app.modules.shopping.repository.orm import (
+    CatalogueEntryORM,
+    CategoryORM,
     ShoppingItemORM,
     ShoppingItemPurchaseORM,
     ShoppingItemStoreORM,
@@ -101,6 +103,9 @@ class SqlAlchemyShoppingItemRepository:
         return statement.options(
             selectinload(ShoppingItemORM.stores).selectinload(ShoppingItemStoreORM.store),
             selectinload(ShoppingItemORM.purchases),
+            # Joined, not selectin: the category decides row order, so it
+            # has to be in the same query the ORDER BY runs in.
+            joinedload(ShoppingItemORM.catalogue_entry).joinedload(CatalogueEntryORM.category),
         )
 
     def get(self, item_id: UUID) -> ShoppingItem | None:
@@ -112,9 +117,14 @@ class SqlAlchemyShoppingItemRepository:
         Returns:
             The item, or None when no item has that id.
         """
-        row = self._session.scalars(
-            self._with_relations(select(ShoppingItemORM).where(ShoppingItemORM.id == item_id))
-        ).one_or_none()
+        row = (
+            self._session
+            .scalars(
+                self._with_relations(select(ShoppingItemORM).where(ShoppingItemORM.id == item_id))
+            )
+            .unique()
+            .one_or_none()
+        )
         return to_item(row) if row else None
 
     def list_outstanding(
@@ -145,8 +155,22 @@ class SqlAlchemyShoppingItemRepository:
         if store_id is not None:
             statement = statement.where(_belongs_to_store(store_id))
 
-        statement = self._with_relations(statement).order_by(ShoppingItemORM.name)
-        return [to_item(row) for row in self._session.scalars(statement).all()]
+        # Grouping is presentation and happens in the client; the query only
+        # has to hand rows over in group order. Uncategorised items sort last
+        # so a freshly typed item lands in the final group, never in the
+        # middle of someone else's.
+        statement = (
+            self
+            ._with_relations(statement)
+            .outerjoin(ShoppingItemORM.catalogue_entry)
+            .outerjoin(CatalogueEntryORM.category)
+            .order_by(
+                CategoryORM.position.nulls_last(),
+                CategoryORM.name.nulls_last(),
+                ShoppingItemORM.name,
+            )
+        )
+        return [to_item(row) for row in self._session.scalars(statement).unique().all()]
 
     def outstanding_names_referencing(self, store_id: UUID) -> tuple[str, ...]:
         """Return the names of outstanding items assigned to a store.
@@ -199,6 +223,24 @@ class SqlAlchemyShoppingItemRepository:
             raise ItemNotFoundError(item_id)
         return row
 
+    def _reload(self, item_id: UUID) -> ShoppingItem:
+        """Return an item freshly loaded with every relation the domain needs.
+
+        Args:
+            item_id: The item to load.
+
+        Returns:
+            The domain item.
+
+        Raises:
+            ItemNotFoundError: If no item has that id.
+        """
+        self._session.expire_all()
+        item = self.get(item_id)
+        if item is None:
+            raise ItemNotFoundError(item_id)
+        return item
+
     def _set_stores(self, row: ShoppingItemORM, store_ids: Iterable[UUID]) -> None:
         """Replace an item's store links with exactly the given stores.
 
@@ -220,6 +262,7 @@ class SqlAlchemyShoppingItemRepository:
         store_ids: Iterable[UUID],
         available_from: date | None,
         origin: ItemOrigin,
+        catalogue_entry_id: UUID | None = None,
     ) -> ShoppingItem:
         """Add an item to the list.
 
@@ -230,6 +273,8 @@ class SqlAlchemyShoppingItemRepository:
             store_ids: Stores the item may be bought at; empty means anywhere.
             available_from: The date the item becomes worth buying, or None.
             origin: How the item came to be on the list.
+            catalogue_entry_id: The catalogue entry this item is an instance
+                of, from which it derives its category.
 
         Returns:
             The created item.
@@ -240,13 +285,13 @@ class SqlAlchemyShoppingItemRepository:
             unit=unit,
             available_from=available_from,
             origin=origin,
+            catalogue_entry_id=catalogue_entry_id,
         )
         self._session.add(row)
         self._session.flush()
         self._set_stores(row, store_ids)
         self._session.flush()
-        self._session.refresh(row)
-        return to_item(row)
+        return self._reload(row.id)
 
     def update(
         self,
@@ -291,8 +336,7 @@ class SqlAlchemyShoppingItemRepository:
             self._set_stores(row, store_ids)
 
         self._session.flush()
-        self._session.refresh(row)
-        return to_item(row)
+        return self._reload(row.id)
 
     def delete(self, item_id: UUID) -> None:
         """Take an item off the list without recording a purchase.

@@ -5,6 +5,7 @@ from datetime import date
 from typing import Literal
 from uuid import UUID
 
+from app.modules.shopping.domain.category import Category
 from app.modules.shopping.domain.purchase import Purchase
 from app.modules.shopping.domain.store import Store
 from app.modules.shopping.domain.units import DEFAULT_QUANTITY, DEFAULT_UNIT, Unit
@@ -70,6 +71,12 @@ class ShoppingItem:
     available_from: date | None = None
     origin: ItemOrigin = "manual"
     purchase: Purchase | None = field(default=None)
+    # The category is the catalogue entry's, never the item's own: correcting
+    # it on the entry regroups every item referring to it, including this
+    # one while it is already on the list. None means uncategorised, and an
+    # uncategorised item is still shown — in the uncategorised group.
+    catalogue_entry_id: UUID | None = None
+    category: Category | None = None
 
     def __post_init__(self) -> None:
         """Enforce the item invariants.

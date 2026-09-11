@@ -18,8 +18,11 @@ from app.modules.shopping.errors import (
     StoreNotFoundError,
     UnknownStoresError,
 )
+from app.modules.shopping.repository.catalogue_repository import SqlAlchemyCatalogueRepository
+from app.modules.shopping.repository.category_repository import SqlAlchemyCategoryRepository
 from app.modules.shopping.repository.item_repository import SqlAlchemyShoppingItemRepository
 from app.modules.shopping.repository.store_repository import SqlAlchemyStoreRepository
+from app.modules.shopping.service.catalogue_service import CatalogueService
 from app.modules.shopping.service.shopping_list_service import ShoppingListService
 from app.modules.shopping.service.store_service import StoreService
 
@@ -39,6 +42,11 @@ def shopping(session: Session) -> ShoppingListService:
     return ShoppingListService(
         SqlAlchemyShoppingItemRepository(session),
         SqlAlchemyStoreRepository(session),
+        CatalogueService(
+            SqlAlchemyCatalogueRepository(session),
+            SqlAlchemyCategoryRepository(session),
+            SqlAlchemyStoreRepository(session),
+        ),
         BUDAPEST,
     )
 

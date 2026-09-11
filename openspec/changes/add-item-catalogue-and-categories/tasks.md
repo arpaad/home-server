@@ -31,11 +31,11 @@
 
 ## 5. Shopping list integration
 
-- [ ] 5.1 Link every added item to a catalogue entry inside the same transaction as the item's creation; verify a test that adding an item creates the entry and links it, and that a rejected add (empty name, non-positive quantity) creates no entry
-- [ ] 5.2 Copy the entry's remembered stores onto a new item as a prefill the caller may override; verify tests that the stores are copied, and that overriding them leaves the entry's remembered stores unchanged
-- [ ] 5.3 Load each item's category through its catalogue entry in `list_outstanding`, as a join rather than a per-row lookup; verify the existing filter tests still pass unchanged and a test asserts the query count does not grow with the number of items
-- [ ] 5.4 Order results by category position then item name, keeping the filter predicate untouched; verify every existing store-and-availability test passes with no edit to its assertions about *which* items appear
-- [ ] 5.5 Verify by test that changing a catalogue entry's category regroups an item already on the list, with no edit to the item
+- [x] 5.1 Link every added item to a catalogue entry inside the same transaction as the item's creation; verify a test that adding an item creates the entry and links it, and that a rejected add (empty name, non-positive quantity) creates no entry
+- [x] 5.2 Copy the entry's remembered stores onto a new item as a prefill the caller may override; verify tests that the stores are copied, and that overriding them leaves the entry's remembered stores unchanged
+- [x] 5.3 Load each item's category through its catalogue entry in `list_outstanding`, as a join rather than a per-row lookup; verify the existing filter tests still pass unchanged and a test asserts the query count does not grow with the number of items
+- [x] 5.4 Order results by category position then item name, keeping the filter predicate untouched; verify every existing store-and-availability test passes with no edit to its assertions about *which* items appear
+- [x] 5.5 Verify by test that changing a catalogue entry's category regroups an item already on the list, with no edit to the item
 
 ## 6. API
 
