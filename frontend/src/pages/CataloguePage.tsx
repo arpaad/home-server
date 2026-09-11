@@ -162,7 +162,7 @@ function NewEntryForm({
           {collision}
         </div>
       )}
-      <label className="catalogue-row__field">
+      <label className="catalogue-row__field catalogue-row__field--inline">
         <span className="hint">Category</span>
         <select
           data-testid="new-entry-category"
@@ -177,8 +177,8 @@ function NewEntryForm({
           ))}
         </select>
       </label>
-      <div className="catalogue-row__field">
-        <span className="hint">Shop</span>
+      <div className="catalogue-row__field catalogue-row__field--inline">
+        <span className="hint">Store</span>
         <div className="chips chips--small">
           {stores.map((store) => {
             const on = storeIds.includes(store.id)
@@ -378,7 +378,7 @@ function EntryRow({
         </select>
 
         <div className="catalogue-row__shops">
-          <span className="hint">Shop</span>
+          <span className="hint">Store</span>
           <div className="chips chips--small">
             {stores.map((store) => {
               const on = entry.stores.some((s) => s.id === store.id)
