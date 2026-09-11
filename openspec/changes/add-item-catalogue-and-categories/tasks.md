@@ -1,6 +1,6 @@
 ## 1. Prerequisite: give this change a base spec
 
-- [ ] 1.1 Sync `add-shopping-list`'s delta into `openspec/specs/shopping-list/spec.md`; verify `openspec validate add-item-catalogue-and-categories --strict` no longer reports "target spec does not exist" for the MODIFIED requirements
+- [x] 1.1 Sync `add-shopping-list`'s delta into `openspec/specs/shopping-list/spec.md`; verify `openspec validate add-item-catalogue-and-categories --strict` no longer reports "target spec does not exist" for the MODIFIED requirements
 
 ## 2. Schema and migration
 
