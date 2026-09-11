@@ -4,13 +4,13 @@
 
 ## 2. Schema and migration
 
-- [ ] 2.1 Define the `CategoryORM` model — name unique case-insensitively, icon, colour, and a position for ordering; verify pyright passes and Alembic autogenerate produces a revision matching it
-- [ ] 2.2 Define the `CatalogueEntryORM` model — name unique case-insensitively, nullable `category_id`, `last_used_at` — plus `catalogue_entry_stores` joining entries to stores; verify autogenerate matches the models
+- [x] 2.1 Define the `CategoryORM` model — name unique case-insensitively, icon, colour, and a position for ordering; verify pyright passes and Alembic autogenerate produces a revision matching it
+- [x] 2.2 Define the `CatalogueEntryORM` model — name unique case-insensitively, nullable `category_id`, `last_used_at` — plus `catalogue_entry_stores` joining entries to stores; verify autogenerate matches the models
 - [ ] 2.3 Add the nullable `shopping_items.catalogue_entry_id` foreign key, with `ON DELETE RESTRICT` so an entry in use cannot vanish; verify a test that deleting a referenced entry is refused by the database
 - [ ] 2.4 Add an index on `lower(catalogue_entries.name)` supporting both the uniqueness rule and the prefix search; verify the suggestion query uses it via `EXPLAIN`
-- [ ] 2.5 Write the migration including the backfill — one entry per distinct case-insensitive existing item name, every existing item linked to its entry, `last_used_at` from the newest item that used it; verify on a copy of the real database that every item ends up linked and no item's name, stores, dates or purchases changed
-- [ ] 2.6 Verify the migration reverses: `alembic downgrade` drops the new tables and column and leaves `shopping_items` byte-identical to its pre-upgrade state on the same copy
-- [ ] 2.7 Seed the default categories (produce, dairy, bakery, meat, frozen, household, drinks, other) with icons, colours and positions, idempotently like the member seed; verify running the seed twice leaves exactly one of each
+- [x] 2.5 Write the migration including the backfill — one entry per distinct case-insensitive existing item name, every existing item linked to its entry, `last_used_at` from the newest item that used it; verify on a copy of the real database that every item ends up linked and no item's name, stores, dates or purchases changed
+- [x] 2.6 Verify the migration reverses: `alembic downgrade` drops the new tables and column and leaves `shopping_items` byte-identical to its pre-upgrade state on the same copy
+- [x] 2.7 Seed the default categories (produce, dairy, bakery, meat, frozen, household, drinks, other) with icons, colours and positions, idempotently like the member seed; verify running the seed twice leaves exactly one of each
 
 ## 3. Categories: domain, repository, service
 

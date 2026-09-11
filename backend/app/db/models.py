@@ -8,6 +8,9 @@ next revision, so every ORM module belongs in this list.
 from app.db.base import Base
 from app.modules.household.repository.member_orm import HouseholdMemberORM
 from app.modules.shopping.repository.orm import (
+    CatalogueEntryORM,
+    CatalogueEntryStoreORM,
+    CategoryORM,
     ShoppingItemORM,
     ShoppingItemPurchaseORM,
     ShoppingItemStoreORM,
@@ -16,6 +19,9 @@ from app.modules.shopping.repository.orm import (
 
 __all__ = [
     "Base",
+    "CatalogueEntryORM",
+    "CatalogueEntryStoreORM",
+    "CategoryORM",
     "HouseholdMemberORM",
     "ShoppingItemORM",
     "ShoppingItemPurchaseORM",
