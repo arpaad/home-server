@@ -31,13 +31,15 @@ The action SHALL be available wherever the list is shown, and SHALL say how many
 
 When a member marks an item as bought, the system SHALL record which member did so and when. The item SHALL remain visible in every view it appeared in, but SHALL be shown as bought — unmistakably distinct from outstanding items, and grouped after them — until it is cleared. Because an item exists once on the shared list, it SHALL show as bought in every member's view and every store's view at once, so it cannot be bought a second time from another store's view.
 
-#### Scenario: Buying an item marks it bought in every store's view
+#### Scenario: Buying an item removes it from every store's view
+
+The item leaves the *outstanding* items of every view at once — it is still shown, but as bought, so that it cannot be bought a second time from another store's view.
 
 - **WHEN** an item assigned to both Lidl and Spar is marked as bought by a member shopping in Lidl
-- **THEN** the item is shown as bought in the shopping view for Lidl
-- **AND** the item is shown as bought in the shopping view for Spar
-- **AND** the item is shown as bought for the other member
-- **AND** the item is no longer among the outstanding items in any view
+- **THEN** the item is no longer among the outstanding items in the shopping view for Lidl
+- **AND** the item is no longer among the outstanding items in the shopping view for Spar
+- **AND** the item is no longer among the outstanding items for any other member
+- **AND** in each of those views it is shown as bought
 
 #### Scenario: A bought item sits after the outstanding ones
 
@@ -86,11 +88,14 @@ After the outstanding items, the view SHALL present the bought and uncleared ite
 - **AND** a member selects the store Lidl
 - **THEN** the view does not contain that item
 
-#### Scenario: A bought item is shown as bought, after the outstanding ones
+#### Scenario: An already bought item is excluded
+
+Excluded from the outstanding items, that is; it is shown in the bought group instead.
 
 - **WHEN** an item assigned to Lidl has been marked as bought and not cleared
 - **AND** a member selects the store Lidl
-- **THEN** the view shows that item in the bought group, after every outstanding item
+- **THEN** the item is not among the outstanding items
+- **AND** the view shows it in the bought group, after every outstanding item
 
 #### Scenario: A cleared item is not shown
 
