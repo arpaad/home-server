@@ -12,7 +12,12 @@ from app.modules.household.domain.member import HouseholdMember
 from app.modules.household.repository.member_repository import SqlAlchemyMemberRepository
 from app.modules.household.service.member_service import MemberService
 
-SessionDep = Annotated[Session, Depends(get_session)]
+# scope="function": the session's exit code — the COMMIT — runs after the
+# path function returns but BEFORE the response is sent. With the default
+# request scope it runs after the response, so a client that reads straight
+# after a 200 can see the world as it was before the write. That was a real
+# bug: the UI refetched on success and showed stale data until a reload.
+SessionDep = Annotated[Session, Depends(get_session, scope="function")]
 
 
 def get_member_service(session: SessionDep) -> Iterator[MemberService]:
@@ -27,7 +32,7 @@ def get_member_service(session: SessionDep) -> Iterator[MemberService]:
     yield MemberService(SqlAlchemyMemberRepository(session))
 
 
-MemberServiceDep = Annotated[MemberService, Depends(get_member_service)]
+MemberServiceDep = Annotated[MemberService, Depends(get_member_service, scope="function")]
 
 
 def get_current_member(
@@ -61,4 +66,4 @@ def get_current_member(
     return members.resolve_acting_member(x_household_member)
 
 
-CurrentMember = Annotated[HouseholdMember, Depends(get_current_member)]
+CurrentMember = Annotated[HouseholdMember, Depends(get_current_member, scope="function")]

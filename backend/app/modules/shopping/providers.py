@@ -17,8 +17,16 @@ from app.modules.shopping.service.category_service import CategoryService
 from app.modules.shopping.service.shopping_list_service import ShoppingListService
 from app.modules.shopping.service.store_service import StoreService
 
-SessionDep = Annotated[Session, Depends(get_session)]
+# scope="function": the session's exit code — the COMMIT — runs after the
+# path function returns but BEFORE the response is sent. With the default
+# request scope it runs after the response, so a client that reads straight
+# after a 200 can see the world as it was before the write. That was a real
+# bug: the UI refetched on success and showed stale data until a reload.
+SessionDep = Annotated[Session, Depends(get_session, scope="function")]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
+
+# Everything below depends on the session, so it has to share its scope: a
+# request-scoped dependency may not depend on a function-scoped one.
 
 
 def _catalogue_service(session: Session) -> CatalogueService:
@@ -96,7 +104,9 @@ def get_store_service(session: SessionDep) -> Iterator[StoreService]:
     )
 
 
-ShoppingListServiceDep = Annotated[ShoppingListService, Depends(get_shopping_list_service)]
-StoreServiceDep = Annotated[StoreService, Depends(get_store_service)]
-CatalogueServiceDep = Annotated[CatalogueService, Depends(get_catalogue_service)]
-CategoryServiceDep = Annotated[CategoryService, Depends(get_category_service)]
+ShoppingListServiceDep = Annotated[
+    ShoppingListService, Depends(get_shopping_list_service, scope="function")
+]
+StoreServiceDep = Annotated[StoreService, Depends(get_store_service, scope="function")]
+CatalogueServiceDep = Annotated[CatalogueService, Depends(get_catalogue_service, scope="function")]
+CategoryServiceDep = Annotated[CategoryService, Depends(get_category_service, scope="function")]
