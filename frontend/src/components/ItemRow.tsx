@@ -20,6 +20,7 @@ export function ItemRow({
   busy,
   canBuy,
   onBuy,
+  onUndo,
   onEdit,
   onDelete,
 }: {
@@ -28,22 +29,33 @@ export function ItemRow({
   busy: boolean
   canBuy: boolean
   onBuy: () => void
+  onUndo: () => void
   onEdit: () => void
   onDelete: () => void
 }) {
   const upcoming = item.available_from !== null && item.available_from > today
+  const bought = item.purchase !== null
 
   return (
-    <li className={`item ${upcoming ? 'item--upcoming' : ''}`} data-testid="item">
+    <li
+      className={`item ${upcoming ? 'item--upcoming' : ''} ${bought ? 'item--bought' : ''}`}
+      data-testid="item"
+      data-bought={bought ? 'true' : 'false'}
+    >
+      {/* The same control marks bought and undoes it: on a bought row the
+          tick is filled, and tapping it is the undo. */}
       <button
         type="button"
-        className="item__check"
-        data-testid={`buy-${item.name}`}
-        aria-label={`Mark ${item.name} as bought`}
-        disabled={busy || !canBuy}
-        title={canBuy ? 'Mark as bought' : 'Choose who you are first'}
-        onClick={onBuy}
-      />
+        className={`item__check ${bought ? 'item__check--done' : ''}`}
+        data-testid={bought ? `undo-${item.name}` : `buy-${item.name}`}
+        aria-label={bought ? `Undo buying ${item.name}` : `Mark ${item.name} as bought`}
+        aria-pressed={bought}
+        disabled={busy || (!bought && !canBuy)}
+        title={bought ? 'Tap to undo' : canBuy ? 'Mark as bought' : 'Choose who you are first'}
+        onClick={bought ? onUndo : onBuy}
+      >
+        {bought ? '✓' : ''}
+      </button>
 
       <div className="item__body">
         <div className="item__line">

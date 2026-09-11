@@ -391,3 +391,17 @@ body {
 .item-form__category .tag { align-self: flex-start; }
 .catalogue-new { gap: 10px; }
 .catalogue-new input { font: inherit; color: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); min-height: 40px; }
+
+/* ---- bought items ---- */
+
+.group--bought { --group-colour: var(--ink-soft); }
+.group--bought .group__title { color: var(--ink-soft); }
+.item--bought { opacity: 0.55; }
+.item--bought .item__name { text-decoration: line-through; }
+.item__check--done {
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.item__check--done:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent); }

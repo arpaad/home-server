@@ -1,22 +1,10 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
-import { createItem, createStore, resetList } from './helpers'
+import { createItem, createStore, itemNames, pickFirstMember, resetList } from './helpers'
 
 test.beforeEach(async ({ request }) => {
   await resetList(request)
 })
-
-export async function pickFirstMember(page: Page) {
-  const picker = page.getByTestId('member-picker')
-  await expect(picker.locator('option')).not.toHaveCount(1)
-  const value = await picker.locator('option').nth(1).getAttribute('value')
-  await picker.selectOption(value!)
-  return value!
-}
-
-export function itemNames(page: Page) {
-  return page.getByTestId('item-name-text')
-}
 
 test('the ketchup case: one item, written once, appears in exactly the right stores', async ({
   page,
@@ -60,23 +48,29 @@ test('buying in one store removes the item from the other store immediately', as
   await expect(itemNames(page)).toHaveText(['ketchup'])
 
   await page.getByTestId('buy-ketchup').click()
-  await expect(itemNames(page)).toHaveCount(0)
+  // Gone from the outstanding items; shown as bought instead.
+  await expect(page.locator('[data-bought="false"]')).toHaveCount(0)
+  await expect(page.locator('[data-bought="true"]').getByTestId('item-name-text')).toHaveText(['ketchup'])
 
+  // And the same in Spar, without anyone touching Spar.
   await page.getByTestId('store-chip-Spar').click()
-  await expect(itemNames(page)).toHaveCount(0)
+  await expect(page.locator('[data-bought="false"]')).toHaveCount(0)
+  await expect(page.locator('[data-bought="true"]').getByTestId('item-name-text')).toHaveText(['ketchup'])
 })
 
-test('undo brings a mistakenly bought item back', async ({ page, request }) => {
+test('tapping the tick on a bought item undoes it', async ({ page, request }) => {
   await createItem(request, 'milk')
 
   await page.goto('/')
   await pickFirstMember(page)
 
   await page.getByTestId('buy-milk').click()
-  await expect(itemNames(page)).toHaveCount(0)
+  await expect(page.locator('[data-category="Bought"]').getByTestId('item-name-text')).toHaveText(['milk'])
 
-  await page.getByTestId('undo-banner').getByRole('button', { name: 'Undo' }).click()
-  await expect(itemNames(page)).toHaveText(['milk'])
+  await page.getByTestId('undo-milk').click()
+
+  await expect(page.locator('[data-category="Bought"]')).toHaveCount(0)
+  await expect(page.locator('[data-category="Uncategorised"]').getByTestId('item-name-text')).toHaveText(['milk'])
 })
 
 test('an item that is not due yet is hidden in a shop and shown when planning', async ({

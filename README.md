@@ -20,6 +20,11 @@ caused the same item to be bought twice.
 Items can also carry a date they become worth buying, so "it's on sale next
 week" stops being something anyone has to remember.
 
+Ticking something off doesn't make it vanish. It drops to a dimmed *Bought*
+group at the bottom, where you can see what's in the basket and tap the tick
+again to undo. **Clear bought** at the top tidies them away in one go — it
+hides them, it doesn't delete them, so the purchase history stays.
+
 The list remembers what you buy. Typing a few letters offers what was bought
 before, and choosing it brings the category and the usual stores along. The
 list is grouped by category — produce, bakery, dairy and so on, in an order

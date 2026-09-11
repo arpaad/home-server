@@ -1,4 +1,4 @@
-import type { APIRequestContext } from '@playwright/test'
+import { expect, type APIRequestContext, type Page } from '@playwright/test'
 
 /** The API the client talks to, reached directly for test setup and teardown. */
 export const API = process.env.E2E_API_URL ?? 'http://127.0.0.1:8080/api'
@@ -117,4 +117,16 @@ export async function setEntry(
   const response = await request.patch(`${API}/shopping/catalogue/${entry.id}`, { data: payload })
   if (!response.ok()) throw new Error(`could not update entry ${name}: ${await response.text()}`)
   return response.json()
+}
+
+export async function pickFirstMember(page: Page): Promise<string> {
+  const picker = page.getByTestId('member-picker')
+  await expect(picker.locator('option')).not.toHaveCount(1)
+  const value = await picker.locator('option').nth(1).getAttribute('value')
+  await picker.selectOption(value!)
+  return value!
+}
+
+export function itemNames(page: Page) {
+  return page.getByTestId('item-name-text')
 }

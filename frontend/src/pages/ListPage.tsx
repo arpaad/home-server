@@ -11,11 +11,19 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 
-import { useBuyItem, useDeleteItem, useItems, useStores, useUndoPurchase } from '../api/queries'
+import {
+  useBuyItem,
+  useClearBought,
+  useDeleteItem,
+  useItems,
+  useStores,
+  useUndoPurchase,
+} from '../api/queries'
 import type { Item } from '../api/types'
 import { GroupedList } from '../components/GroupedList'
 import { StatusBanner } from '../components/StatusBanner'
 import { StoreFilter } from '../components/StoreFilter'
+import { countBought } from '../grouping'
 import { useCurrentMember } from '../member/MemberContext'
 import { todayIso } from '../today'
 
@@ -24,7 +32,6 @@ export function ListPage() {
   const { memberId } = useCurrentMember()
   const [storeId, setStoreId] = useState<string | null>(null)
   const [planning, setPlanning] = useState(false)
-  const [lastBought, setLastBought] = useState<Item | null>(null)
   const [actionError, setActionError] = useState<unknown>(null)
 
   // Planning at home shows upcoming items; standing in a shop must not.
@@ -35,6 +42,7 @@ export function ListPage() {
   const buyItem = useBuyItem(memberId)
   const undoPurchase = useUndoPurchase()
   const deleteItem = useDeleteItem()
+  const clearBought = useClearBought()
 
   const today = useMemo(() => todayIso(), [])
 
@@ -43,10 +51,14 @@ export function ListPage() {
     promise.catch((error: unknown) => setActionError(error))
   }
 
-  const buy = (item: Item) => run(buyItem.mutateAsync(item.id).then(() => setLastBought(item)))
-  const undo = () => {
-    if (!lastBought) return
-    run(undoPurchase.mutateAsync(lastBought.id).then(() => setLastBought(null)))
+  const buy = (item: Item) => run(buyItem.mutateAsync(item.id))
+  // The bought row is the undo: no banner that goes away on its own.
+  const undo = (item: Item) => run(undoPurchase.mutateAsync(item.id))
+
+  const boughtCount = countBought(items.data ?? [])
+  const clear = () => {
+    if (boughtCount === 0) return
+    run(clearBought.mutateAsync())
   }
 
   return (
@@ -74,11 +86,19 @@ export function ListPage() {
         </label>
       )}
 
-      {lastBought && (
-        <div className="banner banner--undo" data-testid="undo-banner">
-          <span>Bought {lastBought.name}.</span>
-          <button type="button" className="banner__action" onClick={undo}>
-            Undo
+      {boughtCount > 0 && (
+        <div className="banner banner--undo" data-testid="clear-bought-banner">
+          <span>
+            {boughtCount} bought {boughtCount === 1 ? 'item' : 'items'} on the list.
+          </span>
+          <button
+            type="button"
+            className="banner__action"
+            data-testid="clear-bought"
+            disabled={clearBought.isPending}
+            onClick={clear}
+          >
+            Clear bought ({boughtCount})
           </button>
         </div>
       )}
@@ -100,9 +120,10 @@ export function ListPage() {
           <GroupedList
             items={items.data}
             today={today}
-            busy={buyItem.isPending || deleteItem.isPending}
+            busy={buyItem.isPending || undoPurchase.isPending || deleteItem.isPending}
             canBuy={memberId !== null}
             onBuy={buy}
+            onUndo={undo}
             onEdit={(item) => void navigate(`/add?edit=${item.id}`)}
             onDelete={(item) => run(deleteItem.mutateAsync(item.id))}
           />

@@ -17,12 +17,12 @@
 
 ## 4. Client
 
-- [ ] 4.1 Split bought items into a final "Bought" group after every category group, dimmed, most recently bought first; verify an end-to-end test that ticking an item moves it below every outstanding item with a bought appearance, in both the store view and the full list
-- [ ] 4.2 Make the tick on a bought row perform the undo and remove the undo banner; verify an end-to-end test that tapping the tick on a bought item returns it to its category group
-- [ ] 4.3 Add a "Clear bought (N)" control at the top of the list, hidden or disabled when N is zero; verify an end-to-end test that it removes every bought item from the Lidl view *and* the Spar view, and that the count shown matched what was cleared
-- [ ] 4.4 Verify by end-to-end test that the spec's ketchup scenario still holds — ketchup bought in Lidl shows as bought in Spar, and is not among the outstanding items anywhere
+- [x] 4.1 Split bought items into a final "Bought" group after every category group, dimmed, most recently bought first; verify an end-to-end test that ticking an item moves it below every outstanding item with a bought appearance, in both the store view and the full list
+- [x] 4.2 Make the tick on a bought row perform the undo and remove the undo banner; verify an end-to-end test that tapping the tick on a bought item returns it to its category group
+- [x] 4.3 Add a "Clear bought (N)" control at the top of the list, hidden or disabled when N is zero; verify an end-to-end test that it removes every bought item from the Lidl view *and* the Spar view, and that the count shown matched what was cleared
+- [x] 4.4 Verify by end-to-end test that the spec's ketchup scenario still holds — ketchup bought in Lidl shows as bought in Spar, and is not among the outstanding items anywhere
 
 ## 5. Acceptance
 
-- [ ] 5.1 Update `README.md` and `AGENTS.md`: the bought group, clearing, and the invariant that clearing never deletes a purchase; verify the documented flow matches the app
+- [x] 5.1 Update `README.md` and `AGENTS.md`: the bought group, clearing, and the invariant that clearing never deletes a purchase; verify the documented flow matches the app
 - [ ] 5.2 Walk the modified scenarios on a phone; note that historical bought items appear in the bought group after the first deploy and clear them once

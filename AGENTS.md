@@ -93,6 +93,12 @@ Treat these as invariants, not preferences. Each one has tests.
 10. **An item with no category is still shown**, in a final Uncategorised
     group. Grouping changes arrangement, never membership. The failure mode
     is silent, so it has its own end-to-end test.
+11. **Clearing never deletes a purchase.** A bought item stays listed,
+    dimmed, until the household clears it; clearing sets `cleared_at` on the
+    item and leaves the purchase row exactly as recorded. The outstanding
+    query is untouched by any of this — bought items come from a second
+    query (`list_bought_uncleared`), so the correctness core's tests keep
+    meaning what they meant.
 
 ## Security posture
 

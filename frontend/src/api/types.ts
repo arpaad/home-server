@@ -74,6 +74,8 @@ export interface Item {
   catalogue_entry_id: string | null
   /** Derived from the catalogue entry; null means uncategorised. */
   category: Category | null
+  /** Set once the household cleared this bought item away. Listed items never have it. */
+  cleared_at: string | null
 }
 
 export interface ItemCreate {

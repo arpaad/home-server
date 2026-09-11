@@ -10,6 +10,7 @@ export function GroupedList({
   busy,
   canBuy,
   onBuy,
+  onUndo,
   onEdit,
   onDelete,
 }: {
@@ -18,6 +19,7 @@ export function GroupedList({
   busy: boolean
   canBuy: boolean
   onBuy: (item: Item) => void
+  onUndo: (item: Item) => void
   onEdit: (item: Item) => void
   onDelete: (item: Item) => void
 }) {
@@ -26,9 +28,9 @@ export function GroupedList({
       {groupByCategory(items).map((group) => (
         <section
           key={group.key}
-          className="group"
+          className={`group ${group.bought ? 'group--bought' : ''}`}
           data-testid="group"
-          data-category={group.category?.name ?? 'Uncategorised'}
+          data-category={group.bought ? 'Bought' : (group.category?.name ?? 'Uncategorised')}
           style={
             group.category
               ? ({ '--group-colour': group.category.colour } as React.CSSProperties)
@@ -37,9 +39,9 @@ export function GroupedList({
         >
           <h2 className={`group__title ${group.category ? '' : 'group__title--none'}`}>
             <span className="group__icon" aria-hidden="true">
-              {group.category?.icon ?? '·'}
+              {group.bought ? '✓' : (group.category?.icon ?? '·')}
             </span>
-            <span>{group.category?.name ?? 'Uncategorised'}</span>
+            <span>{group.bought ? 'Bought' : (group.category?.name ?? 'Uncategorised')}</span>
             <span className="group__count">{group.items.length}</span>
           </h2>
           <ul className="items">
@@ -51,6 +53,7 @@ export function GroupedList({
                 busy={busy}
                 canBuy={canBuy}
                 onBuy={() => onBuy(item)}
+                onUndo={() => onUndo(item)}
                 onEdit={() => onEdit(item)}
                 onDelete={() => onDelete(item)}
               />

@@ -131,6 +131,9 @@ export const api = {
   undoPurchase: (itemId: string) =>
     request<Item>(`/shopping/items/${itemId}/purchase`, { method: 'DELETE' }),
 
+  clearBought: () =>
+    request<{ cleared: number }>('/shopping/items/clear-bought', { method: 'POST' }),
+
   // ---- categories ----
 
   listCategories: () => request<Category[]>('/shopping/categories'),

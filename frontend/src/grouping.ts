@@ -1,10 +1,12 @@
 /**
- * Arranging the list by category.
+ * Arranging the list: category groups, then one group for what was bought.
  *
  * Grouping is presentation only: it never decides which items appear, the
- * server already did. The one rule that matters is that an item with no
- * category is still shown — in a final "Uncategorised" group — because a
- * freshly typed item must never quietly vanish into a group nobody looks at.
+ * server already did. Two rules matter. An item with no category is still
+ * shown, in an "Uncategorised" group, because a freshly typed item must
+ * never quietly vanish. And bought items sit in a final group after every
+ * outstanding one — out of the way of the shopping, in the way of the
+ * end-of-trip review, which is the right order.
  */
 
 import type { Category, Item } from './api/types'
@@ -12,21 +14,28 @@ import type { Category, Item } from './api/types'
 export interface Group {
   key: string
   category: Category | null
+  /** True for the single group of bought, uncleared items. */
+  bought: boolean
   items: Item[]
 }
 
 export function groupByCategory(items: Item[]): Group[] {
-  // The server returns rows already in category order with uncategorised
-  // last, so a single pass preserves the household's ordering.
+  // The server returns outstanding rows in category order, then bought rows
+  // most-recent-first, so a single pass preserves both orderings.
   const groups: Group[] = []
   let current: Group | null = null
   for (const item of items) {
-    const key = item.category?.id ?? 'uncategorised'
+    const bought = item.purchase !== null
+    const key = bought ? 'bought' : (item.category?.id ?? 'uncategorised')
     if (!current || current.key !== key) {
-      current = { key, category: item.category, items: [] }
+      current = { key, category: bought ? null : item.category, bought, items: [] }
       groups.push(current)
     }
     current.items.push(item)
   }
   return groups
+}
+
+export function countBought(items: Item[]): number {
+  return items.filter((item) => item.purchase !== null).length
 }

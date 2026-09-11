@@ -117,6 +117,11 @@ export function useUndoPurchase(): UseMutationResult<Item, Error, string> {
   return useMutation({ mutationFn: api.undoPurchase, onSuccess: invalidate })
 }
 
+export function useClearBought(): UseMutationResult<{ cleared: number }, Error, void> {
+  const invalidate = useInvalidateLists()
+  return useMutation({ mutationFn: () => api.clearBought(), onSuccess: invalidate })
+}
+
 export function useCreateStore(): UseMutationResult<Store, Error, string> {
   const invalidate = useInvalidateLists()
   return useMutation({ mutationFn: api.createStore, onSuccess: invalidate })
