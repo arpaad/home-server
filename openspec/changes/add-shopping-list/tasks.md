@@ -5,7 +5,7 @@
 - [x] 1.3 Repoint every Makefile target at `backend/`, keeping the Makefile at the repository root; verify `make lint-all` and `make test` succeed exactly as before
 - [x] 1.4 Repoint the pre-commit hook that filters on `app/`; verify `pre-commit run --all-files` passes
 - [x] 1.5 Move the container definition into `deploy/` and repoint its copy paths; verify `make build` still produces a runnable image
-- [ ] 1.6 Update both GitHub Actions workflows for the new paths and add path filters so a client-only change does not run pyright; verify the workflow run is green
+- [x] 1.6 Update both GitHub Actions workflows for the new paths and add path filters so a client-only change does not run pyright; verify the workflow run is green
 
 ## 2. Project foundations
 
@@ -64,7 +64,7 @@
 ## 8. Deployment, durability and acceptance
 
 - [x] 8.1 Build a multi-stage image in which Node builds the client and the Python runtime image serves both it and the API; verify one image runs the API and serves the client
-- [ ] 8.2 Build arm64 images in CI so the Pi pulls rather than builds; verify the published image runs on the Pi
+- [x] 8.2 Build arm64 images in CI so the Pi pulls rather than builds; verify the published image runs on the Pi
 - [ ] 8.3 Place the database volume on external storage rather than the SD card; verify the volume's backing path is on the external device
 - [ ] 8.4 Add systemd units so the stack starts at boot; verify by power-cycling the Pi that the list loads afterwards with no manual step
 - [ ] 8.5 Add a systemd timer taking compressed dumps with hourly, daily and monthly retention; verify dumps accumulate on schedule and that expired ones are pruned

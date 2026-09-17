@@ -140,7 +140,8 @@ class TestEditing:
         )
 
         assert response.status_code == 200
-        assert [s["name"] for s in response.json()["stores"]] == ["Lidl", "Spar"]
+        assert response.json()["applied"] is True
+        assert [s["name"] for s in response.json()["item"]["stores"]] == ["Lidl", "Spar"]
         assert names_in(client, store_id=spar) == ["ketchup"]
 
     def test_patching_an_unknown_item_is_a_404(self, client: TestClient):

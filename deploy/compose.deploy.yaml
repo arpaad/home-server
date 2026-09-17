@@ -10,8 +10,12 @@
 # Copy deploy/.env.example to deploy/.env and set HOME_BIND_ADDRESS. There is
 # no authentication in this release: bind it to the LAN, never to a public
 # interface, and do not port-forward it.
+#
+# The project name differs from the development stack's on purpose: the two
+# must not share a volume, or verifying a deployment on a laptop reinitialises
+# the development database with the deployment's password.
 
-name: home
+name: home-deploy
 
 services:
   db:

@@ -13,6 +13,8 @@ import { Link, useNavigate } from 'react-router'
 
 import {
   useBuyItem,
+  useCatalogue,
+  useCategories,
   useClearBought,
   useDeleteItem,
   useItems,
@@ -23,9 +25,20 @@ import type { Item } from '../api/types'
 import { GroupedList } from '../components/GroupedList'
 import { StatusBanner } from '../components/StatusBanner'
 import { StoreFilter } from '../components/StoreFilter'
+import { usePendingClear, usePendingItemIds } from '../api/mutations'
 import { countBought } from '../grouping'
+import { useIsOnline } from '../net/connectivity'
 import { useCurrentMember } from '../member/MemberContext'
 import { todayIso } from '../today'
+
+function formatConfirmed(at: number): string {
+  const date = new Date(at)
+  const today = new Date()
+  const sameDay = date.toDateString() === today.toDateString()
+  return sameDay
+    ? date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+    : date.toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })
+}
 
 export function ListPage() {
   const navigate = useNavigate()
@@ -39,19 +52,26 @@ export function ListPage() {
 
   const stores = useStores()
   const items = useItems(storeId, includeUpcoming)
-  const buyItem = useBuyItem(memberId)
+  // Kept warm here so the add page has suggestions, store chips and
+  // categories from the phone's copy when the server cannot be reached.
+  useCatalogue()
+  useCategories()
+  const buyItem = useBuyItem()
   const undoPurchase = useUndoPurchase()
   const deleteItem = useDeleteItem()
   const clearBought = useClearBought()
 
   const today = useMemo(() => todayIso(), [])
+  const online = useIsOnline()
+  const pendingIds = usePendingItemIds()
+  const clearPending = usePendingClear()
 
   const run = (promise: Promise<unknown>) => {
     setActionError(null)
     promise.catch((error: unknown) => setActionError(error))
   }
 
-  const buy = (item: Item) => run(buyItem.mutateAsync(item.id))
+  const buy = (item: Item) => run(buyItem.mutateAsync({ itemId: item.id, memberId }))
   // The bought row is the undo: no banner that goes away on its own.
   const undo = (item: Item) => run(undoPurchase.mutateAsync(item.id))
 
@@ -64,7 +84,23 @@ export function ListPage() {
   return (
     <>
       <StatusBanner error={actionError} />
-      <StatusBanner error={items.error ?? stores.error} onRetry={() => void items.refetch()} />
+      {online && (
+        <StatusBanner error={items.error ?? stores.error} onRetry={() => void items.refetch()} />
+      )}
+
+      {/* Offline with a copy: say when it was last confirmed. The copy is
+          shown, but never as current. */}
+      {!online && items.data !== undefined && (
+        <div className="banner banner--offline" data-testid="offline-banner">
+          Cannot reach the server. Showing the list as last confirmed at{' '}
+          <time dateTime={new Date(items.dataUpdatedAt).toISOString()} data-testid="last-confirmed">
+            {formatConfirmed(items.dataUpdatedAt)}
+          </time>
+          {pendingIds.size + (clearPending ? 1 : 0) > 0 &&
+            ` · ${pendingIds.size + (clearPending ? 1 : 0)} change${pendingIds.size + (clearPending ? 1 : 0) === 1 ? '' : 's'} waiting to send`}
+          .
+        </div>
+      )}
 
       {memberId === null && (
         <div className="banner banner--info" data-testid="pick-member-hint">
@@ -87,7 +123,13 @@ export function ListPage() {
       )}
 
       <main className="app__list">
-        {items.isPending ? (
+        {items.isPending && !online ? (
+          // Never used on this phone, and no server: there is nothing to
+          // show. Not an empty list — an absent one.
+          <p className="empty empty--error" data-testid="nothing-yet">
+            Cannot reach the server, and this phone has no copy of the list yet.
+          </p>
+        ) : items.isPending ? (
           <p className="empty" data-testid="loading">
             Loading the list…
           </p>
@@ -105,6 +147,7 @@ export function ListPage() {
             today={today}
             busy={buyItem.isPending || undoPurchase.isPending || deleteItem.isPending}
             canBuy={memberId !== null}
+            pendingIds={pendingIds}
             onBuy={buy}
             onUndo={undo}
             onEdit={(item) => void navigate(`/add?edit=${item.id}`)}

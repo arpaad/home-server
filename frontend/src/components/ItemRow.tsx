@@ -19,6 +19,7 @@ export function ItemRow({
   today,
   busy,
   canBuy,
+  pending,
   onBuy,
   onUndo,
   onEdit,
@@ -28,6 +29,7 @@ export function ItemRow({
   today: string
   busy: boolean
   canBuy: boolean
+  pending: boolean
   onBuy: () => void
   onUndo: () => void
   onEdit: () => void
@@ -38,9 +40,10 @@ export function ItemRow({
 
   return (
     <li
-      className={`item ${upcoming ? 'item--upcoming' : ''} ${bought ? 'item--bought' : ''}`}
+      className={`item ${upcoming ? 'item--upcoming' : ''} ${bought ? 'item--bought' : ''} ${pending ? 'item--pending' : ''}`}
       data-testid="item"
       data-bought={bought ? 'true' : 'false'}
+      data-pending={pending ? 'true' : 'false'}
     >
       {/* The same control marks bought and undoes it: on a bought row the
           tick is filled, and tapping it is the undo. */}
@@ -62,6 +65,13 @@ export function ItemRow({
           <span className="item__name" data-testid="item-name-text">
             {item.name}
           </span>
+          {pending && (
+            // Saved on this phone, not yet confirmed by the server. Never
+            // shown as saved; never hidden either.
+            <span className="tag tag--pending" data-testid="pending-mark" title="Not yet sent to the server">
+              pending
+            </span>
+          )}
           <span className="item__quantity">{formatQuantity(item)}</span>
         </div>
 

@@ -127,6 +127,7 @@ class ShoppingItemRepository(Protocol):
         available_from: date | None,
         origin: ItemOrigin,
         catalogue_entry_id: UUID | None = None,
+        item_id: UUID | None = None,
     ) -> ShoppingItem:
         """Add an item to the list.
 
@@ -139,6 +140,7 @@ class ShoppingItemRepository(Protocol):
             origin: How the item came to be on the list.
             catalogue_entry_id: The catalogue entry this item is an instance
                 of, from which it derives its category.
+            item_id: A client-chosen identifier, or None to mint one.
 
         Returns:
             The created item.
@@ -155,6 +157,7 @@ class ShoppingItemRepository(Protocol):
         store_ids: Iterable[UUID] | None = None,
         available_from: date | None = None,
         clear_available_from: bool = False,
+        edited_at: datetime | None = None,
     ) -> ShoppingItem:
         """Change an item's fields, leaving unsupplied ones untouched.
 
@@ -169,6 +172,8 @@ class ShoppingItemRepository(Protocol):
             available_from: A new availability date, or None to leave it.
             clear_available_from: Remove the availability date, making the
                 item always available. Takes precedence over available_from.
+            edited_at: When the editing client made this edit, recorded as
+                the item's `updated_at`; None leaves it.
 
         Returns:
             The updated item.

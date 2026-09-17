@@ -80,6 +80,8 @@ class ShoppingItem:
     # When the household cleared this bought item away. Clearing is what
     # happens to the item's place on the list; the purchase stays as recorded.
     cleared_at: datetime | None = None
+    # When the last applied edit was made, by the editing client's clock.
+    updated_at: datetime | None = None
 
     def __post_init__(self) -> None:
         """Enforce the item invariants.

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { createItem, createStore, itemNames, pickFirstMember, resetList } from './helpers'
+import { API, createItem, createStore, itemNames, pickFirstMember, resetList } from './helpers'
 
 test.beforeEach(async ({ request }) => {
   await resetList(request)
@@ -92,19 +92,32 @@ test('an item that is not due yet is hidden in a shop and shown when planning', 
   await expect(page.getByText(/from Jan/)).toBeVisible()
 })
 
-test('a failed request is reported, never shown as saved', async ({ page }) => {
-  await page.goto('/add')
+test('a change the server never received is shown as pending, never as saved', async ({
+  page,
+  request,
+}) => {
+  // Reversed from the first release: the change is saved on this phone and
+  // queued, and the app says exactly that — pending, not confirmed.
+  await page.goto('/')
+  await expect(page.getByTestId('empty')).toBeVisible()
+  await page.getByTestId('add-button').click()
 
-  await page.route('**/api/shopping/items', (route) =>
+  await page.route('**/api/**', (route) =>
     route.request().method() === 'POST' ? route.abort('failed') : route.continue(),
   )
+  await page.route('**/health', (route) => route.abort('failed'))
 
-  await page.getByTestId('item-name').fill('should not appear')
+  await page.getByTestId('item-name').fill('not yet on the server')
   await page.getByTestId('item-submit').click()
 
-  await expect(page.getByTestId('status-banner')).toContainText('was not saved')
-  // Still on the add page: the failure did not pretend to succeed.
-  await expect(page.getByTestId('add-page')).toBeVisible()
+  await expect(page).toHaveURL(/\/$/)
+  const row = page.locator('[data-testid="item"]', { hasText: 'not yet on the server' })
+  await expect(row).toBeVisible()
+  await expect(row.getByTestId('pending-mark')).toBeVisible()
+  await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 10_000 })
+
+  const server: { name: string }[] = await (await request.get(`${API}/shopping/items`)).json()
+  expect(server.map((i) => i.name)).not.toContain('not yet on the server')
 })
 
 test('the app is installable: manifest and icons are served', async ({ page, request }) => {

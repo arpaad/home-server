@@ -11,7 +11,9 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { api } from '../api/client'
+import { useCatalogue } from '../api/queries'
 import type { CatalogueEntry } from '../api/types'
+import { useIsOnline } from '../net/connectivity'
 
 const DEBOUNCE_MS = 150
 
@@ -26,15 +28,27 @@ export function Typeahead({
   onChoose: (entry: CatalogueEntry) => void
   inputTestId: string
 }) {
-  const [suggestions, setSuggestions] = useState<CatalogueEntry[]>([])
+  const [fetched, setFetched] = useState<CatalogueEntry[]>([])
   const [open, setOpen] = useState(false)
   const controller = useRef<AbortController | null>(null)
+  const online = useIsOnline()
+  const catalogue = useCatalogue()
 
   const prefix = value.trim()
 
+  // Offline, suggest from the phone's copy of the catalogue: the same
+  // prefix rule the server applies, most recently used first.
+  const local = prefix === '' || online
+    ? []
+    : (catalogue.data ?? [])
+        .filter((e) => e.name.toLowerCase().startsWith(prefix.toLowerCase()))
+        .sort((a, b) => (b.last_used_at ?? '').localeCompare(a.last_used_at ?? ''))
+        .slice(0, 8)
+  const suggestions = online ? fetched : local
+
   useEffect(() => {
     controller.current?.abort()
-    if (prefix === '') return
+    if (prefix === '' || !online) return
 
     const own = new AbortController()
     controller.current = own
@@ -42,11 +56,11 @@ export function Typeahead({
       api
         .suggest(prefix, own.signal)
         .then((entries) => {
-          if (!own.signal.aborted) setSuggestions(entries)
+          if (!own.signal.aborted) setFetched(entries)
         })
         .catch(() => {
           // A failed suggestion request must not get in the way of adding.
-          if (!own.signal.aborted) setSuggestions([])
+          if (!own.signal.aborted) setFetched([])
         })
     }, DEBOUNCE_MS)
 
@@ -54,12 +68,12 @@ export function Typeahead({
       window.clearTimeout(timer)
       own.abort()
     }
-  }, [prefix])
+  }, [prefix, online])
 
   const choose = (entry: CatalogueEntry) => {
     onChoose(entry)
     setOpen(false)
-    setSuggestions([])
+    setFetched([])
   }
 
   // Derived, not stored: an empty box shows nothing whatever the last
@@ -78,7 +92,7 @@ export function Typeahead({
         onChange={(event) => {
           onChange(event.target.value)
           setOpen(true)
-          if (event.target.value.trim() === '') setSuggestions([])
+          if (event.target.value.trim() === '') setFetched([])
         }}
         onFocus={() => setOpen(true)}
         // Delay so a tap on a suggestion lands before the list closes.
