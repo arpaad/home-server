@@ -1,0 +1,3004 @@
+{
+ "categories": [
+  {
+   "name": "Zöldség",
+   "icon": "🥦",
+   "colour": "#4c9a2a"
+  },
+  {
+   "name": "Gyümölcs",
+   "icon": "🍎",
+   "colour": "#d9534f"
+  },
+  {
+   "name": "Pékáru",
+   "icon": "🥖",
+   "colour": "#c48a3a"
+  },
+  {
+   "name": "Tejtermék",
+   "icon": "🧀",
+   "colour": "#e0b53a"
+  },
+  {
+   "name": "Hús",
+   "icon": "🥩",
+   "colour": "#b23a3a"
+  },
+  {
+   "name": "Hal",
+   "icon": "🐟",
+   "colour": "#3a8ac4"
+  },
+  {
+   "name": "Felvágott, csemege",
+   "icon": "🥪",
+   "colour": "#a0522d"
+  },
+  {
+   "name": "Tészta, rizs, gabona",
+   "icon": "🍝",
+   "colour": "#c9a227"
+  },
+  {
+   "name": "Konzerv, befőtt",
+   "icon": "🥫",
+   "colour": "#8a8a8a"
+  },
+  {
+   "name": "Fűszer, olaj, szósz",
+   "icon": "🧂",
+   "colour": "#7a5c3a"
+  },
+  {
+   "name": "Édesség",
+   "icon": "🍫",
+   "colour": "#6b3a2a"
+  },
+  {
+   "name": "Snack, sós",
+   "icon": "🥨",
+   "colour": "#e08a3a"
+  },
+  {
+   "name": "Ital",
+   "icon": "🧃",
+   "colour": "#7a4cc4"
+  },
+  {
+   "name": "Alkohol",
+   "icon": "🍷",
+   "colour": "#5a2a5a"
+  },
+  {
+   "name": "Fagyasztott",
+   "icon": "🧊",
+   "colour": "#3a6ac4"
+  },
+  {
+   "name": "Reggeli, kenhető",
+   "icon": "🥣",
+   "colour": "#d4a017"
+  },
+  {
+   "name": "Bébi",
+   "icon": "🍼",
+   "colour": "#e8a5c5"
+  },
+  {
+   "name": "Tisztítószer",
+   "icon": "🧴",
+   "colour": "#5a6b7a"
+  },
+  {
+   "name": "Háztartás",
+   "icon": "🧹",
+   "colour": "#6a7a5a"
+  },
+  {
+   "name": "Papíráru",
+   "icon": "🧻",
+   "colour": "#9a9a9a"
+  },
+  {
+   "name": "Testápolás",
+   "icon": "🧼",
+   "colour": "#3aa0a0"
+  },
+  {
+   "name": "Kozmetikum",
+   "icon": "💄",
+   "colour": "#c45a8a"
+  },
+  {
+   "name": "Gyógyszertár",
+   "icon": "💊",
+   "colour": "#2a8a5a"
+  },
+  {
+   "name": "Kisállat",
+   "icon": "🐾",
+   "colour": "#8a6a3a"
+  },
+  {
+   "name": "Konyhai eszköz",
+   "icon": "🍳",
+   "colour": "#4a4a8a"
+  },
+  {
+   "name": "Kert, erkély",
+   "icon": "🌱",
+   "colour": "#3a8a3a"
+  },
+  {
+   "name": "Iskola, iroda",
+   "icon": "✏️",
+   "colour": "#4a6a9a"
+  },
+  {
+   "name": "Ruházat",
+   "icon": "👕",
+   "colour": "#7a3a8a"
+  },
+  {
+   "name": "Szezonális, ünnep",
+   "icon": "🎄",
+   "colour": "#c43a5a"
+  },
+  {
+   "name": "Egyéb",
+   "icon": "📦",
+   "colour": "#8a8a8a"
+  }
+ ],
+ "entries": [
+  {
+   "name": "burgonya",
+   "category": "Zöldség"
+  },
+  {
+   "name": "vöröshagyma",
+   "category": "Zöldség"
+  },
+  {
+   "name": "lilahagyma",
+   "category": "Zöldség"
+  },
+  {
+   "name": "fokhagyma",
+   "category": "Zöldség"
+  },
+  {
+   "name": "újhagyma",
+   "category": "Zöldség"
+  },
+  {
+   "name": "póréhagyma",
+   "category": "Zöldség"
+  },
+  {
+   "name": "sárgarépa",
+   "category": "Zöldség"
+  },
+  {
+   "name": "fehérrépa",
+   "category": "Zöldség"
+  },
+  {
+   "name": "zeller",
+   "category": "Zöldség"
+  },
+  {
+   "name": "zellerszár",
+   "category": "Zöldség"
+  },
+  {
+   "name": "paradicsom",
+   "category": "Zöldség"
+  },
+  {
+   "name": "koktélparadicsom",
+   "category": "Zöldség"
+  },
+  {
+   "name": "kaliforniai paprika",
+   "category": "Zöldség"
+  },
+  {
+   "name": "tv paprika",
+   "category": "Zöldség"
+  },
+  {
+   "name": "hegyes erős paprika",
+   "category": "Zöldség"
+  },
+  {
+   "name": "kígyóuborka",
+   "category": "Zöldség"
+  },
+  {
+   "name": "fürtös uborka",
+   "category": "Zöldség"
+  },
+  {
+   "name": "cukkini",
+   "category": "Zöldség"
+  },
+  {
+   "name": "padlizsán",
+   "category": "Zöldség"
+  },
+  {
+   "name": "sütőtök",
+   "category": "Zöldség"
+  },
+  {
+   "name": "fejes káposzta",
+   "category": "Zöldség"
+  },
+  {
+   "name": "vöröskáposzta",
+   "category": "Zöldség"
+  },
+  {
+   "name": "kelkáposzta",
+   "category": "Zöldség"
+  },
+  {
+   "name": "kínai kel",
+   "category": "Zöldség"
+  },
+  {
+   "name": "karfiol",
+   "category": "Zöldség"
+  },
+  {
+   "name": "brokkoli",
+   "category": "Zöldség"
+  },
+  {
+   "name": "kelbimbó",
+   "category": "Zöldség"
+  },
+  {
+   "name": "karalábé",
+   "category": "Zöldség"
+  },
+  {
+   "name": "fejes saláta",
+   "category": "Zöldség"
+  },
+  {
+   "name": "jégsaláta",
+   "category": "Zöldség"
+  },
+  {
+   "name": "rukkola",
+   "category": "Zöldség"
+  },
+  {
+   "name": "madársaláta",
+   "category": "Zöldség"
+  },
+  {
+   "name": "spenót",
+   "category": "Zöldség"
+  },
+  {
+   "name": "mángold",
+   "category": "Zöldség"
+  },
+  {
+   "name": "cékla",
+   "category": "Zöldség"
+  },
+  {
+   "name": "retek",
+   "category": "Zöldség"
+  },
+  {
+   "name": "jégcsapretek",
+   "category": "Zöldség"
+  },
+  {
+   "name": "csiperkegomba",
+   "category": "Zöldség"
+  },
+  {
+   "name": "laskagomba",
+   "category": "Zöldség"
+  },
+  {
+   "name": "édesburgonya",
+   "category": "Zöldség"
+  },
+  {
+   "name": "kukorica cső",
+   "category": "Zöldség"
+  },
+  {
+   "name": "zöldbab",
+   "category": "Zöldség"
+  },
+  {
+   "name": "zöldborsó",
+   "category": "Zöldség"
+  },
+  {
+   "name": "spárga",
+   "category": "Zöldség"
+  },
+  {
+   "name": "articsóka",
+   "category": "Zöldség"
+  },
+  {
+   "name": "gyömbér",
+   "category": "Zöldség"
+  },
+  {
+   "name": "petrezselyemzöld",
+   "category": "Zöldség"
+  },
+  {
+   "name": "kapor",
+   "category": "Zöldség"
+  },
+  {
+   "name": "snidling",
+   "category": "Zöldség"
+  },
+  {
+   "name": "bazsalikom friss",
+   "category": "Zöldség"
+  },
+  {
+   "name": "menta friss",
+   "category": "Zöldség"
+  },
+  {
+   "name": "koriander friss",
+   "category": "Zöldség"
+  },
+  {
+   "name": "lime",
+   "category": "Zöldség"
+  },
+  {
+   "name": "citrom",
+   "category": "Zöldség"
+  },
+  {
+   "name": "alma",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "körte",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "banán",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "narancs",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "mandarin",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "grapefruit",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "szőlő",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "eper",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "málna",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "áfonya",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "szeder",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "ribizli",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "őszibarack",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "nektarin",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "sárgabarack",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "szilva",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "cseresznye",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "meggy",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "görögdinnye",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "sárgadinnye",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "kivi",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "ananász",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "mangó",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "avokádó",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "gránátalma",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "füge",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "datolya",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "aszalt szilva",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "mazsola",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "kókuszdió",
+   "category": "Gyümölcs"
+  },
+  {
+   "name": "fehér kenyér",
+   "category": "Pékáru"
+  },
+  {
+   "name": "félbarna kenyér",
+   "category": "Pékáru"
+  },
+  {
+   "name": "teljes kiőrlésű kenyér",
+   "category": "Pékáru"
+  },
+  {
+   "name": "rozskenyér",
+   "category": "Pékáru"
+  },
+  {
+   "name": "kovászos kenyér",
+   "category": "Pékáru"
+  },
+  {
+   "name": "toast kenyér",
+   "category": "Pékáru"
+  },
+  {
+   "name": "bagett",
+   "category": "Pékáru"
+  },
+  {
+   "name": "zsemle",
+   "category": "Pékáru"
+  },
+  {
+   "name": "kifli",
+   "category": "Pékáru"
+  },
+  {
+   "name": "sós kifli",
+   "category": "Pékáru"
+  },
+  {
+   "name": "kalács",
+   "category": "Pékáru"
+  },
+  {
+   "name": "fonott kalács",
+   "category": "Pékáru"
+  },
+  {
+   "name": "briós",
+   "category": "Pékáru"
+  },
+  {
+   "name": "croissant",
+   "category": "Pékáru"
+  },
+  {
+   "name": "kakaós csiga",
+   "category": "Pékáru"
+  },
+  {
+   "name": "pogácsa",
+   "category": "Pékáru"
+  },
+  {
+   "name": "túrós batyu",
+   "category": "Pékáru"
+  },
+  {
+   "name": "lángos",
+   "category": "Pékáru"
+  },
+  {
+   "name": "tortilla lap",
+   "category": "Pékáru"
+  },
+  {
+   "name": "pita",
+   "category": "Pékáru"
+  },
+  {
+   "name": "zsemlemorzsa",
+   "category": "Pékáru"
+  },
+  {
+   "name": "tej 2,8%",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "tej 1,5%",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "laktózmentes tej",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "zabtej",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "mandulatej",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "kefir",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "joghurt natúr",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "gyümölcsjoghurt",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "görög joghurt",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "tejföl",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "főzőtejszín",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "habtejszín",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "vaj",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "margarin",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "túró",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "krémsajt",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "trappista sajt",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "gouda sajt",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "edámi sajt",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "mozzarella",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "parmezán",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "feta",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "camembert",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "füstölt sajt",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "szeletelt sajt",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "reszelt sajt",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "tejszínhab spray",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "vaníliás puding",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "tejberizs",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "túró rudi",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "kakaós tej",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "tojás",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "tanyasi tojás",
+   "category": "Tejtermék"
+  },
+  {
+   "name": "csirkemell filé",
+   "category": "Hús"
+  },
+  {
+   "name": "csirkecomb",
+   "category": "Hús"
+  },
+  {
+   "name": "egész csirke",
+   "category": "Hús"
+  },
+  {
+   "name": "csirkeszárny",
+   "category": "Hús"
+  },
+  {
+   "name": "pulykamell",
+   "category": "Hús"
+  },
+  {
+   "name": "sertéskaraj",
+   "category": "Hús"
+  },
+  {
+   "name": "sertéstarja",
+   "category": "Hús"
+  },
+  {
+   "name": "sertéscomb",
+   "category": "Hús"
+  },
+  {
+   "name": "sertésoldalas",
+   "category": "Hús"
+  },
+  {
+   "name": "dagadó",
+   "category": "Hús"
+  },
+  {
+   "name": "darált sertéshús",
+   "category": "Hús"
+  },
+  {
+   "name": "darált marhahús",
+   "category": "Hús"
+  },
+  {
+   "name": "marhalábszár",
+   "category": "Hús"
+  },
+  {
+   "name": "marha hátszín",
+   "category": "Hús"
+  },
+  {
+   "name": "bélszín",
+   "category": "Hús"
+  },
+  {
+   "name": "kacsamell",
+   "category": "Hús"
+  },
+  {
+   "name": "kacsacomb",
+   "category": "Hús"
+  },
+  {
+   "name": "nyúl",
+   "category": "Hús"
+  },
+  {
+   "name": "bárány",
+   "category": "Hús"
+  },
+  {
+   "name": "virsli",
+   "category": "Hús"
+  },
+  {
+   "name": "frankfurti virsli",
+   "category": "Hús"
+  },
+  {
+   "name": "lecsókolbász",
+   "category": "Hús"
+  },
+  {
+   "name": "csabai kolbász",
+   "category": "Hús"
+  },
+  {
+   "name": "szárazkolbász",
+   "category": "Hús"
+  },
+  {
+   "name": "téliszalámi",
+   "category": "Hús"
+  },
+  {
+   "name": "paprikás szalámi",
+   "category": "Hús"
+  },
+  {
+   "name": "párizsi",
+   "category": "Hús"
+  },
+  {
+   "name": "füstölt sonka",
+   "category": "Hús"
+  },
+  {
+   "name": "gépsonka",
+   "category": "Hús"
+  },
+  {
+   "name": "prágai sonka",
+   "category": "Hús"
+  },
+  {
+   "name": "bacon",
+   "category": "Hús"
+  },
+  {
+   "name": "szalonna",
+   "category": "Hús"
+  },
+  {
+   "name": "tepertő",
+   "category": "Hús"
+  },
+  {
+   "name": "májas hurka",
+   "category": "Hús"
+  },
+  {
+   "name": "véres hurka",
+   "category": "Hús"
+  },
+  {
+   "name": "disznósajt",
+   "category": "Hús"
+  },
+  {
+   "name": "zsír",
+   "category": "Hús"
+  },
+  {
+   "name": "lazacfilé",
+   "category": "Hal"
+  },
+  {
+   "name": "hekk",
+   "category": "Hal"
+  },
+  {
+   "name": "pisztráng",
+   "category": "Hal"
+  },
+  {
+   "name": "ponty",
+   "category": "Hal"
+  },
+  {
+   "name": "busa",
+   "category": "Hal"
+  },
+  {
+   "name": "tonhal konzerv",
+   "category": "Hal"
+  },
+  {
+   "name": "szardínia konzerv",
+   "category": "Hal"
+  },
+  {
+   "name": "makréla konzerv",
+   "category": "Hal"
+  },
+  {
+   "name": "füstölt lazac",
+   "category": "Hal"
+  },
+  {
+   "name": "garnéla",
+   "category": "Hal"
+  },
+  {
+   "name": "tintahal",
+   "category": "Hal"
+  },
+  {
+   "name": "halrudak",
+   "category": "Hal"
+  },
+  {
+   "name": "rákkonzerv",
+   "category": "Hal"
+  },
+  {
+   "name": "tőkehal",
+   "category": "Hal"
+  },
+  {
+   "name": "sonkás felvágott",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "csirkemell sonka",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "pulyka sonka",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "mortadella",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "szalámi szeletelt",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "májkrém",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "kenőmájas",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "húskrém",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "tojáskrém",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "padlizsánkrém",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "humusz",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "tzatziki",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "olívabogyó",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "savanyú uborka",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "csemege uborka",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "csalamádé",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "savanyú káposzta",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "kovászos uborka",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "pepperóni",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "kapribogyó",
+   "category": "Felvágott, csemege"
+  },
+  {
+   "name": "spagetti",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "penne",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "fusilli",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "farfalle",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "tagliatelle",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "lasagne lap",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "makaróni",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "szélesmetélt",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "cérnametélt",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "tarhonya",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "galuska tészta",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "tojásos tészta",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "rizs",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "basmati rizs",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "jázmin rizs",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "barna rizs",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "rizottó rizs",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "kuszkusz",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "bulgur",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "quinoa",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "zabpehely",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "müzli",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "granola",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "kukoricapehely",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "gríz",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "búzadara",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "köles",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "hajdina",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "árpagyöngy",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "liszt",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "teljes kiőrlésű liszt",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "rétesliszt",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "kukoricaliszt",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "kukoricakeményítő",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "sütőpor",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "szódabikarbóna",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "élesztő",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "szárított élesztő",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "vaníliás cukor",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "kristálycukor",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "porcukor",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "barna cukor",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "nádcukor",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "méz",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "juharszirup",
+   "category": "Tészta, rizs, gabona"
+  },
+  {
+   "name": "csemegekukorica konzerv",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "zöldborsó konzerv",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "vörösbab konzerv",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "fehérbab konzerv",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "csicseriborsó konzerv",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "lencse konzerv",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "hámozott paradicsom konzerv",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "passzírozott paradicsom",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "paradicsompüré",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "gomba konzerv",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "ananász konzerv",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "őszibarack befőtt",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "meggybefőtt",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "lekvár",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "baracklekvár",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "szilvalekvár",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "mogyorókrém",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "kókuszkrém",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "kókusztej",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "sűrített tej",
+   "category": "Konzerv, befőtt"
+  },
+  {
+   "name": "só",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "bors",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "őrölt bors",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "pirospaprika édes",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "pirospaprika csípős",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "chili pehely",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "kömény",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "őrölt kömény",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "oregánó",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "bazsalikom szárított",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "kakukkfű",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "rozmaring",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "majoránna",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "babérlevél",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "fahéj",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "szegfűszeg",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "curry",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "kurkuma",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "gyömbér őrölt",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "szerecsendió",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "vegeta",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "ételízesítő",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "leveskocka",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "napraforgóolaj",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "olívaolaj",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "extra szűz olívaolaj",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "kókuszolaj",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "repceolaj",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "szezámolaj",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "ecet",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "almaecet",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "balzsamecet",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "ketchup",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "mustár",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "majonéz",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "tartármártás",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "szójaszósz",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "worcester szósz",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "tabasco",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "sriracha",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "barbecue szósz",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "pesto",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "salátaöntet",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "chili szósz",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "erős pista",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "magos mustár",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "torma",
+   "category": "Fűszer, olaj, szósz"
+  },
+  {
+   "name": "tejcsokoládé",
+   "category": "Édesség"
+  },
+  {
+   "name": "étcsokoládé",
+   "category": "Édesség"
+  },
+  {
+   "name": "fehér csokoládé",
+   "category": "Édesség"
+  },
+  {
+   "name": "csokis keksz",
+   "category": "Édesség"
+  },
+  {
+   "name": "vajas keksz",
+   "category": "Édesség"
+  },
+  {
+   "name": "zabkeksz",
+   "category": "Édesség"
+  },
+  {
+   "name": "nápolyi",
+   "category": "Édesség"
+  },
+  {
+   "name": "ostya",
+   "category": "Édesség"
+  },
+  {
+   "name": "piskóta",
+   "category": "Édesség"
+  },
+  {
+   "name": "muffin",
+   "category": "Édesség"
+  },
+  {
+   "name": "sütemény",
+   "category": "Édesség"
+  },
+  {
+   "name": "torta",
+   "category": "Édesség"
+  },
+  {
+   "name": "kürtőskalács",
+   "category": "Édesség"
+  },
+  {
+   "name": "gumicukor",
+   "category": "Édesség"
+  },
+  {
+   "name": "cukorka",
+   "category": "Édesség"
+  },
+  {
+   "name": "nyalóka",
+   "category": "Édesség"
+  },
+  {
+   "name": "rágógumi",
+   "category": "Édesség"
+  },
+  {
+   "name": "mentolos cukor",
+   "category": "Édesség"
+  },
+  {
+   "name": "mézeskalács",
+   "category": "Édesség"
+  },
+  {
+   "name": "marcipán",
+   "category": "Édesség"
+  },
+  {
+   "name": "tejcsoki drazsé",
+   "category": "Édesség"
+  },
+  {
+   "name": "kakaópor",
+   "category": "Édesség"
+  },
+  {
+   "name": "csokoládé forgács",
+   "category": "Édesség"
+  },
+  {
+   "name": "főzőcsokoládé",
+   "category": "Édesség"
+  },
+  {
+   "name": "tortadara",
+   "category": "Édesség"
+  },
+  {
+   "name": "chips",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "sós mogyoró",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "pisztácia",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "kesudió",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "mandula",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "dió",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "mogyoró",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "napraforgómag",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "tökmag",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "pattogatott kukorica",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "sós perec",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "sós pálcika",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "ropi",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "kréker",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "rizschips",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "tortilla chips",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "salsa szósz",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "aszalt gyümölcs mix",
+   "category": "Snack, sós"
+  },
+  {
+   "name": "ásványvíz szénsavmentes",
+   "category": "Ital"
+  },
+  {
+   "name": "ásványvíz szénsavas",
+   "category": "Ital"
+  },
+  {
+   "name": "szikvíz",
+   "category": "Ital"
+  },
+  {
+   "name": "kóla",
+   "category": "Ital"
+  },
+  {
+   "name": "narancsos üdítő",
+   "category": "Ital"
+  },
+  {
+   "name": "citromos üdítő",
+   "category": "Ital"
+  },
+  {
+   "name": "tonik",
+   "category": "Ital"
+  },
+  {
+   "name": "gyömbérsör",
+   "category": "Ital"
+  },
+  {
+   "name": "narancslé",
+   "category": "Ital"
+  },
+  {
+   "name": "almalé",
+   "category": "Ital"
+  },
+  {
+   "name": "multivitamin lé",
+   "category": "Ital"
+  },
+  {
+   "name": "paradicsomlé",
+   "category": "Ital"
+  },
+  {
+   "name": "őszibaracklé",
+   "category": "Ital"
+  },
+  {
+   "name": "szörp",
+   "category": "Ital"
+  },
+  {
+   "name": "málnaszörp",
+   "category": "Ital"
+  },
+  {
+   "name": "bodzaszörp",
+   "category": "Ital"
+  },
+  {
+   "name": "energiaital",
+   "category": "Ital"
+  },
+  {
+   "name": "izotóniás ital",
+   "category": "Ital"
+  },
+  {
+   "name": "jeges tea",
+   "category": "Ital"
+  },
+  {
+   "name": "kakaó ital",
+   "category": "Ital"
+  },
+  {
+   "name": "zöld tea",
+   "category": "Ital"
+  },
+  {
+   "name": "fekete tea",
+   "category": "Ital"
+  },
+  {
+   "name": "gyümölcstea",
+   "category": "Ital"
+  },
+  {
+   "name": "kamillatea",
+   "category": "Ital"
+  },
+  {
+   "name": "mentatea",
+   "category": "Ital"
+  },
+  {
+   "name": "őrölt kávé",
+   "category": "Ital"
+  },
+  {
+   "name": "szemes kávé",
+   "category": "Ital"
+  },
+  {
+   "name": "instant kávé",
+   "category": "Ital"
+  },
+  {
+   "name": "kávékapszula",
+   "category": "Ital"
+  },
+  {
+   "name": "sör",
+   "category": "Alkohol"
+  },
+  {
+   "name": "alkoholmentes sör",
+   "category": "Alkohol"
+  },
+  {
+   "name": "világos sör",
+   "category": "Alkohol"
+  },
+  {
+   "name": "barna sör",
+   "category": "Alkohol"
+  },
+  {
+   "name": "búzasör",
+   "category": "Alkohol"
+  },
+  {
+   "name": "vörösbor",
+   "category": "Alkohol"
+  },
+  {
+   "name": "fehérbor",
+   "category": "Alkohol"
+  },
+  {
+   "name": "rozé",
+   "category": "Alkohol"
+  },
+  {
+   "name": "pezsgő",
+   "category": "Alkohol"
+  },
+  {
+   "name": "prosecco",
+   "category": "Alkohol"
+  },
+  {
+   "name": "pálinka",
+   "category": "Alkohol"
+  },
+  {
+   "name": "vodka",
+   "category": "Alkohol"
+  },
+  {
+   "name": "whisky",
+   "category": "Alkohol"
+  },
+  {
+   "name": "gin",
+   "category": "Alkohol"
+  },
+  {
+   "name": "rum",
+   "category": "Alkohol"
+  },
+  {
+   "name": "likőr",
+   "category": "Alkohol"
+  },
+  {
+   "name": "tequila",
+   "category": "Alkohol"
+  },
+  {
+   "name": "cider",
+   "category": "Alkohol"
+  },
+  {
+   "name": "mirelit zöldségkeverék",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit zöldborsó",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit spenót",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit brokkoli",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit zöldbab",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit kukorica",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit leveszöldség",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit gyümölcs",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit málna",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit eper",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit pizza",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit hasábburgonya",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "krokett",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit halrudak",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit csirkefalatok",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "jégkrém",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "jégkrém családi",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "vanília fagylalt",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "csokis fagylalt",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "leveles tészta",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "pizzatészta",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit gombóc",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "mirelit palacsinta",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "jégkocka",
+   "category": "Fagyasztott"
+  },
+  {
+   "name": "vajkrém",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "kenhető margarin",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "mogyoróvaj",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "házi lekvár",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "akácméz",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "nutella",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "csokis gabonapehely",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "gabonaszelet",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "müzliszelet",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "zabkása",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "chia mag",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "lenmag",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "proteinszelet",
+   "category": "Reggeli, kenhető"
+  },
+  {
+   "name": "pelenka",
+   "category": "Bébi"
+  },
+  {
+   "name": "popsitörlő",
+   "category": "Bébi"
+  },
+  {
+   "name": "bébiétel",
+   "category": "Bébi"
+  },
+  {
+   "name": "tejpép",
+   "category": "Bébi"
+  },
+  {
+   "name": "babavíz",
+   "category": "Bébi"
+  },
+  {
+   "name": "cumisüveg",
+   "category": "Bébi"
+  },
+  {
+   "name": "cumi",
+   "category": "Bébi"
+  },
+  {
+   "name": "babaszappan",
+   "category": "Bébi"
+  },
+  {
+   "name": "babaolaj",
+   "category": "Bébi"
+  },
+  {
+   "name": "popsikrém",
+   "category": "Bébi"
+  },
+  {
+   "name": "tápszer",
+   "category": "Bébi"
+  },
+  {
+   "name": "rágóka",
+   "category": "Bébi"
+  },
+  {
+   "name": "gyerekjoghurt",
+   "category": "Bébi"
+  },
+  {
+   "name": "mosószer por",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "mosószer folyékony",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "mosókapszula",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "öblítő",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "folttisztító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "fehérítő",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "mosogatószer",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "mosogatógép tabletta",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "mosogatógép só",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "gépi öblítőszer",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "általános tisztítószer",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "fürdőszoba tisztító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "vízkőoldó",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "wc tisztító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "wc illatosító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "ablaktisztító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "padlótisztító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "konyhai zsíroldó",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "sütőtisztító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "hypo",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "domestos",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "szőnyegtisztító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "bútorápoló",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "lefolyótisztító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "penészirtó",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "fertőtlenítő spray",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "mosógép tisztító",
+   "category": "Tisztítószer"
+  },
+  {
+   "name": "szivacs",
+   "category": "Háztartás"
+  },
+  {
+   "name": "mosogatókesztyű",
+   "category": "Háztartás"
+  },
+  {
+   "name": "gumikesztyű",
+   "category": "Háztartás"
+  },
+  {
+   "name": "konyharuha",
+   "category": "Háztartás"
+  },
+  {
+   "name": "mikroszálas kendő",
+   "category": "Háztartás"
+  },
+  {
+   "name": "felmosó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "felmosófej",
+   "category": "Háztartás"
+  },
+  {
+   "name": "seprű",
+   "category": "Háztartás"
+  },
+  {
+   "name": "lapát",
+   "category": "Háztartás"
+  },
+  {
+   "name": "szemeteszsák 30l",
+   "category": "Háztartás"
+  },
+  {
+   "name": "szemeteszsák 60l",
+   "category": "Háztartás"
+  },
+  {
+   "name": "szemeteszsák 120l",
+   "category": "Háztartás"
+  },
+  {
+   "name": "alufólia",
+   "category": "Háztartás"
+  },
+  {
+   "name": "folpack",
+   "category": "Háztartás"
+  },
+  {
+   "name": "sütőpapír",
+   "category": "Háztartás"
+  },
+  {
+   "name": "uzsonnás zacskó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "zipzáras zacskó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "fagyasztózacskó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "sütőzacskó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "ruhacsipesz",
+   "category": "Háztartás"
+  },
+  {
+   "name": "ruhaszárító",
+   "category": "Háztartás"
+  },
+  {
+   "name": "vállfa",
+   "category": "Háztartás"
+  },
+  {
+   "name": "cipőkrém",
+   "category": "Háztartás"
+  },
+  {
+   "name": "molyirtó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "légfrissítő",
+   "category": "Háztartás"
+  },
+  {
+   "name": "gyertya",
+   "category": "Háztartás"
+  },
+  {
+   "name": "teamécses",
+   "category": "Háztartás"
+  },
+  {
+   "name": "gyufa",
+   "category": "Háztartás"
+  },
+  {
+   "name": "öngyújtó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "elem aa",
+   "category": "Háztartás"
+  },
+  {
+   "name": "elem aaa",
+   "category": "Háztartás"
+  },
+  {
+   "name": "izzó e27",
+   "category": "Háztartás"
+  },
+  {
+   "name": "izzó e14",
+   "category": "Háztartás"
+  },
+  {
+   "name": "led izzó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "hosszabbító",
+   "category": "Háztartás"
+  },
+  {
+   "name": "ragasztószalag",
+   "category": "Háztartás"
+  },
+  {
+   "name": "cellux",
+   "category": "Háztartás"
+  },
+  {
+   "name": "ragasztó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "illatgyertya",
+   "category": "Háztartás"
+  },
+  {
+   "name": "szúnyogirtó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "hangyairtó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "légycsapó",
+   "category": "Háztartás"
+  },
+  {
+   "name": "wc papír",
+   "category": "Papíráru"
+  },
+  {
+   "name": "papírtörlő",
+   "category": "Papíráru"
+  },
+  {
+   "name": "papírzsebkendő",
+   "category": "Papíráru"
+  },
+  {
+   "name": "szalvéta",
+   "category": "Papíráru"
+  },
+  {
+   "name": "kozmetikai kendő",
+   "category": "Papíráru"
+  },
+  {
+   "name": "nedves törlőkendő",
+   "category": "Papíráru"
+  },
+  {
+   "name": "papírtányér",
+   "category": "Papíráru"
+  },
+  {
+   "name": "papírpohár",
+   "category": "Papíráru"
+  },
+  {
+   "name": "muffin papír",
+   "category": "Papíráru"
+  },
+  {
+   "name": "sampon",
+   "category": "Testápolás"
+  },
+  {
+   "name": "balzsam",
+   "category": "Testápolás"
+  },
+  {
+   "name": "hajpakolás",
+   "category": "Testápolás"
+  },
+  {
+   "name": "tusfürdő",
+   "category": "Testápolás"
+  },
+  {
+   "name": "szappan",
+   "category": "Testápolás"
+  },
+  {
+   "name": "folyékony szappan",
+   "category": "Testápolás"
+  },
+  {
+   "name": "kézfertőtlenítő",
+   "category": "Testápolás"
+  },
+  {
+   "name": "fogkrém",
+   "category": "Testápolás"
+  },
+  {
+   "name": "fogkefe",
+   "category": "Testápolás"
+  },
+  {
+   "name": "fogselyem",
+   "category": "Testápolás"
+  },
+  {
+   "name": "szájvíz",
+   "category": "Testápolás"
+  },
+  {
+   "name": "dezodor",
+   "category": "Testápolás"
+  },
+  {
+   "name": "izzadásgátló",
+   "category": "Testápolás"
+  },
+  {
+   "name": "borotva",
+   "category": "Testápolás"
+  },
+  {
+   "name": "borotvabetét",
+   "category": "Testápolás"
+  },
+  {
+   "name": "borotvahab",
+   "category": "Testápolás"
+  },
+  {
+   "name": "borotválkozás utáni",
+   "category": "Testápolás"
+  },
+  {
+   "name": "intim mosakodó",
+   "category": "Testápolás"
+  },
+  {
+   "name": "egészségügyi betét",
+   "category": "Testápolás"
+  },
+  {
+   "name": "tampon",
+   "category": "Testápolás"
+  },
+  {
+   "name": "tisztasági betét",
+   "category": "Testápolás"
+  },
+  {
+   "name": "vatta",
+   "category": "Testápolás"
+  },
+  {
+   "name": "vattakorong",
+   "category": "Testápolás"
+  },
+  {
+   "name": "fültisztító pálcika",
+   "category": "Testápolás"
+  },
+  {
+   "name": "körömvágó",
+   "category": "Testápolás"
+  },
+  {
+   "name": "körömreszelő",
+   "category": "Testápolás"
+  },
+  {
+   "name": "hajgumi",
+   "category": "Testápolás"
+  },
+  {
+   "name": "hajcsat",
+   "category": "Testápolás"
+  },
+  {
+   "name": "fésű",
+   "category": "Testápolás"
+  },
+  {
+   "name": "hajlakk",
+   "category": "Testápolás"
+  },
+  {
+   "name": "hajzselé",
+   "category": "Testápolás"
+  },
+  {
+   "name": "hajfesték",
+   "category": "Testápolás"
+  },
+  {
+   "name": "arckrém",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "éjszakai krém",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "szemkörnyékápoló",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "testápoló",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "kézkrém",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "lábkrém",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "ajakápoló",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "napkrém",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "napozás utáni",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "arctisztító",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "micellás víz",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "arcmaszk",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "sminklemosó",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "alapozó",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "szempillaspirál",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "rúzs",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "körömlakk",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "körömlakklemosó",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "parfüm",
+   "category": "Kozmetikum"
+  },
+  {
+   "name": "fájdalomcsillapító",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "lázcsillapító",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "c-vitamin",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "d-vitamin",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "multivitamin",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "magnézium",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "cink",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "probiotikum",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "sebtapasz",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "sebfertőtlenítő",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "kötszer",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "gézlap",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "lázmérő",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "orrspray",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "torokfertőtlenítő",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "köhögés elleni szirup",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "allergia tabletta",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "hányinger elleni",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "hasfogó",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "hashajtó",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "savlekötő",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "szemcsepp",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "maszk",
+   "category": "Gyógyszertár"
+  },
+  {
+   "name": "macskaalom",
+   "category": "Kisállat"
+  },
+  {
+   "name": "macskaeledel száraz",
+   "category": "Kisállat"
+  },
+  {
+   "name": "macskaeledel konzerv",
+   "category": "Kisállat"
+  },
+  {
+   "name": "macska jutalomfalat",
+   "category": "Kisállat"
+  },
+  {
+   "name": "kutyaeledel száraz",
+   "category": "Kisállat"
+  },
+  {
+   "name": "kutyaeledel konzerv",
+   "category": "Kisállat"
+  },
+  {
+   "name": "kutya jutalomfalat",
+   "category": "Kisállat"
+  },
+  {
+   "name": "rágócsont",
+   "category": "Kisállat"
+  },
+  {
+   "name": "macskafű",
+   "category": "Kisállat"
+  },
+  {
+   "name": "bolhairtó",
+   "category": "Kisállat"
+  },
+  {
+   "name": "féreghajtó",
+   "category": "Kisállat"
+  },
+  {
+   "name": "alomlapát",
+   "category": "Kisállat"
+  },
+  {
+   "name": "kutyapiszok zacskó",
+   "category": "Kisállat"
+  },
+  {
+   "name": "hörcsögeledel",
+   "category": "Kisállat"
+  },
+  {
+   "name": "madáreleség",
+   "category": "Kisállat"
+  },
+  {
+   "name": "haleledel",
+   "category": "Kisállat"
+  },
+  {
+   "name": "fakanál",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "habverő",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "szűrő",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "reszelő",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "kés",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "vágódeszka",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "serpenyő",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "lábas",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "tepsi",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "sütőforma",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "sütőkesztyű",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "konyhai mérleg",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "mérőpohár",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "ételtároló doboz",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "befőttes üveg",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "termosz",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "kulacs",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "evőeszköz",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "tányér",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "pohár",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "bögre",
+   "category": "Konyhai eszköz"
+  },
+  {
+   "name": "virágföld",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "tápoldat",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "vetőmag",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "palánta",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "muskátli",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "cserép",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "locsolókanna",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "kerti kesztyű",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "metszőolló",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "fűmag",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "mulcs",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "grillszén",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "grillgyújtó",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "grill fűszer",
+   "category": "Kert, erkély"
+  },
+  {
+   "name": "toll",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "ceruza",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "radír",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "hegyező",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "füzet",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "jegyzettömb",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "post-it",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "ragasztóstift",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "olló",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "vonalzó",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "filctoll",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "színes ceruza",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "zsírkréta",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "nyomtatópapír",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "boríték",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "bélyeg",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "irattartó",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "tűzőgép",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "gemkapocs",
+   "category": "Iskola, iroda"
+  },
+  {
+   "name": "zokni",
+   "category": "Ruházat"
+  },
+  {
+   "name": "harisnya",
+   "category": "Ruházat"
+  },
+  {
+   "name": "alsónadrág",
+   "category": "Ruházat"
+  },
+  {
+   "name": "bugyi",
+   "category": "Ruházat"
+  },
+  {
+   "name": "melltartó",
+   "category": "Ruházat"
+  },
+  {
+   "name": "póló",
+   "category": "Ruházat"
+  },
+  {
+   "name": "pizsama",
+   "category": "Ruházat"
+  },
+  {
+   "name": "papucs",
+   "category": "Ruházat"
+  },
+  {
+   "name": "esernyő",
+   "category": "Ruházat"
+  },
+  {
+   "name": "kesztyű",
+   "category": "Ruházat"
+  },
+  {
+   "name": "sapka",
+   "category": "Ruházat"
+  },
+  {
+   "name": "sál",
+   "category": "Ruházat"
+  },
+  {
+   "name": "cipőfűző",
+   "category": "Ruházat"
+  },
+  {
+   "name": "talpbetét",
+   "category": "Ruházat"
+  },
+  {
+   "name": "szaloncukor",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "adventi naptár",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "karácsonyi izzósor",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "csomagolópapír",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "ajándékszalag",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "képeslap",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "húsvéti tojásfesték",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "csokitojás",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "tökfaragó szett",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "szilveszteri trombita",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "farsangi fánk",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "mikulás csoki",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "virágcsokor",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "lufi",
+   "category": "Szezonális, ünnep"
+  },
+  {
+   "name": "szülinapi gyertya",
+   "category": "Szezonális, ünnep"
+  }
+ ]
+}

@@ -12,6 +12,7 @@ import {
   resetList,
   seededCategory,
   setEntry,
+  starter,
 } from './helpers'
 
 test.beforeEach(async ({ request }) => {
@@ -92,8 +93,8 @@ test('the list is grouped by category in the configured order, uncategorised las
   request,
 }) => {
   const lidl = await createStore(request, 'Lidl')
-  const produce = await seededCategory(request, 'Produce')
-  const dairy = await seededCategory(request, 'Dairy')
+  const produce = await seededCategory(request, starter.produce)
+  const dairy = await seededCategory(request, starter.dairy)
 
   // A known order, whatever an earlier run left: Produce before Dairy.
   const before = await categoryOrder(request)
@@ -115,13 +116,13 @@ test('the list is grouped by category in the configured order, uncategorised las
   const groups = await groupNames(page).evaluateAll((els) =>
     els.map((el) => el.getAttribute('data-category')),
   )
-  expect(groups).toEqual(['Produce', 'Dairy', 'Uncategorised'])
+  expect(groups).toEqual([starter.produce, starter.dairy, 'Uncategorised'])
   await expect(itemNames(page)).toHaveText(['apples', 'cheese', 'milk', 'mystery thing'])
 
   // Each group shows its icon and name.
-  const dairyGroup = page.locator('[data-category="Dairy"]')
+  const dairyGroup = page.locator('[data-category="Tejtermék"]')
   await expect(dairyGroup.locator('.group__icon')).toHaveText(dairy.icon)
-  await expect(dairyGroup.locator('.group__title')).toContainText('Dairy')
+  await expect(dairyGroup.locator('.group__title')).toContainText(starter.dairy)
 
   await setCategoryOrder(request, before)
 })
@@ -138,8 +139,8 @@ test('a freshly typed item is visible under Uncategorised, never absent', async 
 })
 
 test('reordering categories on the manage page reorders the list', async ({ page, request }) => {
-  const dairy = await seededCategory(request, 'Dairy')
-  const produce = await seededCategory(request, 'Produce')
+  const dairy = await seededCategory(request, starter.dairy)
+  const produce = await seededCategory(request, starter.produce)
 
   // Start from a known order regardless of what an earlier run left behind:
   // Produce immediately before Dairy, at the front.
@@ -156,8 +157,8 @@ test('reordering categories on the manage page reorders the list', async ({ page
   await expect(itemNames(page)).toHaveText(['apples', 'milk'])
 
   await page.getByTestId('nav-manage').click()
-  await page.getByTestId('move-up-Dairy').click()
-  await expect(page.getByTestId('move-up-Dairy')).toBeDisabled()
+  await page.getByTestId(`move-up-${starter.dairy}`).click()
+  await expect(page.getByTestId(`move-up-${starter.dairy}`)).toBeDisabled()
 
   await page.getByRole('link', { name: 'List' }).click()
   await expect(itemNames(page)).toHaveText(['milk', 'apples'])
@@ -202,17 +203,17 @@ test('choosing a suggestion prefills category and stores; the stores can be chan
   const lidl = await createStore(request, 'Lidl')
   const spar = await createStore(request, 'Spar')
   await createStore(request, 'Aldi')
-  const household = await seededCategory(request, 'Household')
-  const seed = await createItem(request, 'ketchup', [lidl.id, spar.id])
-  await setEntry(request, 'ketchup', { category_id: household.id, store_ids: [lidl.id, spar.id] })
+  const household = await seededCategory(request, starter.household)
+  const seed = await createItem(request, 'ketchup xxl', [lidl.id, spar.id])
+  await setEntry(request, 'ketchup xxl', { category_id: household.id, store_ids: [lidl.id, spar.id] })
   await request.delete(`${API}/shopping/items/${seed.id}`)
 
   await page.goto('/add')
   await page.getByTestId('item-name').fill('ket')
-  await page.getByTestId('suggest-ketchup').click()
+  await page.getByTestId('suggest-ketchup xxl').click()
 
-  await expect(page.getByTestId('item-name')).toHaveValue('ketchup')
-  await expect(page.getByTestId('prefilled-category')).toContainText('Household')
+  await expect(page.getByTestId('item-name')).toHaveValue('ketchup xxl')
+  await expect(page.getByTestId('prefilled-category')).toContainText(starter.household)
   await expect(page.getByTestId('pick-store-Lidl')).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByTestId('pick-store-Spar')).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByTestId('pick-store-Aldi')).toHaveAttribute('aria-pressed', 'false')
@@ -224,12 +225,12 @@ test('choosing a suggestion prefills category and stores; the stores can be chan
 
   await expect(page).toHaveURL(/\/$/)
   await page.getByTestId('store-chip-Aldi').click()
-  await expect(itemNames(page)).toHaveText(['ketchup'])
-  const householdGroup = page.locator('[data-category="Household"]')
-  await expect(householdGroup.getByTestId('item-name-text')).toHaveText(['ketchup'])
+  await expect(itemNames(page)).toHaveText(['ketchup xxl'])
+  const householdGroup = page.locator('[data-category="Háztartás"]')
+  await expect(householdGroup.getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
 
   // The entry still remembers Lidl and Spar.
-  const entry = await entryFor(request, 'ketchup')
+  const entry = await entryFor(request, 'ketchup xxl')
   expect(entry.stores.map((s) => s.name).sort()).toEqual(['Lidl', 'Spar'])
 })
 
@@ -239,7 +240,7 @@ test('type a name in a hurry, categorise it later, and the next add carries the 
   page,
   request,
 }) => {
-  const bakery = await seededCategory(request, 'Bakery')
+  const bakery = await seededCategory(request, starter.bakery)
 
   // In a hurry: just the name.
   await page.goto('/add')
@@ -249,18 +250,19 @@ test('type a name in a hurry, categorise it later, and the next add carries the 
 
   // Later, at home: one correction on the catalogue page.
   await page.getByTestId('nav-catalogue').click()
+  await page.getByTestId('catalogue-filter').fill('sour')
   await page.getByTestId('category-select-sourdough').selectOption(bakery.id)
   await expect(page.getByTestId('category-select-sourdough')).toHaveValue(bakery.id)
 
   // The item already on the list regrouped, with no edit to the item.
   await page.getByRole('link', { name: 'List' }).click()
-  await expect(page.locator('[data-category="Bakery"]').getByTestId('item-name-text')).toHaveText(['sourdough'])
+  await expect(page.locator('[data-category="Pékáru"]').getByTestId('item-name-text')).toHaveText(['sourdough'])
 
   // And the next add of that name carries it.
   await page.getByTestId('add-button').click()
   await page.getByTestId('item-name').fill('sour')
   await page.getByTestId('suggest-sourdough').click()
-  await expect(page.getByTestId('prefilled-category')).toContainText('Bakery')
+  await expect(page.getByTestId('prefilled-category')).toContainText(starter.bakery)
 })
 
 test('a rename collision offers a merge instead of silently failing', async ({ page, request }) => {
@@ -268,6 +270,7 @@ test('a rename collision offers a merge instead of silently failing', async ({ p
   await createItem(request, 'mlik')
 
   await page.goto('/catalogue')
+  await page.getByTestId('catalogue-filter').fill('mlik')
   await page.getByTestId('rename-mlik').click()
   await page.getByTestId('rename-input-mlik').fill('milk')
   await page.getByTestId('rename-save-mlik').click()
@@ -278,6 +281,7 @@ test('a rename collision offers a merge instead of silently failing', async ({ p
   await page.getByTestId('merge-mlik').click()
 
   await expect(page.getByTestId('entry-row-mlik')).toHaveCount(0)
+  await page.getByTestId('catalogue-filter').fill('milk')
   await expect(page.getByTestId('entry-row-milk')).toBeVisible()
   // Both items now sit under the one entry.
   const entry = await entryFor(request, 'milk')
@@ -320,21 +324,21 @@ test('choosing a category while adding regroups an existing item of that name', 
   page,
   request,
 }) => {
-  const household = await seededCategory(request, 'Household')
-  await createItem(request, 'ketchup')
+  const household = await seededCategory(request, starter.household)
+  await createItem(request, 'ketchup xxl')
 
   await page.goto('/')
-  await expect(page.locator('[data-category="Uncategorised"]').getByTestId('item-name-text')).toHaveText(['ketchup'])
+  await expect(page.locator('[data-category="Uncategorised"]').getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
 
   await page.getByTestId('add-button').click()
-  await page.getByTestId('item-name').fill('ketchup')
+  await page.getByTestId('item-name').fill('ketchup xxl')
   await expect(page.locator('.item-form__category .hint')).toContainText('applies to every')
   await page.getByTestId('item-category').selectOption(household.id)
   await page.getByTestId('item-submit').click()
 
   await expect(page).toHaveURL(/\/$/)
   // Both ketchups — the one added now and the one already there — moved.
-  await expect(page.locator('[data-category="Household"]').getByTestId('item-name-text')).toHaveText(['ketchup', 'ketchup'])
+  await expect(page.locator('[data-category="Háztartás"]').getByTestId('item-name-text')).toHaveText(['ketchup xxl', 'ketchup xxl'])
   await expect(page.locator('[data-category="Uncategorised"]')).toHaveCount(0)
 })
 
@@ -342,7 +346,7 @@ test('typing a known name without touching the category does not uncategorise it
   page,
   request,
 }) => {
-  const dairy = await seededCategory(request, 'Dairy')
+  const dairy = await seededCategory(request, starter.dairy)
   await createItem(request, 'milk')
   await setEntry(request, 'milk', { category_id: dairy.id })
 
@@ -352,14 +356,14 @@ test('typing a known name without touching the category does not uncategorise it
   await page.getByTestId('item-submit').click()
 
   await expect(page).toHaveURL(/\/$/)
-  await expect(page.locator('[data-category="Dairy"]').getByTestId('item-name-text')).toHaveText(['milk', 'milk'])
+  await expect(page.locator('[data-category="Tejtermék"]').getByTestId('item-name-text')).toHaveText(['milk', 'milk'])
 })
 
 test('choosing a category while editing applies to every item of that name', async ({
   page,
   request,
 }) => {
-  const dairy = await seededCategory(request, 'Dairy')
+  const dairy = await seededCategory(request, starter.dairy)
   const one = await createItem(request, 'milk')
   await createItem(request, 'milk')
 
@@ -368,14 +372,14 @@ test('choosing a category while editing applies to every item of that name', asy
   await page.getByTestId('item-submit').click()
 
   await expect(page).toHaveURL(/\/$/)
-  await expect(page.locator('[data-category="Dairy"]').getByTestId('item-name-text')).toHaveText(['milk', 'milk'])
+  await expect(page.locator('[data-category="Tejtermék"]').getByTestId('item-name-text')).toHaveText(['milk', 'milk'])
 })
 
 test('an entry can be added on the catalogue page ahead of needing it', async ({
   page,
   request,
 }) => {
-  const dairy = await seededCategory(request, 'Dairy')
+  const dairy = await seededCategory(request, starter.dairy)
   await createStore(request, 'Lidl')
 
   await page.goto('/catalogue')
@@ -385,6 +389,8 @@ test('an entry can be added on the catalogue page ahead of needing it', async ({
   await page.getByTestId('new-entry-store-Lidl').click()
   await page.getByTestId('new-entry-submit').click()
 
+  // The list is capped; the search is how an entry is found.
+  await page.getByTestId('catalogue-filter').fill('oat')
   await expect(page.getByTestId('entry-row-oat milk')).toBeVisible()
   await expect(page.getByTestId('category-select-oat milk')).toHaveValue(dairy.id)
 
@@ -397,7 +403,7 @@ test('an entry can be added on the catalogue page ahead of needing it', async ({
   await page.goto('/add')
   await page.getByTestId('item-name').fill('oat')
   await page.getByTestId('suggest-oat milk').click()
-  await expect(page.getByTestId('prefilled-category')).toContainText('Dairy')
+  await expect(page.getByTestId('prefilled-category')).toContainText(starter.dairy)
   await expect(page.getByTestId('pick-store-Lidl')).toHaveAttribute('aria-pressed', 'true')
 })
 
@@ -410,5 +416,18 @@ test('adding an entry with a name that exists is refused and says so', async ({ 
   await page.getByTestId('new-entry-submit').click()
 
   await expect(page.getByTestId('new-entry-collision')).toContainText('already exists')
+  await page.getByTestId('catalogue-filter').fill('milk')
   await expect(page.getByTestId('entry-row-milk')).toHaveCount(1)
+})
+
+test('the catalogue page shows a capped list and says how to see the rest', async ({ page }) => {
+  await page.goto('/catalogue')
+
+  // The starter pack alone is far more than the cap.
+  await expect(page.getByTestId('catalogue-truncated')).toContainText('type to narrow')
+  const shown = await page.locator('.catalogue-row').count()
+  expect(shown).toBeLessThanOrEqual(60)
+
+  await page.getByTestId('catalogue-filter').fill('tej')
+  await expect(page.getByTestId('entry-row-tej 2,8%')).toBeVisible()
 })

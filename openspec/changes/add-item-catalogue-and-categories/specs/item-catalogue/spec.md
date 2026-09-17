@@ -44,6 +44,25 @@ The system SHALL also allow a member to add a catalogue entry on its own, with a
 - **THEN** the system rejects the request and identifies the existing entry
 - **AND** no second entry is created
 
+### Requirement: A starter catalogue
+
+A fresh installation SHALL come with a starter catalogue — several hundred everyday items, food and household alike, each already categorised — so that suggestions are useful from the first day rather than only after weeks of typing. The starter catalogue SHALL be inserted only into an empty catalogue, once; after that it belongs to the household, and an entry they rename or remove SHALL stay renamed or removed across restarts.
+
+#### Scenario: Suggestions work on the first day
+
+- **WHEN** the household opens the app on a newly installed system and a member types "tej"
+- **THEN** starter entries such as "tej 2,8%" are offered, carrying their category
+
+#### Scenario: A removed starter entry stays removed
+
+- **WHEN** a member removes a starter entry and the service is restarted
+- **THEN** the entry is not reinserted
+
+#### Scenario: The starter catalogue does not overwrite a household's own
+
+- **WHEN** the catalogue already holds entries
+- **THEN** the starter catalogue is not applied
+
 ### Requirement: Suggestions while typing
 
 While a member is typing an item name, the system SHALL offer matching catalogue entries. A match SHALL be on the beginning of the name, compared case-insensitively. Suggestions SHALL be ordered with the most recently used first, so the things bought often are reached first.

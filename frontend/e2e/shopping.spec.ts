@@ -14,20 +14,20 @@ test('the ketchup case: one item, written once, appears in exactly the right sto
   const spar = await createStore(request, 'Spar')
   const aldi = await createStore(request, 'Aldi')
 
-  await createItem(request, 'ketchup', [lidl.id, spar.id])
+  await createItem(request, 'ketchup xxl', [lidl.id, spar.id])
   await createItem(request, 'milk')
   await createItem(request, 'cat litter', [aldi.id])
 
   await page.goto('/')
 
-  await expect(itemNames(page)).toHaveText(['cat litter', 'ketchup', 'milk'])
+  await expect(itemNames(page)).toHaveText(['cat litter', 'ketchup xxl', 'milk'])
 
   await page.getByTestId('store-chip-Lidl').click()
-  await expect(itemNames(page)).toHaveText(['ketchup', 'milk'])
+  await expect(itemNames(page)).toHaveText(['ketchup xxl', 'milk'])
   await expect(page.getByText('cat litter')).toHaveCount(0)
 
   await page.getByTestId('store-chip-Spar').click()
-  await expect(itemNames(page)).toHaveText(['ketchup', 'milk'])
+  await expect(itemNames(page)).toHaveText(['ketchup xxl', 'milk'])
 
   await page.getByTestId('store-chip-Aldi').click()
   await expect(itemNames(page)).toHaveText(['cat litter', 'milk'])
@@ -39,23 +39,23 @@ test('buying in one store removes the item from the other store immediately', as
 }) => {
   const lidl = await createStore(request, 'Lidl')
   const spar = await createStore(request, 'Spar')
-  await createItem(request, 'ketchup', [lidl.id, spar.id])
+  await createItem(request, 'ketchup xxl', [lidl.id, spar.id])
 
   await page.goto('/')
   await pickFirstMember(page)
 
   await page.getByTestId('store-chip-Lidl').click()
-  await expect(itemNames(page)).toHaveText(['ketchup'])
+  await expect(itemNames(page)).toHaveText(['ketchup xxl'])
 
-  await page.getByTestId('buy-ketchup').click()
+  await page.getByTestId('buy-ketchup xxl').click()
   // Gone from the outstanding items; shown as bought instead.
   await expect(page.locator('[data-bought="false"]')).toHaveCount(0)
-  await expect(page.locator('[data-bought="true"]').getByTestId('item-name-text')).toHaveText(['ketchup'])
+  await expect(page.locator('[data-bought="true"]').getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
 
   // And the same in Spar, without anyone touching Spar.
   await page.getByTestId('store-chip-Spar').click()
   await expect(page.locator('[data-bought="false"]')).toHaveCount(0)
-  await expect(page.locator('[data-bought="true"]').getByTestId('item-name-text')).toHaveText(['ketchup'])
+  await expect(page.locator('[data-bought="true"]').getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
 })
 
 test('tapping the tick on a bought item undoes it', async ({ page, request }) => {

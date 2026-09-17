@@ -11,6 +11,7 @@ import {
   resetList,
   seededCategory,
   setEntry,
+  starter,
 } from './helpers'
 
 test.beforeEach(async ({ request }) => {
@@ -26,7 +27,7 @@ test('ticking an item moves it below every outstanding item, dimmed, in both vie
   request,
 }) => {
   const lidl = await createStore(request, 'Lidl')
-  const dairy = await seededCategory(request, 'Dairy')
+  const dairy = await seededCategory(request, starter.dairy)
   await createItem(request, 'apples', [lidl.id])
   await createItem(request, 'milk', [lidl.id])
   await setEntry(request, 'milk', { category_id: dairy.id })
@@ -98,15 +99,15 @@ test('the ketchup scenario: bought in Lidl, shown as bought in Spar, outstanding
 }) => {
   const lidl = await createStore(request, 'Lidl')
   const spar = await createStore(request, 'Spar')
-  await createItem(request, 'ketchup', [lidl.id, spar.id])
+  await createItem(request, 'ketchup xxl', [lidl.id, spar.id])
 
   await page.goto('/')
   await pickFirstMember(page)
   await page.getByTestId('store-chip-Lidl').click()
-  await page.getByTestId('buy-ketchup').click()
-  await expect(bought(page).getByTestId('item-name-text')).toHaveText(['ketchup'])
+  await page.getByTestId('buy-ketchup xxl').click()
+  await expect(bought(page).getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
 
   await page.getByTestId('store-chip-Spar').click()
-  await expect(bought(page).getByTestId('item-name-text')).toHaveText(['ketchup'])
+  await expect(bought(page).getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
   await expect(page.locator('[data-bought="false"]')).toHaveCount(0)
 })

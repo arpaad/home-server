@@ -27,7 +27,7 @@ The system SHALL maintain the set of categories the household sorts its shopping
 
 ### Requirement: Seeded categories
 
-The system SHALL provide a usable set of categories on a fresh installation, so that categorising works before anyone has configured anything. These seeded categories SHALL be editable and removable exactly like any other, carrying no special status.
+The system SHALL provide a usable set of categories on a fresh installation, so that categorising works before anyone has configured anything. These seeded categories SHALL be editable and removable exactly like any other, carrying no special status: they SHALL be inserted only into an empty registry, once, and a seeded category the household removes SHALL NOT be reinserted on a later start.
 
 #### Scenario: A fresh installation already has categories
 
@@ -39,6 +39,11 @@ The system SHALL provide a usable set of categories on a fresh installation, so 
 
 - **WHEN** a member renames or removes a seeded category
 - **THEN** the change is accepted, exactly as for a category they created
+
+#### Scenario: A removed seeded category stays removed
+
+- **WHEN** a member removes a seeded category and the service is restarted
+- **THEN** the category is not reinserted
 
 ### Requirement: Category appearance
 
