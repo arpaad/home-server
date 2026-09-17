@@ -1,0 +1,11 @@
+[Unit]
+Description=H.O.M.E. database backup
+After=home.service
+Requires=home.service
+OnFailure=home-backup-failed.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/home-server
+EnvironmentFile=/opt/home-server/deploy/.env
+ExecStart=/opt/home-server/deploy/pi/backup.sh

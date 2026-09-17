@@ -1,0 +1,9 @@
+# Runs only when a backup fails. A backup job that fails silently for six
+# months is worse than none, because it is trusted.
+[Unit]
+Description=Notify that a H.O.M.E. backup failed
+
+[Service]
+Type=oneshot
+EnvironmentFile=/opt/home-server/deploy/.env
+ExecStart=/bin/sh -c 'if [ -n "${NTFY_TOPIC:-}" ]; then curl -fsS -H "Title: H.O.M.E. backup FAILED" -d "$(journalctl -u home-backup -n 20 --no-pager)" "https://ntfy.sh/$NTFY_TOPIC"; else logger -p user.err "H.O.M.E. backup failed and NTFY_TOPIC is not set"; fi'

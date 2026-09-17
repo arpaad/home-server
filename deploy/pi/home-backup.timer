@@ -1,0 +1,12 @@
+# Hourly. Persistent=true takes a backup that was missed while the Pi was
+# off, as soon as it is back — a Pi is switched off more often than a server.
+[Unit]
+Description=Hourly H.O.M.E. database backup
+
+[Timer]
+OnCalendar=hourly
+RandomizedDelaySec=5m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
