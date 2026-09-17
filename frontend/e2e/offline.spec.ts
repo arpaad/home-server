@@ -17,6 +17,7 @@ import {
   pickFirstMember,
   resetList,
   seededCategory,
+  starter,
 } from './helpers'
 
 test.beforeEach(async ({ request }) => {
@@ -162,11 +163,11 @@ test('an item added offline can be bought offline, and lands once on the server'
 
   await goOffline(context, page)
   await page.getByTestId('add-button').click()
-  await page.getByTestId('item-name').fill('ketchup')
+  await page.getByTestId('item-name').fill('ketchup xxl')
   await page.getByTestId('item-submit').click()
-  await expect(itemNames(page)).toContainText(['ketchup'])
-  await page.getByTestId('buy-ketchup').click()
-  await expect(page.locator('[data-category="Bought"]').getByTestId('item-name-text')).toHaveText(['ketchup'])
+  await expect(itemNames(page)).toContainText(['ketchup xxl'])
+  await page.getByTestId('buy-ketchup xxl').click()
+  await expect(page.locator('[data-category="Bought"]').getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
 
   await context.setOffline(false)
   await untilSynced(page)
@@ -174,7 +175,7 @@ test('an item added offline can be bought offline, and lands once on the server'
   const server: { name: string; purchase: unknown }[] = await (
     await request.get(`${API}/shopping/items`)
   ).json()
-  const ketchups = server.filter((i) => i.name === 'ketchup')
+  const ketchups = server.filter((i) => i.name === 'ketchup xxl')
   expect(ketchups).toHaveLength(1)
   expect(ketchups[0]?.purchase).not.toBeNull()
 })
@@ -324,15 +325,15 @@ test('management pages read offline but refuse to change anything', async ({
   context,
   request,
 }) => {
-  await seededCategory(request, 'Dairy')
+  await seededCategory(request, starter.dairy)
   await page.goto('/manage')
-  await expect(page.getByTestId('category-row-Dairy')).toBeVisible()
+  await expect(page.getByTestId(`category-row-${starter.dairy}`)).toBeVisible()
   await settle(page)
 
   await context.setOffline(true)
   await page.reload()
 
-  await expect(page.getByTestId('category-row-Dairy')).toBeVisible()
+  await expect(page.getByTestId(`category-row-${starter.dairy}`)).toBeVisible()
   await expect(page.getByTestId('offline-note')).toContainText('Cannot reach the server')
   // Playwright only calls form controls disabled, so assert on one inside
   // the guard rather than on the fieldset itself.

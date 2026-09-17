@@ -81,6 +81,12 @@ make db-up && make run           # API on :8080
 make client-dev                  # client on :5173, proxying /api
 ```
 
+A fresh database gets a **starter pack**: 30 categories and ~700 everyday
+items (Hungarian), all categorised, so suggestions work from the first day.
+It's inserted once, into an empty database, and then it's yours — rename or
+delete freely; nothing comes back on restart. Stores are not seeded; add
+your own under *Manage*.
+
 Set the household's members before first use — the seed defaults to
 `Árpád` and `Partner`:
 

@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
 import { expect, type APIRequestContext, type Page } from '@playwright/test'
 
 /** The API the client talks to, reached directly for test setup and teardown. */
@@ -26,8 +29,29 @@ export interface Item {
   category: Category | null
 }
 
-/** Categories the seed installs; left alone so the dev database stays usable. */
-const SEEDED = new Set(['produce', 'bakery', 'dairy', 'meat', 'frozen', 'drinks', 'household', 'other'])
+/**
+ * The starter pack the seed installs, read from the same file the backend
+ * reads. Tests leave it alone so the dev database stays usable, and use its
+ * category names (e.g. `starter.dairy`) rather than hardcoding them.
+ */
+interface StarterPack {
+  categories: { name: string; icon: string; colour: string }[]
+  entries: { name: string; category: string }[]
+}
+const PACK_PATH = fileURLToPath(
+  new URL('../../backend/app/db/seed_data/catalogue.hu.json', import.meta.url),
+)
+export const STARTER: StarterPack = JSON.parse(readFileSync(PACK_PATH, 'utf-8'))
+const SEEDED_CATEGORIES = new Set(STARTER.categories.map((c) => c.name.toLowerCase()))
+const SEEDED_ENTRIES = new Set(STARTER.entries.map((e) => e.name.toLowerCase()))
+
+/** Starter categories the tests lean on, by role. */
+export const starter = {
+  produce: 'Zöldség',
+  bakery: 'Pékáru',
+  dairy: 'Tejtermék',
+  household: 'Háztartás',
+} as const
 
 async function json<T>(request: APIRequestContext, path: string): Promise<T> {
   const response = await request.get(`${API}${path}`)
@@ -45,6 +69,7 @@ export async function resetList(request: APIRequestContext): Promise<void> {
     await request.delete(`${API}/shopping/items/${item.id}`)
   }
   for (const entry of await json<Entry[]>(request, '/shopping/catalogue')) {
+    if (SEEDED_ENTRIES.has(entry.name.toLowerCase())) continue
     // Bought items are not listed, so their entries survive (RESTRICT, by
     // design). Strip whatever a test set on them so nothing leaks forward.
     await request.patch(`${API}/shopping/catalogue/${entry.id}`, {
@@ -56,7 +81,7 @@ export async function resetList(request: APIRequestContext): Promise<void> {
     await request.delete(`${API}/shopping/stores/${store.id}`)
   }
   for (const category of await json<Category[]>(request, '/shopping/categories')) {
-    if (!SEEDED.has(category.name.toLowerCase())) {
+    if (!SEEDED_CATEGORIES.has(category.name.toLowerCase())) {
       await request.delete(`${API}/shopping/categories/${category.id}`)
     }
   }

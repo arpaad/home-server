@@ -24,6 +24,8 @@ import type { CatalogueEntry } from '../api/types'
 import { StatusBanner } from '../components/StatusBanner'
 import { useIsOnline } from '../net/connectivity'
 
+const MAX_ROWS = 60
+
 export function CataloguePage() {
   const online = useIsOnline()
   const catalogue = useCatalogue()
@@ -31,10 +33,20 @@ export function CataloguePage() {
   const stores = useStores()
   const [error, setError] = useState<unknown>(null)
   const [filter, setFilter] = useState('')
+  const actions: EntryActions = {
+    update: useUpdateEntry(),
+    rename: useRenameEntry(),
+    merge: useMergeEntry(),
+    remove: useDeleteEntry(),
+  }
 
-  const entries = (catalogue.data ?? []).filter((entry) =>
-    entry.name.toLowerCase().includes(filter.trim().toLowerCase()),
-  )
+  const all = catalogue.data ?? []
+  const needle = filter.trim().toLowerCase()
+  const matching = needle === '' ? all : all.filter((entry) => entry.name.toLowerCase().includes(needle))
+  // The starter pack alone is several hundred entries. Rendering them all
+  // is slow on a phone and useless to read; the search is the way in.
+  const entries = matching.slice(0, MAX_ROWS)
+  const hidden = matching.length - entries.length
 
   return (
     <section className="page" data-testid="catalogue-page">
@@ -74,23 +86,32 @@ export function CataloguePage() {
         onChange={(event) => setFilter(event.target.value)}
       />
 
-      {catalogue.isSuccess && entries.length === 0 && (
+      {catalogue.isSuccess && all.length === 0 && (
         <p className="empty">Nothing in the catalogue yet — it fills itself as you add items.</p>
+      )}
+      {catalogue.isSuccess && all.length > 0 && matching.length === 0 && (
+        <p className="empty">Nothing matches "{filter.trim()}".</p>
+      )}
+      {hidden > 0 && (
+        <p className="hint" data-testid="catalogue-truncated">
+          Showing {entries.length} of {matching.length} — type to narrow it down.
+        </p>
       )}
 
       <fieldset className="offline-guard" disabled={!online} data-testid="catalogue-controls">
-      <ul className="manage-list">
-        {entries.map((entry) => (
-          <EntryRow
-            key={entry.id}
-            entry={entry}
-            all={catalogue.data ?? []}
-            categories={categories.data ?? []}
-            stores={stores.data ?? []}
-            onError={setError}
-          />
-        ))}
-      </ul>
+        <ul className="manage-list">
+          {entries.map((entry) => (
+            <EntryRow
+              key={entry.id}
+              entry={entry}
+              all={all}
+              categories={categories.data ?? []}
+              stores={stores.data ?? []}
+              actions={actions}
+              onError={setError}
+            />
+          ))}
+        </ul>
       </fieldset>
     </section>
   )
@@ -236,23 +257,29 @@ function NewEntryForm({
   )
 }
 
+interface EntryActions {
+  update: ReturnType<typeof useUpdateEntry>
+  rename: ReturnType<typeof useRenameEntry>
+  merge: ReturnType<typeof useMergeEntry>
+  remove: ReturnType<typeof useDeleteEntry>
+}
+
 function EntryRow({
   entry,
   all,
   categories,
   stores,
+  actions,
   onError,
 }: {
   entry: CatalogueEntry
   all: CatalogueEntry[]
   categories: { id: string; name: string; icon: string; colour: string }[]
   stores: { id: string; name: string }[]
+  actions: EntryActions
   onError: (error: unknown) => void
 }) {
-  const update = useUpdateEntry()
-  const rename = useRenameEntry()
-  const merge = useMergeEntry()
-  const remove = useDeleteEntry()
+  const { update, rename, merge, remove } = actions
   const [renaming, setRenaming] = useState(false)
   const [newName, setNewName] = useState(entry.name)
   const [collision, setCollision] = useState<string | null>(null)
