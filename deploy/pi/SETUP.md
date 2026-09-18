@@ -15,14 +15,14 @@ már fut a `main`.
   a MAC-címe alapján. (Router admin → DHCP → reservation.) Így a cím
   újraindítás után sem változik.
 - [ ] **DuckDNS.** Nyisd meg a https://www.duckdns.org oldalt, lépj be
-  (GitHub/Google), adj hozzá egy aldomaint, pl. `szabohome` → ez lesz a
-  `szabohome.duckdns.org`. Az IP mezőbe írd be: `192.168.0.242`. Igen, privát
+  (GitHub/Google), adj hozzá egy aldomaint, pl. `pami-home` → ez lesz a
+  `pami-home.duckdns.org`. Az IP mezőbe írd be: `192.168.0.242`. Igen, privát
   IP — ez így jó, kívülről senki nem ér el semmit, csak a név oldódik fel.
   **Másold ki a tokent** (a lap tetején), kelleni fog.
 - [ ] **Tailscale fiók.** https://login.tailscale.com — lépj be (Google/GitHub).
   Egyelőre ennyi.
 
-✅ **Ellenőrzés:** a laptopon `nslookup szabohome.duckdns.org` → `192.168.0.242`.
+✅ **Ellenőrzés:** a laptopon `nslookup pami-home.duckdns.org` → `192.168.0.242`.
 
 ---
 
@@ -150,7 +150,7 @@ sudo nano /etc/caddy/env
 ```
 
 ```
-HOME_DOMAIN=szabohome.duckdns.org
+HOME_DOMAIN=pami-home.duckdns.org
 DUCKDNS_TOKEN=<a duckdns token a 0. fázisból>
 ```
 
@@ -162,7 +162,7 @@ sudo journalctl -u caddy -f         # várj a "certificate obtained successfully
 Az első tanúsítvány 30–90 másodperc (DNS-propagálás). Ha "DNS problem"-et
 látsz, várj egy percet, `sudo systemctl restart caddy`.
 
-✅ **Ellenőrzés:** a laptopon, **böngészőben**: `https://szabohome.duckdns.org`
+✅ **Ellenőrzés:** a laptopon, **böngészőben**: `https://pami-home.duckdns.org`
 → zöld lakat, és a lista. A telefonon (otthoni wifin) ugyanez → a böngésző
 felajánlja a *Hozzáadás a kezdőképernyőhöz*-t. Telepítsd. Ez a PWA.
 
@@ -205,10 +205,10 @@ BACKUP_OFFSITE=lucky@<laptop-tailscale-ip>:backups/home
 ### 7b. Értesítés, ha elromlik
 
 https://ntfy.sh — nem kell fiók. Találj ki egy hosszú, nem kitalálható
-témanevet (pl. `szabohome-backup-Xk29fQ`), telepítsd az ntfy appot a
+témanevet (pl. `pami-home-backup-Xk29fQ`), telepítsd az ntfy appot a
 telefonra, iratkozz fel rá. `deploy/.env`:
 ```
-NTFY_TOPIC=szabohome-backup-Xk29fQ
+NTFY_TOPIC=pami-home-backup-Xk29fQ
 ```
 
 Aztán próbáld ki **mindkét irányba**:
@@ -259,7 +259,7 @@ A beállításokban legyen bekapcsolva a **"Use Tailscale subnets"** (Android:
 Settings → Use subnet routes).
 
 ✅ **Ellenőrzés:** kapcsold ki a wifit a telefonon (mobilnet), Tailscale be,
-nyisd meg `https://szabohome.duckdns.org` → **ugyanaz** a lista, zöld lakat.
+nyisd meg `https://pami-home.duckdns.org` → **ugyanaz** a lista, zöld lakat.
 Tailscale ki → nem tölt be, de az app **offline-módban** mutatja a másolatot.
 
 A feleséged telefonjára ugyanez, ha akarja. Ha nem, otthon wifin nélküle is
