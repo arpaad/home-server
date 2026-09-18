@@ -3,9 +3,14 @@
 Egy fázis egy ülés. Minden fázis végén van egy **✅ Ellenőrzés** — amíg az nem
 jó, ne menj tovább. A `[ ]` dobozokat pipáld, ahogy haladsz.
 
-Előfeltevések: Raspberry Pi OS 64-bit (Bookworm), a Pi neve `pi`, a fix IP
-`192.168.0.242`, van egy USB-s SSD/pendrive az adatoknak, és a laptopodon
-már fut a `main`.
+Előfeltevések: a Pi-n Ubuntu 22.04 (64-bit) fut, a felhasználód `lucky`, a
+fix IP `192.168.0.242`, van egy USB-s SSD/pendrive az adatoknak, és a
+laptopodon már fut a `main`.
+
+A Pi-n **Docker** hostolja a konténereket, nem podman: az Ubuntu 22.04
+repójában lévő podman (3.4) túl régi ehhez a stackhez, a Docker hivatalos
+repója viszont naprakész arm64-re. A laptopon marad a podman; a compose fájl
+ugyanaz mindkettőnek.
 
 ---
 
@@ -28,30 +33,36 @@ már fut a `main`.
 
 ## 1. Fázis — Pi alap (15 perc)
 
-SSH-zz be a Pi-re: `ssh pi@192.168.0.242`
+SSH-zz be a Pi-re: `ssh lucky@192.168.0.242`
 
 ```bash
 sudo apt update && sudo apt full-upgrade -y
-sudo apt install -y podman git rsync curl pipx
-sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install podman-compose
+sudo apt remove -y podman                      # ha fent van; a régi 3.4 csak zavarna
+sudo apt install -y ca-certificates curl git rsync
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu jammy stable" \
+  | sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo reboot
 ```
 
-(A `podman-compose` nem minden Pi OS repóban van meg, ezért pipx-szel megy
-fel, root-nak, a `/usr/local/bin`-be. Frissítés később:
-`sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade podman-compose`.)
+(Ubuntu 24.04-en a `jammy` helyett `noble`.)
 
 Várj egy percet, SSH vissza.
 
-- [ ] `podman --version` → 4.x
-- [ ] `podman-compose --version` → 1.x
+- [ ] `docker --version` → 2x.x
+- [ ] `docker compose version` → v2.x
+- [ ] `systemctl is-enabled docker` → `enabled`
 
-✅ **Ellenőrzés:** `sudo podman run --rm docker.io/library/hello-world` kiír
-egy "Hello from Docker!" szöveget.
+✅ **Ellenőrzés:** `sudo docker run --rm hello-world` kiír egy
+"Hello from Docker!" szöveget.
 
 > Mindent **root-ként** (`sudo`) futtatunk a Pi-n. Otthoni gépen ez egyszerűbb
-> és a boot-sorrend is egyértelmű; a rootless podman + systemd user unit több
-> lépés, több hibalehetőség.
+> és a boot-sorrend is egyértelmű. (Ha nem akarsz mindig `sudo`-zni:
+> `sudo usermod -aG docker lucky`, ki-be lépés — de a systemd unitok így is
+> rootként futnak.)
 
 ---
 
@@ -130,7 +141,7 @@ beseedeli a magyar kezdőcsomagot.
 `{"status":"ok",...}`. Meg: `curl -s http://127.0.0.1:8080/api/shopping/categories | head -c 200`
 → magyar kategóriák.
 
-> Hiba? `sudo podman ps -a` és `sudo podman logs home-deploy_api_1`.
+> Hiba? `sudo docker ps -a` és `sudo docker logs home-deploy-api`.
 
 ---
 
@@ -225,9 +236,9 @@ ls -la /mnt/home-data/backups/hourly/    # ott a dump
 # és a laptopon: ls ~/backups/home/hourly/
 
 # Most rontsd el szándékosan, hogy lásd, szól-e:
-sudo podman stop home-deploy_db_1
+sudo docker stop home-deploy-db
 sudo systemctl start home-backup         # ez elhasal
-sudo podman start home-deploy_db_1
+sudo docker start home-deploy-db
 ```
 
 ✅ **Ellenőrzés:** a második futás után **jött push a telefonra**. Ha nem jött,
@@ -290,8 +301,8 @@ Ez `git pull` + kép lehúzás + újraindítás; a konténer migrál. Ha a
 | Tünet | Parancs |
 |---|---|
 | nem tölt be az app | `sudo systemctl status home caddy` |
-| API log | `sudo podman logs home-deploy_api_1` |
-| adatbázis log | `sudo podman logs home-deploy_db_1` |
+| API log | `sudo docker logs home-deploy-api` |
+| adatbázis log | `sudo docker logs home-deploy-db` |
 | HTTPS/tanúsítvány | `sudo journalctl -u caddy -n 50` |
 | mentés | `sudo journalctl -u home-backup -n 50`, `systemctl list-timers` |
 | Tailscale | `sudo tailscale status` |

@@ -5,7 +5,13 @@
 # undermines Postgres's own crash-safety. HOME_DATA_DIR is the mount point of
 # that disk (see SETUP.md, phase 3).
 
+# Fixed container names: docker names them home-deploy-db-1, podman
+# home-deploy_db_1. The backup and restore scripts want one name.
+
 services:
   db:
+    container_name: home-deploy-db
     volumes:
       - ${HOME_DATA_DIR:?set HOME_DATA_DIR in deploy/.env}/postgres:/var/lib/postgresql/data
+  api:
+    container_name: home-deploy-api
