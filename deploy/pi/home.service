@@ -15,6 +15,8 @@ After=network-online.target
 RequiresMountsFor=/mnt/home-data
 
 [Service]
+# No absolute path: systemd searches /usr/local/bin too, so a pipx-installed
+# podman-compose (SETUP.md, phase 1) is found as well as an apt one.
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/home-server

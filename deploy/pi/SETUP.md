@@ -32,9 +32,14 @@ SSH-zz be a Pi-re: `ssh pi@192.168.0.242`
 
 ```bash
 sudo apt update && sudo apt full-upgrade -y
-sudo apt install -y podman podman-compose git rsync curl
+sudo apt install -y podman git rsync curl pipx
+sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install podman-compose
 sudo reboot
 ```
+
+(A `podman-compose` nem minden Pi OS repóban van meg, ezért pipx-szel megy
+fel, root-nak, a `/usr/local/bin`-be. Frissítés később:
+`sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade podman-compose`.)
 
 Várj egy percet, SSH vissza.
 
