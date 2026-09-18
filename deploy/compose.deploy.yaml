@@ -7,6 +7,9 @@
 #   make deploy-pull      # fetch the published image
 #   make deploy-up        # run it
 #
+# On the Raspberry Pi, deploy/pi/ adds an override (data on external storage)
+# and the systemd units; see deploy/pi/SETUP.md.
+#
 # Copy deploy/.env.example to deploy/.env and set HOME_BIND_ADDRESS. There is
 # no authentication in this release: bind it to the LAN, never to a public
 # interface, and do not port-forward it.

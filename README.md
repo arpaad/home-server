@@ -164,13 +164,16 @@ Updating is deliberate (`make deploy-pull`), so a machine coming back from a
 power cut returns to the version it was running rather than whatever is
 newest.
 
-### Not yet done
+### On the Raspberry Pi
 
-Running this on the Pi still needs: the data volume placed on external
-storage rather than the SD card, systemd units so the stack starts at boot,
-and scheduled off-device backups with a rehearsed restore. Those are tasks
-8.3–8.9 of the `add-shopping-list` change. **Do not let the household depend
-on this service before the backup and restore work is finished.**
+`deploy/pi/` holds everything the Pi needs: a compose override putting the
+database on external storage, systemd units so the stack and its hourly
+backup survive a reboot, Caddy for HTTPS on a DuckDNS name (required — the
+PWA and offline mode only run in a secure context), and a restore script.
+The step-by-step runbook is `deploy/pi/SETUP.md`. Remote access is Tailscale
+as a subnet router, so the same URL works at home and away, with no port
+opened on the router. **Do not let the household depend on this service
+before the restore drill in that runbook has been done once.**
 
 ## Tools
 

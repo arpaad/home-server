@@ -1,0 +1,27 @@
+# H.O.M.E. stack — brought up at boot, so a power cut needs nobody to log in.
+#
+#   sudo cp deploy/pi/home.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now home
+#
+# The containers carry restart: unless-stopped, but that only restarts them
+# while podman is already running; this unit is what starts them after a
+# reboot. It is a oneshot that stays "active", so `systemctl status home`
+# reflects whether the stack was brought up.
+
+[Unit]
+Description=H.O.M.E. household server (API + Postgres)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=/mnt/home-data
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/home-server
+EnvironmentFile=/opt/home-server/deploy/.env
+ExecStart=/usr/bin/podman-compose -f deploy/compose.deploy.yaml -f deploy/pi/compose.override.yaml up -d
+ExecStop=/usr/bin/podman-compose -f deploy/compose.deploy.yaml -f deploy/pi/compose.override.yaml down
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target
