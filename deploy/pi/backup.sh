@@ -11,7 +11,7 @@ set -euo pipefail
 
 : "${HOME_DATA_DIR:?HOME_DATA_DIR is not set (source deploy/.env)}"
 DIR="$HOME_DATA_DIR/backups"
-DB_CONTAINER="${DB_CONTAINER:-home-deploy-db}"   # container_name in compose.override.yaml
+DB_CONTAINER="${DB_CONTAINER:-home-deploy_db_1}"
 PG_USER="${POSTGRES_USER:-home}"
 PG_DB="${POSTGRES_DB:-home}"
 OFFSITE="${BACKUP_OFFSITE:-}"          # e.g. lucky@laptop:backups/home  (over Tailscale)
@@ -21,12 +21,12 @@ stamp="$(date +%Y%m%d-%H%M)"
 file="$DIR/hourly/home-$stamp.dump"
 
 echo "backup: dumping $PG_DB -> $file"
-docker exec "$DB_CONTAINER" pg_dump -U "$PG_USER" -Fc "$PG_DB" > "$file"
+podman exec "$DB_CONTAINER" pg_dump -U "$PG_USER" -Fc "$PG_DB" > "$file"
 
 # A dump that cannot be listed is not a backup. pg_restore --list reads the
 # custom-format header and table of contents, which catches a truncated or
 # empty file without needing a database to restore into.
-if ! docker exec -i "$DB_CONTAINER" pg_restore --list < "$file" > /dev/null; then
+if ! podman exec -i "$DB_CONTAINER" pg_restore --list < "$file" > /dev/null; then
   echo "backup: VERIFY FAILED for $file" >&2
   rm -f "$file"
   exit 1

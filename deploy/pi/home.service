@@ -3,27 +3,26 @@
 #   sudo cp deploy/pi/home.service /etc/systemd/system/
 #   sudo systemctl daemon-reload && sudo systemctl enable --now home
 #
-# Docker restarts unless-stopped containers on boot by itself; this unit
-# exists so there is one thing to `systemctl restart home`, and so a fresh
-# checkout comes up without anyone typing a compose command. It is a oneshot
-# that stays "active", so `systemctl status home` reflects whether the stack
-# was brought up.
+# The containers carry restart: unless-stopped, but that only restarts them
+# while podman is already running; this unit is what starts them after a
+# reboot. It is a oneshot that stays "active", so `systemctl status home`
+# reflects whether the stack was brought up.
 
 [Unit]
 Description=H.O.M.E. household server (API + Postgres)
 Wants=network-online.target
-After=network-online.target docker.service
-Requires=docker.service
+After=network-online.target
 RequiresMountsFor=/mnt/home-data
 
 [Service]
+# No absolute path: systemd searches /usr/local/bin too, so a pipx-installed
+# podman-compose (SETUP.md, phase 1) is found as well as an apt one.
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/home-server
-# No EnvironmentFile: compose reads deploy/.env itself (the directory of the
-# first -f file), and parsing it twice with two parsers only invites drift.
-ExecStart=/usr/bin/docker compose -f deploy/compose.deploy.yaml -f deploy/pi/compose.override.yaml up -d
-ExecStop=/usr/bin/docker compose -f deploy/compose.deploy.yaml -f deploy/pi/compose.override.yaml down
+EnvironmentFile=/opt/home-server/deploy/.env
+ExecStart=podman-compose -f deploy/compose.deploy.yaml -f deploy/pi/compose.override.yaml up -d
+ExecStop=podman-compose -f deploy/compose.deploy.yaml -f deploy/pi/compose.override.yaml down
 TimeoutStartSec=300
 
 [Install]
