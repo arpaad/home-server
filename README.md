@@ -167,7 +167,7 @@ newest.
 ### On the Raspberry Pi
 
 `deploy/pi/` holds everything the Pi needs: a compose override putting the
-database on external storage (the Pi runs Docker; same compose file), systemd units so the stack and its hourly
+database on external storage, systemd units so the stack and its hourly
 backup survive a reboot, Caddy for HTTPS on a DuckDNS name (required — the
 PWA and offline mode only run in a secure context), and a restore script.
 The step-by-step runbook is `deploy/pi/SETUP.md`. Remote access is Tailscale
@@ -187,5 +187,5 @@ before the restore drill in that runbook has been done once.**
 | **Vite / oxlint**   | Client build and linting                            |
 | **Playwright**      | End-to-end tests in a real browser                  |
 | **pre-commit**      | Formats and lints before a commit lands             |
-| **Podman / Docker** | Containers: podman on the laptop, Docker on the Pi  |
+| **Podman**          | Containers, locally and on the Pi                   |
 | **GitHub Actions**  | Checks on every branch; multi-arch publish on tags  |
