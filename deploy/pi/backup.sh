@@ -11,7 +11,7 @@ set -euo pipefail
 
 : "${HOME_DATA_DIR:?HOME_DATA_DIR is not set (source deploy/.env)}"
 DIR="$HOME_DATA_DIR/backups"
-DB_CONTAINER="${DB_CONTAINER:-home-deploy_db_1}"
+DB_CONTAINER="${DB_CONTAINER:-home-deploy-db}"   # container_name in compose.override.yaml
 PG_USER="${POSTGRES_USER:-home}"
 PG_DB="${POSTGRES_DB:-home}"
 OFFSITE="${BACKUP_OFFSITE:-}"          # e.g. lucky@laptop:backups/home  (over Tailscale)

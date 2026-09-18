@@ -9,7 +9,7 @@
 set -euo pipefail
 
 dump="${1:?usage: restore.sh <file.dump>}"
-DB_CONTAINER="${DB_CONTAINER:-home-deploy_db_1}"
+DB_CONTAINER="${DB_CONTAINER:-home-deploy-db}"   # container_name in compose.override.yaml
 PG_USER="${POSTGRES_USER:-home}"
 PG_DB="${POSTGRES_DB:-home}"
 

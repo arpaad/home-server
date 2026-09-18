@@ -3,7 +3,7 @@
 Egy fázis egy ülés. Minden fázis végén van egy **✅ Ellenőrzés** — amíg az nem
 jó, ne menj tovább. A `[ ]` dobozokat pipáld, ahogy haladsz.
 
-Előfeltevések: Raspberry Pi OS 64-bit (Bookworm), a Pi neve `pi`, a fix IP
+Előfeltevések: a Pi-n Ubuntu (64-bit) fut, a felhasználód `lucky`, a fix IP
 `192.168.0.242`, van egy USB-s SSD/pendrive az adatoknak, és a laptopodon
 már fut a `main`.
 
@@ -28,22 +28,34 @@ már fut a `main`.
 
 ## 1. Fázis — Pi alap (15 perc)
 
-SSH-zz be a Pi-re: `ssh pi@192.168.0.242`
+SSH-zz be a Pi-re: `ssh lucky@192.168.0.242`
+
+**Podman 4.6 vagy újabb kell.** Az Ubuntu 22.04-ben 3.4 van, ami a
+`depends_on: service_healthy`-t szó nélkül kihagyja, és a konténerek közti
+DNS-hez külön plugin kellene. Az Ubuntu 24.04-ben 4.9.3 van — ugyanaz, mint
+a laptopon. Ha `lsb_release -rs` → `22.04`, előbb frissíts:
 
 ```bash
 sudo apt update && sudo apt full-upgrade -y
+sudo do-release-upgrade            # kérdez; Enter/y; SSH-n az 1022-es portot is engedd (y). 30–60 perc.
+```
+
+Reboot után, 24.04-en:
+
+```bash
 sudo apt install -y podman git rsync curl pipx
 sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install podman-compose
 sudo reboot
 ```
 
-(A `podman-compose` nem minden Pi OS repóban van meg, ezért pipx-szel megy
-fel, root-nak, a `/usr/local/bin`-be. Frissítés később:
-`sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade podman-compose`.)
+(A `podman-compose` az apt-ban régi (1.0.x), ezért pipx-szel megy fel,
+root-nak, a `/usr/local/bin`-be. Ha a rendszer-Python frissült alatta — pl.
+a 24.04-es frissítés után —: `... pipx reinstall podman-compose`. Frissítés
+később: `sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade podman-compose`.)
 
 Várj egy percet, SSH vissza.
 
-- [ ] `podman --version` → 4.x
+- [ ] `podman --version` → **4.6 vagy újabb** (24.04: 4.9.3)
 - [ ] `podman-compose --version` → 1.x
 
 ✅ **Ellenőrzés:** `sudo podman run --rm docker.io/library/hello-world` kiír
@@ -130,7 +142,7 @@ beseedeli a magyar kezdőcsomagot.
 `{"status":"ok",...}`. Meg: `curl -s http://127.0.0.1:8080/api/shopping/categories | head -c 200`
 → magyar kategóriák.
 
-> Hiba? `sudo podman ps -a` és `sudo podman logs home-deploy_api_1`.
+> Hiba? `sudo podman ps -a` és `sudo podman logs home-deploy-api`.
 
 ---
 
@@ -225,9 +237,9 @@ ls -la /mnt/home-data/backups/hourly/    # ott a dump
 # és a laptopon: ls ~/backups/home/hourly/
 
 # Most rontsd el szándékosan, hogy lásd, szól-e:
-sudo podman stop home-deploy_db_1
+sudo podman stop home-deploy-db
 sudo systemctl start home-backup         # ez elhasal
-sudo podman start home-deploy_db_1
+sudo podman start home-deploy-db
 ```
 
 ✅ **Ellenőrzés:** a második futás után **jött push a telefonra**. Ha nem jött,
@@ -290,8 +302,8 @@ Ez `git pull` + kép lehúzás + újraindítás; a konténer migrál. Ha a
 | Tünet | Parancs |
 |---|---|
 | nem tölt be az app | `sudo systemctl status home caddy` |
-| API log | `sudo podman logs home-deploy_api_1` |
-| adatbázis log | `sudo podman logs home-deploy_db_1` |
+| API log | `sudo podman logs home-deploy-api` |
+| adatbázis log | `sudo podman logs home-deploy-db` |
 | HTTPS/tanúsítvány | `sudo journalctl -u caddy -n 50` |
 | mentés | `sudo journalctl -u home-backup -n 50`, `systemctl list-timers` |
 | Tailscale | `sudo tailscale status` |

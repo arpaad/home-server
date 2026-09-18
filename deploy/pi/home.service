@@ -5,7 +5,9 @@
 #
 # The containers carry restart: unless-stopped, but that only restarts them
 # while podman is already running; this unit is what starts them after a
-# reboot. It is a oneshot that stays "active", so `systemctl status home`
+# reboot. podman-compose is looked up on PATH (it is pipx-installed into
+# /usr/local/bin, which systemd searches); podman >= 4.6 is required for
+# depends_on's service_healthy to be honoured rather than silently skipped. It is a oneshot that stays "active", so `systemctl status home`
 # reflects whether the stack was brought up.
 
 [Unit]
@@ -15,8 +17,6 @@ After=network-online.target
 RequiresMountsFor=/mnt/home-data
 
 [Service]
-# No absolute path: systemd searches /usr/local/bin too, so a pipx-installed
-# podman-compose (SETUP.md, phase 1) is found as well as an apt one.
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/home-server
