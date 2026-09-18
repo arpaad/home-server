@@ -3,7 +3,7 @@
 Egy fázis egy ülés. Minden fázis végén van egy **✅ Ellenőrzés** — amíg az nem
 jó, ne menj tovább. A `[ ]` dobozokat pipáld, ahogy haladsz.
 
-Előfeltevések: a Pi-n Ubuntu (64-bit) fut, a felhasználód `lucky`, a fix IP
+Előfeltevések: a Pi-n Ubuntu 22.04 (64-bit) fut, a felhasználód `lucky`, a fix IP
 `192.168.0.242`, van egy USB-s SSD/pendrive az adatoknak, és a laptopodon
 már fut a `main`.
 
@@ -30,33 +30,31 @@ már fut a `main`.
 
 SSH-zz be a Pi-re: `ssh lucky@192.168.0.242`
 
-**Podman 4.6 vagy újabb kell.** Az Ubuntu 22.04-ben 3.4 van, ami a
-`depends_on: service_healthy`-t szó nélkül kihagyja, és a konténerek közti
-DNS-hez külön plugin kellene. Az Ubuntu 24.04-ben 4.9.3 van — ugyanaz, mint
-a laptopon. Ha `lsb_release -rs` → `22.04`, előbb frissíts:
-
 ```bash
 sudo apt update && sudo apt full-upgrade -y
-sudo do-release-upgrade            # kérdez; Enter/y; SSH-n az 1022-es portot is engedd (y). 30–60 perc.
-```
-
-Reboot után, 24.04-en:
-
-```bash
-sudo apt install -y podman git rsync curl pipx
+sudo apt install -y podman golang-github-containernetworking-plugin-dnsname git rsync curl pipx
 sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install podman-compose
 sudo reboot
 ```
 
-(A `podman-compose` az apt-ban régi (1.0.x), ezért pipx-szel megy fel,
-root-nak, a `/usr/local/bin`-be. Ha a rendszer-Python frissült alatta — pl.
-a 24.04-es frissítés után —: `... pipx reinstall podman-compose`. Frissítés
-később: `sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade podman-compose`.)
+Három dolog, ami a 22.04-es (3.4-es) podman miatt van itt:
+
+- A **`dnsname` plugin** adja a konténerek közti névfeloldást (`api` → `db`).
+  Az újabb podmanben beépített, a 3.4-ben külön csomag, és a podman **a
+  hálózat létrehozásakor** teszi bele — ezért az első `up` előtt kell fent
+  lennie. (Ha mégis utána tetted fel: `sudo podman network rm home-deploy_default`,
+  és indítsd újra a stacket.)
+- A `podman-compose` az apt-ban nincs meg, ezért pipx-szel megy fel, root-nak,
+  a `/usr/local/bin`-be. Frissítés később:
+  `sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade podman-compose`.
+- A 3.4 a `depends_on: service_healthy`-t szó nélkül kihagyja — nem baj, az
+  API konténer maga várja meg az adatbázist (v0.2.0-tól).
 
 Várj egy percet, SSH vissza.
 
-- [ ] `podman --version` → **4.6 vagy újabb** (24.04: 4.9.3)
+- [ ] `podman --version` → 3.4.4
 - [ ] `podman-compose --version` → 1.x
+- [ ] `ls /usr/lib/cni/dnsname` → megvan
 
 ✅ **Ellenőrzés:** `sudo podman run --rm docker.io/library/hello-world` kiír
 egy "Hello from Docker!" szöveget.

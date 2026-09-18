@@ -6,8 +6,8 @@
 # The containers carry restart: unless-stopped, but that only restarts them
 # while podman is already running; this unit is what starts them after a
 # reboot. podman-compose is looked up on PATH (it is pipx-installed into
-# /usr/local/bin, which systemd searches); podman >= 4.6 is required for
-# depends_on's service_healthy to be honoured rather than silently skipped. It is a oneshot that stays "active", so `systemctl status home`
+# /usr/local/bin, which systemd searches). Start order between the two
+# containers is not relied on: the API image waits for the database itself. It is a oneshot that stays "active", so `systemctl status home`
 # reflects whether the stack was brought up.
 
 [Unit]
