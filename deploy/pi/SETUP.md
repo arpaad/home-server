@@ -3,9 +3,13 @@
 Egy fázis egy ülés. Minden fázis végén van egy **✅ Ellenőrzés** — amíg az nem
 jó, ne menj tovább. A `[ ]` dobozokat pipáld, ahogy haladsz.
 
-Előfeltevések: a Pi-n Ubuntu 22.04 (64-bit) fut, a felhasználód `lucky`, a fix IP
-`192.168.0.242`, van egy USB-s SSD/pendrive az adatoknak, és a laptopodon
-már fut a `main`.
+Előfeltevések: Raspberry Pi 4, rajta **Ubuntu Server 24.04 LTS, 64-bit**, a
+felhasználód `lucky`, a fix IP `192.168.0.242`, van egy USB-s SSD/pendrive az
+adatoknak, és a laptopodon már fut a `main`.
+
+> **64-bit kötelező.** A publikált image csak amd64-re és arm64-re készül, és
+> a 64-bites Ubuntu 24.04-ben van elég friss podman (4.9). Ha `uname -m`
+> `armv7l`-t mond, az egy 32-bites rendszer — újra kell telepíteni, lásd 0b.
 
 ---
 
@@ -24,6 +28,21 @@ már fut a `main`.
 
 ✅ **Ellenőrzés:** a laptopon `nslookup pami-home.duckdns.org` → `192.168.0.242`.
 
+### 0b. Ha a Pi-n nem 64-bites rendszer van (20 perc)
+
+Raspberry Pi Imager (https://www.raspberrypi.com/software/) a laptopon:
+
+- [ ] Eszköz: Raspberry Pi 4. OS: *Other general-purpose OS → Ubuntu →
+  Ubuntu Server 24.04 LTS (64-bit)*.
+- [ ] Beállítások (⚙ / "Edit settings"): hostname `LuckyPi`, user `lucky`
+  jelszóval, **SSH engedélyezve** (a laptop `~/.ssh/id_ed25519.pub` kulcsával,
+  ha van), wifi csak ha nincs kábel.
+- [ ] Írd az SD-re, indítsd a Pi-t, várj 2–3 percet. A router DHCP-foglalása
+  a MAC-hez kötött, így a cím marad.
+
+✅ **Ellenőrzés:** `ssh lucky@192.168.0.242`, majd `uname -m` → `aarch64`,
+`lsb_release -rs` → `24.04`.
+
 ---
 
 ## 1. Fázis — Pi alap (15 perc)
@@ -32,29 +51,19 @@ SSH-zz be a Pi-re: `ssh lucky@192.168.0.242`
 
 ```bash
 sudo apt update && sudo apt full-upgrade -y
-sudo apt install -y podman golang-github-containernetworking-plugin-dnsname git rsync curl pipx
+sudo apt install -y podman git rsync curl pipx
 sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install podman-compose
 sudo reboot
 ```
 
-Három dolog, ami a 22.04-es (3.4-es) podman miatt van itt:
-
-- A **`dnsname` plugin** adja a konténerek közti névfeloldást (`api` → `db`).
-  Az újabb podmanben beépített, a 3.4-ben külön csomag, és a podman **a
-  hálózat létrehozásakor** teszi bele — ezért az első `up` előtt kell fent
-  lennie. (Ha mégis utána tetted fel: `sudo podman network rm home-deploy_default`,
-  és indítsd újra a stacket.)
-- A `podman-compose` az apt-ban nincs meg, ezért pipx-szel megy fel, root-nak,
-  a `/usr/local/bin`-be. Frissítés később:
-  `sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade podman-compose`.
-- A 3.4 a `depends_on: service_healthy`-t szó nélkül kihagyja — nem baj, az
-  API konténer maga várja meg az adatbázist (v0.2.0-tól).
+(A `podman-compose` az apt-ban régi, ezért pipx-szel megy fel, root-nak, a
+`/usr/local/bin`-be. Frissítés később:
+`sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade podman-compose`.)
 
 Várj egy percet, SSH vissza.
 
-- [ ] `podman --version` → 3.4.4
+- [ ] `podman --version` → 4.9.x
 - [ ] `podman-compose --version` → 1.x
-- [ ] `ls /usr/lib/cni/dnsname` → megvan
 
 ✅ **Ellenőrzés:** `sudo podman run --rm docker.io/library/hello-world` kiír
 egy "Hello from Docker!" szöveget.
