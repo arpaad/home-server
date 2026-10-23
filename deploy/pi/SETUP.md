@@ -3,9 +3,13 @@
 Egy fázis egy ülés. Minden fázis végén van egy **✅ Ellenőrzés** — amíg az nem
 jó, ne menj tovább. A `[ ]` dobozokat pipáld, ahogy haladsz.
 
-Előfeltevések: Raspberry Pi OS 64-bit (Bookworm), a Pi neve `pi`, a fix IP
-`192.168.0.242`, van egy USB-s SSD/pendrive az adatoknak, és a laptopodon
-már fut a `main`.
+Előfeltevések: Raspberry Pi 4, rajta **Ubuntu Server 24.04 LTS, 64-bit**, a
+felhasználód `lucky`, a fix IP `192.168.0.242`, van egy USB-s SSD/pendrive az
+adatoknak, és a laptopodon már fut a `main`.
+
+> **64-bit kötelező.** A publikált image csak amd64-re és arm64-re készül, és
+> a 64-bites Ubuntu 24.04-ben van elég friss podman (4.9). Ha `uname -m`
+> `armv7l`-t mond, az egy 32-bites rendszer — újra kell telepíteni, lásd 0b.
 
 ---
 
@@ -15,30 +19,50 @@ már fut a `main`.
   a MAC-címe alapján. (Router admin → DHCP → reservation.) Így a cím
   újraindítás után sem változik.
 - [ ] **DuckDNS.** Nyisd meg a https://www.duckdns.org oldalt, lépj be
-  (GitHub/Google), adj hozzá egy aldomaint, pl. `szabohome` → ez lesz a
-  `szabohome.duckdns.org`. Az IP mezőbe írd be: `192.168.0.242`. Igen, privát
+  (GitHub/Google), adj hozzá egy aldomaint, pl. `pami-home` → ez lesz a
+  `pami-home.duckdns.org`. Az IP mezőbe írd be: `192.168.0.242`. Igen, privát
   IP — ez így jó, kívülről senki nem ér el semmit, csak a név oldódik fel.
   **Másold ki a tokent** (a lap tetején), kelleni fog.
 - [ ] **Tailscale fiók.** https://login.tailscale.com — lépj be (Google/GitHub).
   Egyelőre ennyi.
 
-✅ **Ellenőrzés:** a laptopon `nslookup szabohome.duckdns.org` → `192.168.0.242`.
+✅ **Ellenőrzés:** a laptopon `nslookup pami-home.duckdns.org` → `192.168.0.242`.
+
+### 0b. Ha a Pi-n nem 64-bites rendszer van (20 perc)
+
+Raspberry Pi Imager (https://www.raspberrypi.com/software/) a laptopon:
+
+- [ ] Eszköz: Raspberry Pi 4. OS: *Other general-purpose OS → Ubuntu →
+  Ubuntu Server 24.04 LTS (64-bit)*.
+- [ ] Beállítások (⚙ / "Edit settings"): hostname `LuckyPi`, user `lucky`
+  jelszóval, **SSH engedélyezve** (a laptop `~/.ssh/id_ed25519.pub` kulcsával,
+  ha van), wifi csak ha nincs kábel.
+- [ ] Írd az SD-re, indítsd a Pi-t, várj 2–3 percet. A router DHCP-foglalása
+  a MAC-hez kötött, így a cím marad.
+
+✅ **Ellenőrzés:** `ssh lucky@192.168.0.242`, majd `uname -m` → `aarch64`,
+`lsb_release -rs` → `24.04`.
 
 ---
 
 ## 1. Fázis — Pi alap (15 perc)
 
-SSH-zz be a Pi-re: `ssh pi@192.168.0.242`
+SSH-zz be a Pi-re: `ssh lucky@192.168.0.242`
 
 ```bash
 sudo apt update && sudo apt full-upgrade -y
-sudo apt install -y podman podman-compose git rsync curl
+sudo apt install -y podman git rsync curl pipx
+sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install podman-compose
 sudo reboot
 ```
 
+(A `podman-compose` az apt-ban régi, ezért pipx-szel megy fel, root-nak, a
+`/usr/local/bin`-be. Frissítés később:
+`sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade podman-compose`.)
+
 Várj egy percet, SSH vissza.
 
-- [ ] `podman --version` → 4.x
+- [ ] `podman --version` → 4.9.x
 - [ ] `podman-compose --version` → 1.x
 
 ✅ **Ellenőrzés:** `sudo podman run --rm docker.io/library/hello-world` kiír
@@ -125,7 +149,7 @@ beseedeli a magyar kezdőcsomagot.
 `{"status":"ok",...}`. Meg: `curl -s http://127.0.0.1:8080/api/shopping/categories | head -c 200`
 → magyar kategóriák.
 
-> Hiba? `sudo podman ps -a` és `sudo podman logs home-deploy_api_1`.
+> Hiba? `sudo podman ps -a` és `sudo podman logs home-deploy-api`.
 
 ---
 
@@ -150,7 +174,7 @@ sudo nano /etc/caddy/env
 ```
 
 ```
-HOME_DOMAIN=szabohome.duckdns.org
+HOME_DOMAIN=pami-home.duckdns.org
 DUCKDNS_TOKEN=<a duckdns token a 0. fázisból>
 ```
 
@@ -162,7 +186,7 @@ sudo journalctl -u caddy -f         # várj a "certificate obtained successfully
 Az első tanúsítvány 30–90 másodperc (DNS-propagálás). Ha "DNS problem"-et
 látsz, várj egy percet, `sudo systemctl restart caddy`.
 
-✅ **Ellenőrzés:** a laptopon, **böngészőben**: `https://szabohome.duckdns.org`
+✅ **Ellenőrzés:** a laptopon, **böngészőben**: `https://pami-home.duckdns.org`
 → zöld lakat, és a lista. A telefonon (otthoni wifin) ugyanez → a böngésző
 felajánlja a *Hozzáadás a kezdőképernyőhöz*-t. Telepítsd. Ez a PWA.
 
@@ -205,10 +229,10 @@ BACKUP_OFFSITE=lucky@<laptop-tailscale-ip>:backups/home
 ### 7b. Értesítés, ha elromlik
 
 https://ntfy.sh — nem kell fiók. Találj ki egy hosszú, nem kitalálható
-témanevet (pl. `szabohome-backup-Xk29fQ`), telepítsd az ntfy appot a
+témanevet (pl. `pami-home-backup-Xk29fQ`), telepítsd az ntfy appot a
 telefonra, iratkozz fel rá. `deploy/.env`:
 ```
-NTFY_TOPIC=szabohome-backup-Xk29fQ
+NTFY_TOPIC=pami-home-backup-Xk29fQ
 ```
 
 Aztán próbáld ki **mindkét irányba**:
@@ -220,9 +244,9 @@ ls -la /mnt/home-data/backups/hourly/    # ott a dump
 # és a laptopon: ls ~/backups/home/hourly/
 
 # Most rontsd el szándékosan, hogy lásd, szól-e:
-sudo podman stop home-deploy_db_1
+sudo podman stop home-deploy-db
 sudo systemctl start home-backup         # ez elhasal
-sudo podman start home-deploy_db_1
+sudo podman start home-deploy-db
 ```
 
 ✅ **Ellenőrzés:** a második futás után **jött push a telefonra**. Ha nem jött,
@@ -259,7 +283,7 @@ A beállításokban legyen bekapcsolva a **"Use Tailscale subnets"** (Android:
 Settings → Use subnet routes).
 
 ✅ **Ellenőrzés:** kapcsold ki a wifit a telefonon (mobilnet), Tailscale be,
-nyisd meg `https://szabohome.duckdns.org` → **ugyanaz** a lista, zöld lakat.
+nyisd meg `https://pami-home.duckdns.org` → **ugyanaz** a lista, zöld lakat.
 Tailscale ki → nem tölt be, de az app **offline-módban** mutatja a másolatot.
 
 A feleséged telefonjára ugyanez, ha akarja. Ha nem, otthon wifin nélküle is
@@ -285,8 +309,8 @@ Ez `git pull` + kép lehúzás + újraindítás; a konténer migrál. Ha a
 | Tünet | Parancs |
 |---|---|
 | nem tölt be az app | `sudo systemctl status home caddy` |
-| API log | `sudo podman logs home-deploy_api_1` |
-| adatbázis log | `sudo podman logs home-deploy_db_1` |
+| API log | `sudo podman logs home-deploy-api` |
+| adatbázis log | `sudo podman logs home-deploy-db` |
 | HTTPS/tanúsítvány | `sudo journalctl -u caddy -n 50` |
 | mentés | `sudo journalctl -u home-backup -n 50`, `systemctl list-timers` |
 | Tailscale | `sudo tailscale status` |
