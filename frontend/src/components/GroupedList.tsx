@@ -13,7 +13,6 @@ function title(group: Group): string {
 export function GroupedList({
   items,
   today,
-  busy,
   canBuy,
   pendingIds,
   onBuy,
@@ -23,7 +22,6 @@ export function GroupedList({
 }: {
   items: Item[]
   today: string
-  busy: boolean
   canBuy: boolean
   pendingIds: Set<string>
   onBuy: (item: Item) => void
@@ -58,7 +56,6 @@ export function GroupedList({
                 key={item.id}
                 item={item}
                 today={today}
-                busy={busy}
                 canBuy={canBuy}
                 pending={pendingIds.has(item.id)}
                 onBuy={() => onBuy(item)}

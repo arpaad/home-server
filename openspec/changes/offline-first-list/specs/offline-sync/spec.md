@@ -37,6 +37,19 @@ When a member adds, edits, removes, buys, undoes or clears items, the client SHA
 - **THEN** the item moves to the bought group at once
 - **AND** the change is queued
 
+#### Scenario: Buying several items in a basement
+
+- **WHEN** a member marks five items bought, one after another, while the server cannot be reached
+- **THEN** each of them moves to the bought group at once, and none is refused or ignored
+- **AND** after the app is reloaded, still offline, all five are still shown bought and still queued
+- **AND** when the server becomes reachable, all five purchases are recorded
+
+#### Scenario: A request that hangs is treated as offline
+
+- **WHEN** the network accepts a request but never answers it
+- **THEN** after a bounded wait the client treats the server as unreachable and queues the change
+- **AND** a change whose request was still in flight survives the app being closed, and is sent on reopening
+
 #### Scenario: Adding an item offline and referring to it
 
 - **WHEN** a member adds "ketchup" offline and then marks it bought, still offline

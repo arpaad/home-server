@@ -68,7 +68,45 @@ interface ErrorBody {
   existing_id?: string | null
 }
 
+/**
+ * How long a request may go unanswered before the server counts as
+ * unreachable. In a shop the phone often has "signal" that carries nothing:
+ * the request is accepted and never answered. Without a bound it stays in
+ * flight for minutes — not offline, so not queued, and not persisted, so
+ * closing the app loses the change. A bounded wait turns that into an
+ * ordinary offline failure, which pauses and persists the change.
+ */
+export const REQUEST_TIMEOUT_MS = 10_000
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  // Our own controller, so the timeout and a caller's abort (a typeahead
+  // superseded by the next keystroke) can be told apart.
+  const controller = new AbortController()
+  let timedOut = false
+  const timer = window.setTimeout(() => {
+    timedOut = true
+    controller.abort()
+  }, REQUEST_TIMEOUT_MS)
+  const callerSignal = init.signal
+  const forwardAbort = () => controller.abort()
+  if (callerSignal?.aborted) controller.abort()
+  callerSignal?.addEventListener('abort', forwardAbort)
+
+  try {
+    return await send<T>(path, { ...init, signal: controller.signal })
+  } catch (caught) {
+    if (timedOut) {
+      markOffline()
+      throw new OfflineError()
+    }
+    throw caught
+  } finally {
+    window.clearTimeout(timer)
+    callerSignal?.removeEventListener('abort', forwardAbort)
+  }
+}
+
+async function send<T>(path: string, init: RequestInit): Promise<T> {
   let response: Response
   try {
     response = await fetch(`${BASE}${path}`, {
@@ -77,7 +115,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     })
   } catch (caught) {
     // An aborted request says nothing about the server; a network failure
-    // does, and it is the only signal we trust for "offline".
+    // does, and it is the only signal we trust for "offline". (A timeout is
+    // an abort too; `request` turns that one into offline.)
     if (caught instanceof DOMException && caught.name === 'AbortError') throw caught
     markOffline()
     throw new OfflineError()
