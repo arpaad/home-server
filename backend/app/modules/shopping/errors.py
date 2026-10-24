@@ -55,6 +55,26 @@ class ItemNotFoundError(ShoppingError):
         self.item_id = item_id
 
 
+class DuplicateItemError(ShoppingError):
+    """An outstanding item with this name is already on the list.
+
+    Writing the same thing twice — milk for Lidl, then milk for Spar — is how
+    it ends up bought twice, which is the failure this list exists to stop.
+    A bought item does not count: needing more of it is normal.
+    """
+
+    def __init__(self, name: str, existing_id: UUID) -> None:
+        """Record the name and the item already carrying it.
+
+        Args:
+            name: The name that was being added.
+            existing_id: The outstanding item with that name.
+        """
+        super().__init__(f"{name!r} is already on the list")
+        self.name = name
+        self.existing_id = existing_id
+
+
 class StoreNotFoundError(ShoppingError):
     """The referenced store is not in the registry."""
 

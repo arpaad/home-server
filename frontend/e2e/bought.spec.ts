@@ -46,7 +46,7 @@ test('ticking an item moves it below every outstanding item, dimmed, in both vie
   await expect(bought(page).locator('.item--bought')).toHaveCount(1)
 
   // Same arrangement on the full list.
-  await page.getByRole('button', { name: 'Everywhere' }).click()
+  await page.getByRole('button', { name: 'Anywhere' }).click()
   await expect(itemNames(page)).toHaveText(['apples', 'milk'])
   await expect(bought(page).getByTestId('item-name-text')).toHaveText(['milk'])
 })
@@ -81,7 +81,7 @@ test('clear bought removes every bought item from every store, and says how many
   // Household-wide: Spar's bought item is gone too.
   await page.getByTestId('store-chip-Spar').click()
   await expect(bought(page)).toHaveCount(0)
-  await page.getByRole('button', { name: 'Everywhere' }).click()
+  await page.getByRole('button', { name: 'Anywhere' }).click()
   await expect(itemNames(page)).toHaveText(['still needed'])
 })
 

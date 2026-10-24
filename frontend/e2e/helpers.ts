@@ -155,3 +155,36 @@ export async function pickFirstMember(page: Page): Promise<string> {
 export function itemNames(page: Page) {
   return page.getByTestId('item-name-text')
 }
+
+/** The row for an item, by its name. */
+export function row(page: Page, name: string) {
+  return page.getByTestId('item').filter({ has: page.getByTestId('item-name-text').getByText(name, { exact: true }) })
+}
+
+/**
+ * Drag a row sideways with the pointer, as a thumb would: press, move in
+ * steps, release. Positive `dx` is to the right.
+ */
+export async function swipe(page: Page, name: string, dx: number): Promise<void> {
+  const box = await row(page, name).boundingBox()
+  if (!box) throw new Error(`no row for ${name}`)
+  const y = box.y + box.height / 2
+  const x = box.x + box.width / 2
+  await page.mouse.move(x, y)
+  await page.mouse.down()
+  await page.mouse.move(x + dx, y, { steps: 12 })
+  await page.mouse.up()
+}
+
+/**
+ * Mark an item bought, as the first member. The same name cannot be added
+ * while an outstanding item has it, so tests that need two items of one
+ * name buy the first.
+ */
+export async function buyItem(request: APIRequestContext, itemId: string): Promise<void> {
+  const [member] = await json<{ id: string }[]>(request, '/household/members')
+  const response = await request.post(`${API}/shopping/items/${itemId}/purchase`, {
+    headers: { 'X-Household-Member': member.id },
+  })
+  if (!response.ok()) throw new Error(`could not buy ${itemId}: ${await response.text()}`)
+}

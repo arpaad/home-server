@@ -10,7 +10,7 @@ from collections.abc import Iterable
 from datetime import date, datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import ColumnElement, Select, and_, delete, exists, or_, select, update
+from sqlalchemy import ColumnElement, Select, and_, delete, exists, func, or_, select, update
 from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.core.clock import now_utc
@@ -172,6 +172,30 @@ class SqlAlchemyShoppingItemRepository:
         )
         return [to_item(row) for row in self._session.scalars(statement).unique().all()]
 
+    def find_outstanding_by_name(self, name: str) -> ShoppingItem | None:
+        """Return the outstanding item with this name, ignoring case and padding.
+
+        Args:
+            name: The name to look for.
+
+        Returns:
+            The first matching outstanding item, or None.
+        """
+        row = (
+            self._session
+            .scalars(
+                self
+                ._with_relations(select(ShoppingItemORM))
+                .where(func.lower(func.btrim(ShoppingItemORM.name)) == name.strip().lower())
+                .where(_is_outstanding())
+                .order_by(ShoppingItemORM.created_at)
+                .limit(1)
+            )
+            .unique()
+            .first()
+        )
+        return to_item(row) if row else None
+
     def list_bought_uncleared(self, *, store_id: UUID | None = None) -> list[ShoppingItem]:
         """Return bought items the household has not yet cleared away.
 
@@ -306,6 +330,7 @@ class SqlAlchemyShoppingItemRepository:
         origin: ItemOrigin,
         catalogue_entry_id: UUID | None = None,
         item_id: UUID | None = None,
+        important: bool = False,
     ) -> ShoppingItem:
         """Add an item to the list.
 
@@ -321,6 +346,7 @@ class SqlAlchemyShoppingItemRepository:
             item_id: An identifier chosen by the client, so an item added
                 offline can be referred to before the server has seen it and
                 replayed without landing twice. None lets the server mint one.
+            important: Whether it must be bought this trip.
 
         Returns:
             The created item.
@@ -333,6 +359,7 @@ class SqlAlchemyShoppingItemRepository:
             available_from=available_from,
             origin=origin,
             catalogue_entry_id=catalogue_entry_id,
+            important=important,
         )
         self._session.add(row)
         self._session.flush()
@@ -350,6 +377,7 @@ class SqlAlchemyShoppingItemRepository:
         store_ids: Iterable[UUID] | None = None,
         available_from: date | None = None,
         clear_available_from: bool = False,
+        important: bool | None = None,
         edited_at: datetime | None = None,
     ) -> ShoppingItem:
         """Change an item's fields, leaving unsupplied ones untouched.
@@ -364,6 +392,7 @@ class SqlAlchemyShoppingItemRepository:
             available_from: A new availability date, or None to leave it.
             clear_available_from: Remove the availability date. Takes
                 precedence over available_from.
+            important: Flag or unflag the item, or None to leave it.
             edited_at: When the editing client made this edit. Recorded as
                 the item's `updated_at`; None leaves it as it was.
 
@@ -384,6 +413,8 @@ class SqlAlchemyShoppingItemRepository:
             row.available_from = None
         elif available_from is not None:
             row.available_from = available_from
+        if important is not None:
+            row.important = important
         if store_ids is not None:
             self._set_stores(row, store_ids)
 

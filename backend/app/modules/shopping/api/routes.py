@@ -122,6 +122,7 @@ def create_item(payload: ItemCreateRequest, shopping: ShoppingListServiceDep) ->
         category_id=payload.category_id,
         clear_category=payload.clear_category,
         item_id=payload.id,
+        important=payload.important,
     )
     return ItemResponse.from_domain(item)
 
@@ -154,6 +155,7 @@ def update_item(
         clear_available_from=payload.clear_available_from,
         category_id=payload.category_id,
         clear_category=payload.clear_category,
+        important=payload.important,
         edited_at=payload.edited_at,
     )
     return ItemEditResponse(item=ItemResponse.from_domain(outcome.item), applied=outcome.applied)

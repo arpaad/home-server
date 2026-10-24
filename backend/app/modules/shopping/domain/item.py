@@ -70,6 +70,9 @@ class ShoppingItem:
     stores: tuple[Store, ...] = ()
     available_from: date | None = None
     origin: ItemOrigin = "manual"
+    # Must not come home without it. Arrangement only: an important item is
+    # shown first in the views it belongs to, and in no others.
+    important: bool = False
     purchase: Purchase | None = field(default=None)
     # The category is the catalogue entry's, never the item's own: correcting
     # it on the entry regroups every item referring to it, including this

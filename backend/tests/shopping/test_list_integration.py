@@ -6,7 +6,7 @@ correcting the entry regroups items already on the list.
 
 from datetime import date
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -107,9 +107,11 @@ class TestLinking:
         assert item.category is None
 
     def test_a_familiar_name_links_to_the_existing_entry(
-        self, shopping: ShoppingListService, catalogue: CatalogueService
+        self, shopping: ShoppingListService, catalogue: CatalogueService, member_id: UUID
     ):
         first = shopping.add_item(name="milk")
+        # Bought first: an outstanding "milk" would refuse the second add.
+        shopping.mark_bought(first.id, member_id)
 
         second = shopping.add_item(name="Milk")
 

@@ -9,7 +9,7 @@
  */
 
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router'
 
 import {
   useBuyItem,
@@ -42,15 +42,25 @@ function formatConfirmed(at: number): string {
 
 export function ListPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { memberId } = useCurrentMember()
-  const [storeId, setStoreId] = useState<string | null>(null)
+  // The store view is part of the address, so going to the add form and
+  // back — by its buttons or the phone's back gesture — lands in the same
+  // shop. Not localStorage: that would survive closing the app, and
+  // tomorrow's list at home would open on Lidl looking half empty.
+  const [params, setParams] = useSearchParams()
+  const setStoreId = (id: string | null) => setParams(id === null ? {} : { store: id }, { replace: true })
+  // Where the add form returns to.
+  const here = { from: `${location.pathname}${location.search}` }
   const [planning, setPlanning] = useState(false)
   const [actionError, setActionError] = useState<unknown>(null)
 
+  const stores = useStores()
+  const wanted = params.get('store')
+  // A store deleted since the address was made falls back to Anywhere.
+  const storeId = wanted !== null && stores.data !== undefined && !stores.data.some((s) => s.id === wanted) ? null : wanted
   // Planning at home shows upcoming items; standing in a shop must not.
   const includeUpcoming = planning && storeId === null
-
-  const stores = useStores()
   const items = useItems(storeId, includeUpcoming)
   // Kept warm here so the add page has suggestions, store chips and
   // categories from the phone's copy when the server cannot be reached.
@@ -150,7 +160,7 @@ export function ListPage() {
             pendingIds={pendingIds}
             onBuy={buy}
             onUndo={undo}
-            onEdit={(item) => void navigate(`/add?edit=${item.id}`)}
+            onEdit={(item) => void navigate(`/add?edit=${item.id}`, { state: here })}
             onDelete={(item) => run(deleteItem.mutateAsync(item.id))}
           />
         )}
@@ -173,9 +183,14 @@ export function ListPage() {
         )}
       </main>
 
-      <Link to="/add" className="fab" data-testid="add-button" aria-label="Add an item">
+      <Link to="/add" state={here} className="fab" data-testid="add-button" aria-label="Add an item">
         +
       </Link>
+
+      {/* Here only: on the add form it sat right under the buttons. */}
+      <footer className="app__footer">
+        On the household network only — no login, so keep it off the internet.
+      </footer>
     </>
   )
 }

@@ -14,6 +14,7 @@ from datetime import date, datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     Date,
     DateTime,
@@ -22,6 +23,7 @@ from sqlalchemy import (
     Index,
     Integer,
     String,
+    false,
     func,
     text,
 )
@@ -177,6 +179,12 @@ class ShoppingItemORM(Base):
     available_from: Mapped[date | None] = mapped_column(Date, nullable=True)
 
     origin: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'manual'"))
+
+    # Must be bought this trip. The item's own, not the catalogue entry's:
+    # urgency is about this week's need, not about the product, so it must
+    # not stick to the next item of the same name. Arranges the list only —
+    # it never decides which views an item appears in.
+    important: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=false())
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()

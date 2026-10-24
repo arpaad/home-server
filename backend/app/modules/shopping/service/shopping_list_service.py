@@ -20,7 +20,7 @@ from app.modules.shopping.domain.item import (
 )
 from app.modules.shopping.domain.purchase import Purchase
 from app.modules.shopping.domain.units import DEFAULT_QUANTITY, DEFAULT_UNIT, Unit
-from app.modules.shopping.errors import ItemNotFoundError, UnknownStoresError
+from app.modules.shopping.errors import DuplicateItemError, ItemNotFoundError, UnknownStoresError
 from app.modules.shopping.repository.interfaces import (
     ShoppingItemRepository,
     StoreRepository,
@@ -197,6 +197,7 @@ class ShoppingListService:
         category_id: UUID | None = None,
         clear_category: bool = False,
         item_id: UUID | None = None,
+        important: bool = False,
     ) -> ShoppingItem:
         """Put an item on the shared list, remembering its name in the catalogue.
 
@@ -223,9 +224,16 @@ class ShoppingListService:
                 every item of that name. None leaves the entry as it is.
             clear_category: Make the entry uncategorised. Takes precedence.
             item_id: A client-chosen identifier, or None to mint one.
+            important: Whether it must be bought this trip. The item's own
+                and never the catalogue entry's, so it is not remembered for
+                the next item of this name.
 
         Returns:
             The created item — or the existing one, when the id is known.
+
+        Raises:
+            DuplicateItemError: If an outstanding item already has this name,
+                whatever its stores.
         """
         if item_id is not None:
             existing = self._items.get(item_id)
@@ -236,6 +244,12 @@ class ShoppingListService:
         # quantity must not leave an entry behind.
         cleaned = ensure_valid_name(name)
         checked_quantity = ensure_positive_quantity(quantity)
+        # After the replay check, so a create sent twice still lands once
+        # rather than refusing itself; before the catalogue, so a refused add
+        # leaves no trace.
+        duplicate = self._items.find_outstanding_by_name(cleaned)
+        if duplicate is not None:
+            raise DuplicateItemError(cleaned, duplicate.id)
         explicit = list(store_ids) if store_ids is not None else None
 
         entry = self._catalogue.remember(cleaned)
@@ -254,6 +268,7 @@ class ShoppingListService:
             origin=origin,
             catalogue_entry_id=entry.id,
             item_id=item_id,
+            important=important,
         )
 
     def edit_item(
@@ -268,6 +283,7 @@ class ShoppingListService:
         clear_available_from: bool = False,
         category_id: UUID | None = None,
         clear_category: bool = False,
+        important: bool | None = None,
         edited_at: datetime | None = None,
     ) -> EditOutcome:
         """Change an item, leaving unsupplied fields untouched.
@@ -289,6 +305,7 @@ class ShoppingListService:
             category_id: A category to record on the item's catalogue entry,
                 and so on every item of that name. None leaves it.
             clear_category: Make the entry uncategorised. Takes precedence.
+            important: Flag or unflag the item, or None to leave it.
             edited_at: When the editing client made this edit. None always
                 applies.
 
@@ -314,6 +331,7 @@ class ShoppingListService:
             store_ids=(self._require_known_stores(store_ids) if store_ids is not None else None),
             available_from=available_from,
             clear_available_from=clear_available_from,
+            important=important,
             edited_at=edited_at,
         )
         return EditOutcome(item=updated, applied=True)

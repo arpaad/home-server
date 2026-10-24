@@ -54,6 +54,13 @@ class ItemCreateRequest(BaseModel):
     clear_category: bool = Field(
         default=False, description="Make the entry uncategorised. Takes precedence."
     )
+    important: bool = Field(
+        default=False,
+        description=(
+            "Must be bought this trip; shown first. The item's own, not "
+            "remembered on the catalogue entry."
+        ),
+    )
 
 
 class ItemUpdateRequest(BaseModel):
@@ -82,6 +89,9 @@ class ItemUpdateRequest(BaseModel):
     )
     clear_category: bool = Field(
         default=False, description="Make the entry uncategorised. Takes precedence."
+    )
+    important: bool | None = Field(
+        default=None, description="Flag or unflag the item. Omit to leave it."
     )
     edited_at: datetime | None = Field(
         default=None,
@@ -130,6 +140,13 @@ class ItemResponse(BaseModel):
     )
     available_from: date | None
     origin: ItemOrigin = Field(description="How the item came to be on the list.")
+    important: bool = Field(
+        default=False,
+        description=(
+            "Must be bought this trip. Changes where the item is shown in a "
+            "view, never which views it is shown in."
+        ),
+    )
     purchase: PurchaseResponse | None = Field(
         default=None, description="The purchase, when the item has been bought."
     )
@@ -170,6 +187,7 @@ class ItemResponse(BaseModel):
             stores=[StoreResponse.from_domain(store) for store in item.stores],
             available_from=item.available_from,
             origin=item.origin,
+            important=item.important,
             purchase=(
                 PurchaseResponse.from_domain(item.purchase) if item.purchase is not None else None
             ),

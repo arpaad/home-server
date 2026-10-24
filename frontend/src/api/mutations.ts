@@ -98,6 +98,7 @@ function buildOptimisticItem(client: QueryClient, payload: ItemCreate): Item {
     stores: stores.filter((s) => payload.store_ids.includes(s.id)),
     available_from: payload.available_from ?? null,
     origin: 'manual',
+    important: payload.important ?? false,
     purchase: null,
     catalogue_entry_id: entry?.id ?? null,
     category: entry?.category ?? null,
@@ -194,6 +195,7 @@ export function registerMutationDefaults(client: QueryClient): void {
                 ...(payload.name !== undefined ? { name: payload.name } : {}),
                 ...(payload.quantity !== undefined ? { quantity: payload.quantity } : {}),
                 ...(payload.unit !== undefined ? { unit: payload.unit } : {}),
+                ...(payload.important !== undefined ? { important: payload.important } : {}),
                 ...(payload.store_ids !== undefined
                   ? { stores: stores.filter((s) => payload.store_ids?.includes(s.id)) }
                   : {}),
