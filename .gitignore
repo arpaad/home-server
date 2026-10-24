@@ -226,9 +226,6 @@ __marimo__/
 *.sqlite
 *.sqlite3
 
-# Local deployment settings; deploy/.env.example is the template
-deploy/.env
-
 # Frontend workspace
 frontend/node_modules/
 frontend/dist/

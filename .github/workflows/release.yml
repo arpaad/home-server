@@ -109,10 +109,7 @@ jobs:
             podman pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
             ```
 
-            Then, with `deploy/.env` configured:
-
-            ```
-            make deploy-pull && make deploy-up
-            ```
+            On the Pi, `sudo make update` pulls `:latest`; see
+            `docs/deployment.md`.
 
             This release has no authentication. Bind it to the LAN only.

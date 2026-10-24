@@ -66,10 +66,16 @@
 - [x] 8.1 Build a multi-stage image in which Node builds the client and the Python runtime image serves both it and the API; verify one image runs the API and serves the client
 - [x] 8.2 Build arm64 images in CI so the Pi pulls rather than builds; verify the published image runs on the Pi
 - [ ] 8.3 Place the database volume on external storage rather than the SD card; verify the volume's backing path is on the external device
+  - Not done: the database is a bind mount at `/var/lib/home/postgres` on the SD card; the Pi has no external disk (see `docs/deployment.md`).
 - [ ] 8.4 Add systemd units so the stack starts at boot; verify by power-cycling the Pi that the list loads afterwards with no manual step
+  - `home.service` and `caddy.service` are installed and enabled on the Pi; the power-cycle verification has not been run.
 - [ ] 8.5 Add a systemd timer taking compressed dumps with hourly, daily and monthly retention; verify dumps accumulate on schedule and that expired ones are pruned
+  - Not done: dumps are taken only by `make update` / `make backup` on the Pi, not on a timer.
 - [ ] 8.6 Verify each dump's integrity by listing its contents and fail loudly to a notification on error; verify by deliberately breaking the job that the notification actually arrives
+  - Not done.
 - [ ] 8.7 Copy every dump off the device to a separate machine; verify a dump written on the Pi appears on the target
+  - Not done: dumps stay on the Pi.
 - [ ] 8.8 Perform a restore drill into an empty database; verify the restored list, stores and purchases match the source
+  - Not done; the restore steps in `docs/deployment.md` are untested.
 - [ ] 8.9 Walk through every scenario in `specs/shopping-list/spec.md` against the deployment on the Pi using both phones; verify each scenario behaves as specified and record any that do not
 - [ ] 8.10 Update `README.md` and `AGENTS.md` for the new repository layout, Postgres, the migration workflow, the Makefile database targets and the backup and restore procedure, stating that the service is LAN-only and must not be exposed until authentication exists, and pointing at `openspec/` as the place where specifications and changes live; verify the documented setup steps work from a clean checkout
