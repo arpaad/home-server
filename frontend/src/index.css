@@ -154,7 +154,19 @@ body {
 .item__check:disabled { border-color: var(--line); cursor: not-allowed; }
 .item__check:hover:not(:disabled) { background: var(--accent-soft); }
 
-.item__body { flex: 1; min-width: 0; }
+/* A button, because the whole body is the tap target for editing. */
+.item__body {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
 .item__line { display: flex; justify-content: space-between; gap: 10px; }
 .item__name { font-weight: 600; overflow-wrap: anywhere; }
 .item__quantity { color: var(--ink-soft); font-size: 0.9rem; white-space: nowrap; }
@@ -460,3 +472,98 @@ body {
 
 .offline-guard { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .offline-guard:disabled { opacity: 0.55; }
+
+/* ---- must buy ---- */
+
+.group--important { --group-colour: var(--danger); }
+.group--important .group__title { color: var(--danger); }
+.group--important .group__icon { font-weight: 800; }
+.item__important {
+  flex: none;
+  font-weight: 800;
+  color: var(--danger);
+  margin-right: -4px;
+}
+.item--important .item__name { flex: 1; }
+
+.item-form__important { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+.item-form__important input { width: 20px; height: 20px; min-height: 0; }
+
+/* ---- added-again status bar ---- */
+
+/* A thin strip, not a dialog: the form under it stays usable. */
+.toast {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 6px 16px calc(6px + env(safe-area-inset-bottom));
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.85rem;
+  text-align: center;
+  z-index: 10;
+}
+.toast--pending { background: var(--ink-soft); }
+
+/* ---- swiping a row ---- */
+
+/* pan-y: the browser keeps vertical scrolling, horizontal moves reach us. */
+.swipe {
+  position: relative;
+  touch-action: pan-y;
+  border-radius: var(--radius);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.swipe > .item { position: relative; }
+.item--settled { transition: transform 160ms ease-out; }
+.swipe__under {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  color: #fff;
+}
+.swipe--right .swipe__under { display: flex; background: var(--accent); }
+.swipe--left .swipe__under { display: flex; background: var(--danger); }
+.swipe__label { visibility: hidden; }
+.swipe--right .swipe__label--right,
+.swipe--left .swipe__label--left { visibility: visible; }
+.swipe--left .swipe__label--left { margin-left: auto; }
+
+/* ---- add form: the buttons get their own row ---- */
+
+.item-form__submit { display: flex; gap: 8px; }
+.item-form__submit .button { flex: 1; }
+.item-form__remove { align-self: flex-start; color: var(--danger); }
+
+/* ---- "already on the list" dialog ---- */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 20;
+}
+.dialog {
+  width: min(360px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border-top: 4px solid var(--danger);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+.dialog__text { margin: 0; }
+.dialog__actions { display: flex; gap: 8px; justify-content: flex-end; }

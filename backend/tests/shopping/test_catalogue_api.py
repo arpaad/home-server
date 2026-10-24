@@ -1,7 +1,7 @@
 """Contract tests for categories, the catalogue and suggestions over HTTP."""
 
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi.testclient import TestClient
 from sqlalchemy import text
@@ -57,6 +57,20 @@ def add_item(client: TestClient, name: str, **fields: Any) -> dict[str, Any]:
     assert r.status_code == 201, r.text
     created: dict[str, Any] = r.json()
     return created
+
+
+def buy(client: TestClient, member_id: UUID, item: dict[str, Any]) -> None:
+    """Mark an item bought, so the same name can be added again.
+
+    Args:
+        client: The test client.
+        member_id: The member buying it.
+        item: The item, as returned on creation.
+    """
+    r = client.post(
+        f"{API}/items/{item['id']}/purchase", headers={"X-Household-Member": str(member_id)}
+    )
+    assert r.status_code == 200, r.text
 
 
 def entry_id_for(client: TestClient, name: str) -> str:
@@ -130,8 +144,9 @@ class TestCategories:
 
 
 class TestCatalogue:
-    def test_adding_items_fills_the_catalogue(self, client: TestClient):
-        add_item(client, "milk")
+    def test_adding_items_fills_the_catalogue(self, client: TestClient, member_id: UUID):
+        # Bought first: an outstanding "milk" would refuse the second add.
+        buy(client, member_id, add_item(client, "milk"))
         add_item(client, "Milk")
         add_item(client, "bread")
 
@@ -254,14 +269,17 @@ class TestItemRepresentation:
         [item] = client.get(f"{API}/items").json()
         assert item["category"] is None
 
-    def test_omitting_store_ids_takes_the_catalogue_prefill(self, client: TestClient):
+    def test_omitting_store_ids_takes_the_catalogue_prefill(
+        self, client: TestClient, member_id: UUID
+    ):
         lidl = add_store(client, "Lidl")
-        add_item(client, "ketchup", store_ids=[])
+        buy(client, member_id, add_item(client, "ketchup", store_ids=[]))
         client.patch(
             f"{API}/catalogue/{entry_id_for(client, 'ketchup')}", json={"store_ids": [lidl]}
         )
 
         prefilled = add_item(client, "ketchup")
+        buy(client, member_id, prefilled)
         overridden = add_item(client, "ketchup", store_ids=[])
 
         assert [s["name"] for s in prefilled["stores"]] == ["Lidl"]
@@ -286,11 +304,13 @@ class TestItemRepresentation:
 
 class TestCategoryFromTheItemForms:
     def test_choosing_a_category_while_adding_categorises_the_entry_and_regroups_every_item(
-        self, client: TestClient
+        self, client: TestClient, member_id: UUID
     ):
         household = add_category(client, "Household")
         earlier = add_item(client, "ketchup")
         assert earlier["category"] is None
+        # Bought, so still listed but no longer blocking a second ketchup.
+        buy(client, member_id, earlier)
 
         later = add_item(client, "ketchup", category_id=household)
 
@@ -299,9 +319,12 @@ class TestCategoryFromTheItemForms:
         items = {i["id"]: i for i in client.get(f"{API}/items").json()}
         assert items[earlier["id"]]["category"]["name"] == "Household"
 
-    def test_choosing_a_category_while_editing_applies_to_the_entry(self, client: TestClient):
+    def test_choosing_a_category_while_editing_applies_to_the_entry(
+        self, client: TestClient, member_id: UUID
+    ):
         dairy = add_category(client, "Dairy")
         one = add_item(client, "milk")
+        buy(client, member_id, one)
         other = add_item(client, "milk")
 
         r = client.patch(f"{API}/items/{one['id']}", json={"category_id": dairy})

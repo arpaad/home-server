@@ -1,9 +1,10 @@
 /**
  * The store filter.
  *
- * "Everywhere" is not a store; it is the absence of a filter, showing every
- * outstanding item. Picking a store shows what to put in the basket there,
- * which includes items assigned to no store at all.
+ * "Anywhere" is not a store; it is the absence of a filter, showing every
+ * outstanding item. It sits after the stores because the stores are what
+ * gets tapped in a shop. Picking a store shows what to put in the basket
+ * there, which includes items assigned to no store at all.
  */
 
 import type { Store } from '../api/types'
@@ -19,14 +20,6 @@ export function StoreFilter({
 }) {
   return (
     <nav className="chips" aria-label="Filter by store" data-testid="store-filter">
-      <button
-        type="button"
-        className={`chip ${selected === null ? 'chip--on' : ''}`}
-        aria-pressed={selected === null}
-        onClick={() => onSelect(null)}
-      >
-        Everywhere
-      </button>
       {stores.map((store) => (
         <button
           key={store.id}
@@ -39,6 +32,15 @@ export function StoreFilter({
           {store.name}
         </button>
       ))}
+      <button
+        type="button"
+        data-testid="store-chip-anywhere"
+        className={`chip ${selected === null ? 'chip--on' : ''}`}
+        aria-pressed={selected === null}
+        onClick={() => onSelect(null)}
+      >
+        Anywhere
+      </button>
     </nav>
   )
 }

@@ -6,9 +6,11 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
 
 import {
   API,
+  buyItem,
   createItem,
   createStore,
   entryFor,
+  type Item,
   resetList,
   seededCategory,
   setEntry,
@@ -325,10 +327,12 @@ test('choosing a category while adding regroups an existing item of that name', 
   request,
 }) => {
   const household = await seededCategory(request, starter.household)
-  await createItem(request, 'ketchup xxl')
+  // Bought, so it is still listed but does not refuse a second ketchup.
+  const earlier = await createItem(request, 'ketchup xxl')
+  await buyItem(request, earlier.id)
 
   await page.goto('/')
-  await expect(page.locator('[data-category="Uncategorised"]').getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
+  await expect(page.locator('[data-category="Bought"]').getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
 
   await page.getByTestId('add-button').click()
   await page.getByTestId('item-name').fill('ketchup xxl')
@@ -337,9 +341,14 @@ test('choosing a category while adding regroups an existing item of that name', 
   await page.getByTestId('item-submit').click()
 
   await expect(page).toHaveURL(/\/$/)
-  // Both ketchups — the one added now and the one already there — moved.
-  await expect(page.locator('[data-category="Háztartás"]').getByTestId('item-name-text')).toHaveText(['ketchup xxl', 'ketchup xxl'])
+  await expect(page.locator('[data-category="Háztartás"]').getByTestId('item-name-text')).toHaveText(['ketchup xxl'])
   await expect(page.locator('[data-category="Uncategorised"]')).toHaveCount(0)
+  // Both ketchups — the one added now and the one already there — moved.
+  await expect
+    .poll(async () =>
+      ((await (await request.get(`${API}/shopping/items`)).json()) as Item[]).map((i) => i.category?.name),
+    )
+    .toEqual(['Háztartás', 'Háztartás'])
 })
 
 test('typing a known name without touching the category does not uncategorise it', async ({
@@ -347,7 +356,8 @@ test('typing a known name without touching the category does not uncategorise it
   request,
 }) => {
   const dairy = await seededCategory(request, starter.dairy)
-  await createItem(request, 'milk')
+  const earlier = await createItem(request, 'milk')
+  await buyItem(request, earlier.id)
   await setEntry(request, 'milk', { category_id: dairy.id })
 
   await page.goto('/add')
@@ -356,7 +366,7 @@ test('typing a known name without touching the category does not uncategorise it
   await page.getByTestId('item-submit').click()
 
   await expect(page).toHaveURL(/\/$/)
-  await expect(page.locator('[data-category="Tejtermék"]').getByTestId('item-name-text')).toHaveText(['milk', 'milk'])
+  await expect(page.locator('[data-category="Tejtermék"]').getByTestId('item-name-text')).toHaveText(['milk'])
 })
 
 test('choosing a category while editing applies to every item of that name', async ({
@@ -365,6 +375,7 @@ test('choosing a category while editing applies to every item of that name', asy
 }) => {
   const dairy = await seededCategory(request, starter.dairy)
   const one = await createItem(request, 'milk')
+  await buyItem(request, one.id)
   await createItem(request, 'milk')
 
   await page.goto(`/add?edit=${one.id}`)
@@ -372,7 +383,8 @@ test('choosing a category while editing applies to every item of that name', asy
   await page.getByTestId('item-submit').click()
 
   await expect(page).toHaveURL(/\/$/)
-  await expect(page.locator('[data-category="Tejtermék"]').getByTestId('item-name-text')).toHaveText(['milk', 'milk'])
+  // Edited the bought one; the other milk, still to buy, moved with it.
+  await expect(page.locator('[data-category="Tejtermék"]').getByTestId('item-name-text')).toHaveText(['milk'])
 })
 
 test('an entry can be added on the catalogue page ahead of needing it', async ({

@@ -107,7 +107,8 @@ Treat these as invariants, not preferences. Each one has tests.
     I just added" reaches the server after the add.
 13. **A pending change is shown as pending, never as saved.** The mark comes
     from the mutation being in flight or paused, not from anything on the
-    item. A permanent refusal (4xx other than 408/429) drops the mutation
+    item. The same goes for the "Add (again)" bar: it reads the add's state
+    from the mutation cache and says *pending* until the server has it. A permanent refusal (4xx other than 408/429) drops the mutation
     and pushes a notice; anything else keeps retrying.
 14. **Clearing never deletes a purchase.** A bought item stays listed,
     dimmed, until the household clears it; clearing sets `cleared_at` on the
@@ -115,6 +116,20 @@ Treat these as invariants, not preferences. Each one has tests.
     query is untouched by any of this — bought items come from a second
     query (`list_bought_uncleared`), so the correctness core's tests keep
     meaning what they meant.
+
+15. **Importance arranges, it never filters.** `important` is the item's
+    own column, never the catalogue entry's — urgency is this week's need,
+    not the product's. Outstanding important items are pulled into a first
+    "Must buy" group *by the client* (so an offline flag moves the row at
+    once); the outstanding query and its ordering are untouched, and an
+    important item restricted to Lidl still does not appear in Spar.
+
+16. **The same name is not outstanding twice.** `add_item` refuses (409,
+    `existing_id`) a name — trimmed, case-insensitive — that an outstanding
+    item already has, whatever the stores; a bought one does not count. The
+    check sits *after* the client-id replay check, so a replayed create
+    still lands once. The add form checks its cached copy first to offer
+    "Edit it"; the server rule is what holds both phones to it.
 
 ## Security posture
 

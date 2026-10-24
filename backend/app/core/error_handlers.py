@@ -13,6 +13,7 @@ from app.modules.shopping.errors import (
     CategoryNotFoundError,
     DuplicateCategoryNameError,
     DuplicateEntryNameError,
+    DuplicateItemError,
     DuplicateStoreNameError,
     EmptyCategoryIconError,
     EmptyCategoryNameError,
@@ -104,6 +105,25 @@ def _entry_in_use(_: Request, exc: Exception) -> JSONResponse:
     )
 
 
+def _item_already_listed(_: Request, exc: Exception) -> JSONResponse:
+    """Answer a refused add with the item already on the list.
+
+    The client offers to edit that item instead, so it needs its id.
+
+    Args:
+        _: The request, unused.
+        exc: The raised DuplicateItemError.
+
+    Returns:
+        A 409 carrying the existing item's id.
+    """
+    existing = str(exc.existing_id) if isinstance(exc, DuplicateItemError) else None
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content={"detail": str(exc), "existing_id": existing},
+    )
+
+
 def _rename_collision(_: Request, exc: Exception) -> JSONResponse:
     """Answer a refused rename with the entry to merge into instead.
 
@@ -136,3 +156,4 @@ def register_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(StoreInUseError, _store_in_use)
     app.add_exception_handler(EntryInUseError, _entry_in_use)
     app.add_exception_handler(DuplicateEntryNameError, _rename_collision)
+    app.add_exception_handler(DuplicateItemError, _item_already_listed)

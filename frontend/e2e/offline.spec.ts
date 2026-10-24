@@ -38,7 +38,7 @@ async function settle(page: Page) {
 async function goOffline(context: BrowserContext, page: Page) {
   await context.setOffline(true)
   // The app notices on its next request; provoke one.
-  await page.getByRole('button', { name: 'Everywhere' }).click()
+  await page.getByRole('button', { name: 'Anywhere' }).click()
   await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 10_000 })
 }
 
@@ -227,7 +227,7 @@ test('later edit wins: the 10:00 edit does not overwrite the 10:05 one', async (
   await expect(itemNames(pageA)).toHaveText(['milk'])
   await settle(pageA)
   await a.setOffline(true)
-  await pageA.getByRole('button', { name: 'Everywhere' }).click()
+  await pageA.getByRole('button', { name: 'Anywhere' }).click()
   await expect(pageA.getByTestId('offline-banner')).toBeVisible({ timeout: 10_000 })
   await pageA.clock.setFixedTime(new Date('2026-09-11T10:00:00+02:00'))
   await pageA.goto(`/add?edit=${item.id}`)

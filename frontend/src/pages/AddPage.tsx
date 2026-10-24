@@ -1,17 +1,22 @@
 /**
  * Adding an item, and editing one. Reached deliberately, from the + button.
  *
+ * "Add (again)" adds and comes straight back to an empty form, for writing
+ * up several things in a row. A thin bar then says what happened to the
+ * last one — pending until the server has it, added once it does.
+ *
  * Choosing a suggestion prefills the category (shown, not editable here —
  * it belongs to the catalogue entry) and the stores (editable, because
  * "we normally get it at Lidl but we are in Spar now" has to stay possible).
  */
 
-import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router'
+import { useMutationState, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate, useSearchParams } from 'react-router'
 
-import { useCategories, useCreateItem, useItems, useStores, useUpdateItem } from '../api/queries'
-import type { CatalogueEntry, Category, Item, Store, Unit } from '../api/types'
+import { mutationKeys } from '../api/mutations'
+import { useCategories, useCreateItem, useDeleteItem, useItems, useStores, useUpdateItem } from '../api/queries'
+import type { CatalogueEntry, Category, Item, ItemCreate, Store, Unit } from '../api/types'
 import { UNITS } from '../api/types'
 import { Typeahead } from '../components/Typeahead'
 
@@ -21,6 +26,10 @@ export function AddPage() {
 
   const stores = useStores()
   const queryClient = useQueryClient()
+  // Bumped by "Add (again)": a fresh key remounts the form, so every field
+  // is back to empty with no per-field reset to forget.
+  const [round, setRound] = useState(0)
+  const [lastAdded, setLastAdded] = useState<Added | null>(null)
 
   // Look for the item being edited in any list view already in the cache —
   // the member almost always arrives from one, and offline that copy is
@@ -31,7 +40,10 @@ export function AddPage() {
         .flatMap(([, data]) => data ?? [])
         .find((item) => item.id === editId)
     : undefined
-  const allItems = useItems(null, true, editId !== null && cached === undefined)
+  // Adding needs the whole list too, to catch a name already on it — the
+  // view the member came from may be one store's, and the milk on the list
+  // may be for another.
+  const allItems = useItems(null, true, editId === null || cached === undefined)
 
   const editing: Item | undefined = cached ?? (editId ? allItems.data?.find((item) => item.id === editId) : undefined)
 
@@ -45,15 +57,89 @@ export function AddPage() {
         <div className="banner banner--error">That item is not in this phone's copy of the list.</div>
       )}
       {/* Keyed so a different item gets a fresh form, initialised from props. */}
-      <ItemEditor key={editing?.id ?? 'new'} editing={editing} stores={stores.data ?? []} />
+      <ItemEditor
+        key={editing?.id ?? `new-${round}`}
+        editing={editing}
+        stores={stores.data ?? []}
+        onAddedAgain={(added) => {
+          setLastAdded(added)
+          setRound((n) => n + 1)
+        }}
+      />
+      {lastAdded && <AddedBar key={lastAdded.id} added={lastAdded} />}
     </section>
   )
 }
 
-function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: Store[] }) {
+interface Added {
+  id: string
+  name: string
+}
+
+const BAR_MS = 3000
+
+/**
+ * The thin bar after "Add (again)". Its words come from the add's own state
+ * in the mutation queue, never from having pressed the button: offline the
+ * add is only queued, and a queued change is never shown as saved.
+ */
+function AddedBar({ added }: { added: Added }) {
+  const states = useMutationState({
+    filters: {
+      mutationKey: mutationKeys.createItem,
+      predicate: (m) => (m.state.variables as ItemCreate | undefined)?.id === added.id,
+    },
+    select: (m) => ({ status: m.state.status, paused: m.state.isPaused }),
+  })
+  const state = states.at(-1)
+  const phase = state === undefined ? 'pending' : state.status === 'pending' && state.paused ? 'paused' : state.status
+  // Shown for a while after each change of phase, then gone by itself.
+  const [hiddenPhase, setHiddenPhase] = useState<string | null>(null)
+  useEffect(() => {
+    const timer = window.setTimeout(() => setHiddenPhase(phase), BAR_MS)
+    return () => window.clearTimeout(timer)
+  }, [phase])
+
+  // A refusal is reported by the notice it raises; this bar just goes.
+  if (phase === 'error' || phase === hiddenPhase) return null
+
+  const text =
+    phase === 'success'
+      ? `“${added.name}” added`
+      : phase === 'paused'
+        ? `“${added.name}” pending — will send when back online`
+        : `“${added.name}” pending — sending…`
+
+  return (
+    <div
+      className={`toast ${phase === 'success' ? '' : 'toast--pending'}`}
+      role="status"
+      data-testid="added-bar"
+      data-phase={phase}
+    >
+      {text}
+    </div>
+  )
+}
+
+function ItemEditor({
+  editing,
+  stores,
+  onAddedAgain,
+}: {
+  editing: Item | undefined
+  stores: Store[]
+  onAddedAgain: (added: Added) => void
+}) {
   const navigate = useNavigate()
+  const location = useLocation()
+  const queryClient = useQueryClient()
   const createItem = useCreateItem()
   const updateItem = useUpdateItem()
+  const deleteItem = useDeleteItem()
+  // The list view this form was opened from, store filter and all.
+  const from = (location.state as { from?: string } | null)?.from ?? '/'
+  const [duplicate, setDuplicate] = useState<Item | null>(null)
 
   const [name, setName] = useState(editing?.name ?? '')
   const [quantity, setQuantity] = useState(String(editing?.quantity ?? 1))
@@ -61,6 +147,7 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
   const [storeIds, setStoreIds] = useState<string[]>(editing?.stores.map((s) => s.id) ?? [])
   const [availableFrom, setAvailableFrom] = useState(editing?.available_from ?? '')
   const [category, setCategory] = useState<Category | null>(editing?.category ?? null)
+  const [important, setImportant] = useState(editing?.important ?? false)
   // Only a deliberate choice is sent. Leaving the picker alone must never
   // uncategorise a known item that was typed without choosing a suggestion.
   const [categoryTouched, setCategoryTouched] = useState(false)
@@ -83,10 +170,28 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
     setCategoryTouched(true)
   }
 
-  const back = () => void navigate('/')
+  const back = () => void navigate(from)
 
-  const submit = (event: React.FormEvent) => {
-    event.preventDefault()
+  /**
+   * An outstanding item with this name on this phone's copy of the list,
+   * including ones added here and not yet sent. The server holds the same
+   * rule; this only saves the round trip and lets us offer the edit.
+   */
+  const alreadyListed = (wanted: string): Item | undefined => {
+    const key = wanted.trim().toLowerCase()
+    return queryClient
+      .getQueriesData<Item[]>({ queryKey: ['items'] })
+      .flatMap(([, data]) => data ?? [])
+      .find((item) => item.purchase === null && item.name.trim().toLowerCase() === key)
+  }
+
+  const remove = () => {
+    if (!editing) return
+    deleteItem.mutate(editing.id)
+    back()
+  }
+
+  const save = (again: boolean) => {
     const parsed = Number(quantity)
     const payload = {
       name: name.trim(),
@@ -95,6 +200,7 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
       // Always explicit: the chips are the truth, never the catalogue.
       store_ids: storeIds,
       available_from: availableFrom === '' ? null : availableFrom,
+      important,
       // The category goes to the entry, so only a deliberate choice is sent.
       ...(category ? { category_id: category.id } : {}),
       ...(categoryTouched && !category ? { clear_category: true } : {}),
@@ -109,12 +215,27 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
         payload: { ...payload, clear_available_from: availableFrom === '', edited_at: new Date().toISOString() },
       })
     } else {
+      const existing = alreadyListed(payload.name)
+      if (existing) {
+        setDuplicate(existing)
+        return
+      }
       // The id is chosen here so an item added offline can be edited or
       // bought before the server has seen it, and replayed without landing
       // twice.
-      createItem.mutate({ ...payload, id: crypto.randomUUID() })
+      const id = crypto.randomUUID()
+      createItem.mutate({ ...payload, id })
+      if (again) {
+        onAddedAgain({ id, name: payload.name })
+        return
+      }
     }
     back()
+  }
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault()
+    save(false)
   }
 
   const busy = createItem.isPending || updateItem.isPending
@@ -234,6 +355,18 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
           </div>
         </fieldset>
 
+        <label className="item-form__important">
+          <input
+            type="checkbox"
+            data-testid="item-important"
+            checked={important}
+            onChange={(event) => setImportant(event.target.checked)}
+          />
+          <span>
+            <strong>!</strong> Must buy — don't come home without it
+          </span>
+        </label>
+
         <div className="item-form__row">
           <label className="item-form__date">
             <span>Not before</span>
@@ -244,18 +377,75 @@ function ItemEditor({ editing, stores }: { editing: Item | undefined; stores: St
               onChange={(event) => setAvailableFrom(event.target.value)}
             />
           </label>
-          <div className="item-form__actions">
+        </div>
+
+        {/* Their own row, at the bottom: beside the date they were missed. */}
+        <div className="item-form__submit">
+          {!editing && (
             <button
-              type="submit"
-              className="button button--primary"
-              data-testid="item-submit"
+              type="button"
+              className="button"
+              data-testid="item-submit-again"
               disabled={busy || name.trim() === ''}
+              onClick={() => save(true)}
             >
-              {busy ? 'Saving…' : editing ? 'Save' : 'Add'}
+              Add (again)
             </button>
+          )}
+          <button
+            type="submit"
+            className="button button--primary"
+            data-testid="item-submit"
+            disabled={busy || name.trim() === ''}
+          >
+            {busy ? 'Saving…' : editing ? 'Save' : 'Add'}
+          </button>
+        </div>
+
+        {editing && (
+          // Rows are swiped away too; this is the way that needs no gesture.
+          <button
+            type="button"
+            className="button button--quiet item-form__remove"
+            data-testid="item-remove"
+            onClick={remove}
+          >
+            Remove from list
+          </button>
+        )}
+      </form>
+
+      {duplicate && (
+        <div className="dialog-backdrop" onClick={() => setDuplicate(null)}>
+          <div
+            className="dialog"
+            role="alertdialog"
+            aria-labelledby="duplicate-text"
+            data-testid="duplicate-dialog"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <p className="dialog__text" id="duplicate-text">
+              <strong>“{duplicate.name}”</strong> is already on the list —{' '}
+              {duplicate.stores.length === 0 ? 'for any store' : `at ${duplicate.stores.map((s) => s.name).join(', ')}`}.
+              Edit that one instead?
+            </p>
+            <div className="dialog__actions">
+              <button type="button" className="button" data-testid="duplicate-cancel" onClick={() => setDuplicate(null)}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="button button--primary"
+                data-testid="duplicate-edit"
+                autoFocus
+                onClick={() => void navigate(`/add?edit=${duplicate.id}`, { state: { from }, replace: true })}
+              >
+                Edit it
+              </button>
+            </div>
           </div>
         </div>
-      </form>
+      )}
     </>
   )
 }

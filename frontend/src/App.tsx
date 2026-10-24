@@ -60,10 +60,6 @@ export default function App() {
         <Route path="/catalogue" element={<CataloguePage />} />
         <Route path="*" element={<ListPage />} />
       </Routes>
-
-      <footer className="app__footer">
-        On the household network only — no login, so keep it off the internet.
-      </footer>
     </div>
   )
 }

@@ -86,7 +86,7 @@ test('an item that is not due yet is hidden in a shop and shown when planning', 
   await page.getByTestId('store-chip-Lidl').click()
   await expect(itemNames(page)).toHaveText(['bread'])
 
-  await page.getByRole('button', { name: 'Everywhere' }).click()
+  await page.getByRole('button', { name: 'Anywhere' }).click()
   await page.getByTestId('planning-toggle').check()
   await expect(itemNames(page)).toHaveText(['bread', 'sale coffee'])
   await expect(page.getByText(/from Jan/)).toBeVisible()

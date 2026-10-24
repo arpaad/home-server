@@ -70,6 +70,8 @@ export interface Item {
   /** ISO date; until it arrives the item stays out of the shopping views. */
   available_from: string | null
   origin: ItemOrigin
+  /** Must be bought this trip. Moves the item to the top; never hides or shows it anywhere new. */
+  important: boolean
   purchase: Purchase | null
   catalogue_entry_id: string | null
   /** Derived from the catalogue entry; null means uncategorised. */
@@ -102,6 +104,8 @@ export interface ItemCreate {
   /** Recorded on the catalogue entry, so it applies to every item of this name. */
   category_id?: string
   clear_category?: boolean
+  /** The item's own; not remembered on the catalogue entry. */
+  important?: boolean
 }
 
 export interface ItemUpdate {
@@ -115,6 +119,7 @@ export interface ItemUpdate {
   clear_available_from?: boolean
   category_id?: string
   clear_category?: boolean
+  important?: boolean
 }
 
 export interface CatalogueEntryCreate {

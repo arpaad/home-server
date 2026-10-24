@@ -41,6 +41,23 @@ you set — so a shop is walked once, not criss-crossed. A name typed in a
 hurry lands under *Uncategorised* and gets its category later, once, on the
 catalogue page; every future add of it carries that category.
 
+Something that must not be forgotten can be flagged **Must buy** when adding
+or editing it. It then sits in a group marked **!** at the very top of the
+list, above every category — only in the stores it belongs to, as ever. The
+flag belongs to that item, not to the product, so next week's milk isn't
+urgent just because this week's was. The store filter's no-filter choice is
+called **Anywhere** and sits after the stores.
+
+On the list, tap a row to edit it, swipe it right to tick it off (or back),
+and swipe it left to remove it; a short swipe springs back. The list keeps
+the shop you picked while you add or edit something. And it won't take the
+same thing twice: adding a name that's already waiting to be bought — in
+whatever store — shows what's there and offers to edit it instead.
+
+For writing up several things in a row, **Add (again)** adds the item and
+reopens an empty form, with a thin bar at the bottom saying the last one was
+added — or that it's *pending*, if the server can't be reached yet.
+
 Planned modules — recipes, tasks, calendar, finance — are not built. The data
 model is shaped so they can attach later without a migration that loses
 history.

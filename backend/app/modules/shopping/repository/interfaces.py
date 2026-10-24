@@ -128,6 +128,7 @@ class ShoppingItemRepository(Protocol):
         origin: ItemOrigin,
         catalogue_entry_id: UUID | None = None,
         item_id: UUID | None = None,
+        important: bool = False,
     ) -> ShoppingItem:
         """Add an item to the list.
 
@@ -141,6 +142,7 @@ class ShoppingItemRepository(Protocol):
             catalogue_entry_id: The catalogue entry this item is an instance
                 of, from which it derives its category.
             item_id: A client-chosen identifier, or None to mint one.
+            important: Whether it must be bought this trip.
 
         Returns:
             The created item.
@@ -157,6 +159,7 @@ class ShoppingItemRepository(Protocol):
         store_ids: Iterable[UUID] | None = None,
         available_from: date | None = None,
         clear_available_from: bool = False,
+        important: bool | None = None,
         edited_at: datetime | None = None,
     ) -> ShoppingItem:
         """Change an item's fields, leaving unsupplied ones untouched.
@@ -172,6 +175,7 @@ class ShoppingItemRepository(Protocol):
             available_from: A new availability date, or None to leave it.
             clear_available_from: Remove the availability date, making the
                 item always available. Takes precedence over available_from.
+            important: Flag or unflag the item, or None to leave it.
             edited_at: When the editing client made this edit, recorded as
                 the item's `updated_at`; None leaves it.
 
@@ -225,6 +229,20 @@ class ShoppingItemRepository(Protocol):
 
         Args:
             store_id: The store being deleted.
+        """
+        ...
+
+    def find_outstanding_by_name(self, name: str) -> ShoppingItem | None:
+        """Return the outstanding item with this name, ignoring case and padding.
+
+        Used to refuse adding the same thing twice. Bought items are not
+        considered: needing more of something just bought is normal.
+
+        Args:
+            name: The name to look for.
+
+        Returns:
+            The first matching outstanding item, or None.
         """
         ...
 

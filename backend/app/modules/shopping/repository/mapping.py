@@ -72,6 +72,7 @@ def to_item(row: ShoppingItemORM) -> ShoppingItem:
         stores=stores,
         available_from=row.available_from,
         origin=cast(ItemOrigin, row.origin),
+        important=row.important,
         purchase=purchase,
         catalogue_entry_id=row.catalogue_entry_id,
         category=category,
