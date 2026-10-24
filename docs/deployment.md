@@ -35,10 +35,6 @@ Recorded 2026-10-24, from the running machine.
 | `/etc/caddy/env`                     | `HOME_DOMAIN`, `DUCKDNS_TOKEN`, mode 600          |
 | `/etc/systemd/system/caddy.service`  | Runs Caddy as the `caddy` system user             |
 
-Leftovers from the earlier attempt to deploy from a checkout:
-`~lucky/home-server` (a clone at `v0.2.0`) and the `/opt/home-server`
-symlink to it. Nothing references them, so both can be deleted.
-
 ## Operations
 
 All of these run from the home directory, as root:
@@ -166,9 +162,7 @@ running. After a reboot, this unit is what brings them back.
 Recipes are indented with real tabs.
 
 ```make
-# H.O.M.E. a Pi-n. Mindig sudo-val:  cd /opt/home && sudo make update
-#
-# A recept-prefix ">" a tab helyett, hogy terminálból bemásolva se törjön el.
+# H.O.M.E. a Pi-n. Mindig sudo-val: sudo make update
 SHELL = /bin/bash
 COMPOSE = cd /opt/home && podman-compose
 IMAGE = ghcr.io/arpaad/home-server:latest
@@ -200,10 +194,6 @@ status:
 logs:
 	podman logs --tail 100 -f home-deploy-api
 ```
-
-Two comments in its header are out of date. The file lives in the home
-directory, not `/opt/home`. Recipes are indented with tabs, not a `>`
-prefix (`.RECIPEPREFIX` is not set).
 
 ### `/etc/caddy/Caddyfile`
 
