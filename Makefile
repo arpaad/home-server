@@ -7,7 +7,6 @@ BACKEND=backend
 FRONTEND=frontend
 TEST_DB=home_test
 COMPOSE=podman compose -f deploy/compose.yaml
-DEPLOY_COMPOSE=podman compose -f deploy/compose.deploy.yaml
 
 # ---- Development ----
 
@@ -42,8 +41,7 @@ formatter:
 # Formatter + linter + type-checker, both halves of the repository
 lint-all: formatter linter type-checker client-lint
 
-# Run tests. Needs the development database: run `make db-up` first (the
-# deploy stack does not publish Postgres, by design).
+# Run tests. Needs the development database, which `db-up` starts.
 test: db-up
 	cd $(BACKEND) && uv run pytest tests
 
@@ -138,27 +136,6 @@ down:
 logs:
 	$(COMPOSE) logs -f
 
-# ---- Deployment (prebuilt image from GHCR) ----
-#
-# The Pi hosts the image, it does not build it. These targets run the same
-# stack here on a laptop.
-
-# Fetch the published image
-deploy-pull:
-	$(DEPLOY_COMPOSE) pull
-
-# Run the published image
-deploy-up:
-	$(DEPLOY_COMPOSE) up -d
-
-# Stop it, keeping the volume
-deploy-down:
-	$(DEPLOY_COMPOSE) down
-
-# Follow the deployed stack's logs
-deploy-logs:
-	$(DEPLOY_COMPOSE) logs -f
-
 # Run container standalone
 start-container:
 	podman run --rm -d --name $(APP_NAME) -p $(PORT):8080 $(IMAGE_NAME)
@@ -170,5 +147,4 @@ stop:
 .PHONY: run install-dev-dependencies linter linter-fix type-checker formatter \
         lint-all test coverage security-audit client-install client-dev \
         client-build client-lint e2e e2e-deployed db-up db-down migrate \
-        migration seed db-reset build up down logs deploy-pull deploy-up \
-        deploy-down deploy-logs start-container stop
+        migration seed db-reset build up down logs start-container stop

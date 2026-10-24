@@ -1,12 +1,10 @@
 # Development stack: the API (which also serves the built client) and Postgres.
 #
-# Credentials here are fixed, not read from deploy/.env. They are throwaway
-# local-development values, and making them configurable would silently couple
-# this stack to the deployment's settings — which breaks `make test`, since
-# the test suite connects with these credentials.
+# Credentials here are fixed. They are throwaway local-development values, and
+# the test suite connects with them, so making them configurable would only
+# give `make test` a way to break.
 #
-# For deployment use deploy/compose.deploy.yaml, which pulls a prebuilt image
-# and takes its settings from deploy/.env.
+# This is not how the Pi runs the service; see docs/deployment.md.
 #
 # The published port defaults to loopback. This release has no authentication:
 # do not bind it to a public interface.
@@ -40,8 +38,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
-    # Fixed: the development stack must never pick up HOME_IMAGE from
-    # deploy/.env and tag a local build with the published image's name.
+    # Fixed, so a local build never carries the published image's name.
     image: localhost/home-server:dev
     restart: unless-stopped
     depends_on:

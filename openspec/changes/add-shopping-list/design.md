@@ -181,6 +181,14 @@ Two failure modes are designed against explicitly, because they are the reason b
 
 **Rejected:** WAL archiving and point-in-time recovery. It is the right answer at a scale this is not, and the operational burden would never be repaid by a household shopping list.
 
+### The Pi's configuration lives on the Pi, documented in the repository
+
+The repository publishes the image; the Pi runs it from a hand-written compose file, two systemd units, Caddy and a small Makefile, with no checkout of this repository on the device. Those files are reproduced in `docs/deployment.md`, which is kept as the record of what is deployed and of how far it falls short of the durability decision above.
+
+**Chosen because** shipping Pi scripts in the repository meant a clone on the device and a second copy of every setting to keep in step, for a single machine configured once.
+
+**Rejected:** `deploy/pi/` with install, update, backup and restore scripts and the units, installed from a checkout. It was built and then not used.
+
 ## Risks / Trade-offs
 
 - **No authentication, on a network-reachable service** → Bind the service to the LAN interface, document that it must not be port-forwarded, and treat the authentication change as a hard prerequisite for any external exposure. This is the single largest known gap and it is a deliberate scope decision, not an oversight.

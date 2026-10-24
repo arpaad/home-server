@@ -50,7 +50,8 @@ history.
 ```
 backend/     FastAPI application, tests, migrations   (Python 3.14, uv)
 frontend/    React + TypeScript PWA                   (Vite, npm)
-deploy/      Container image and compose definitions
+deploy/      Container image and the development compose stack
+docs/        How the service runs on the Pi
 openspec/    Specifications and changes
 Makefile     Every routine action, for both halves
 ```
@@ -145,35 +146,14 @@ it against a different engine would test something other than what ships.
 
 ## Deployment
 
-CI publishes a multi-architecture image to GHCR on every tag. The target
-machine pulls it; it never builds.
+CI publishes a multi-architecture image to GHCR (`:latest` from `main`, and
+a version tag per release). The Raspberry Pi pulls that image; it never
+builds, and it holds no checkout of this repository — just a compose file,
+two systemd units, Caddy for HTTPS, and a Makefile.
 
-```bash
-cp deploy/.env.example deploy/.env    # set HOME_BIND_ADDRESS and a password
-make deploy-pull
-make deploy-up
-```
-
-`deploy/compose.deploy.yaml` runs the published image with Postgres beside
-it, on a named volume, with restart policies on both. Postgres is not
-published on the host at all. The published API port defaults to loopback;
-set `HOME_BIND_ADDRESS` to the machine's LAN address — and to nothing else,
-because there is no login.
-
-Updating is deliberate (`make deploy-pull`), so a machine coming back from a
-power cut returns to the version it was running rather than whatever is
-newest.
-
-### On the Raspberry Pi
-
-`deploy/pi/` holds everything the Pi needs: a compose override putting the
-database on external storage, systemd units so the stack and its hourly
-backup survive a reboot, Caddy for HTTPS on a DuckDNS name (required — the
-PWA and offline mode only run in a secure context), and a restore script.
-The step-by-step runbook is `deploy/pi/SETUP.md`. Remote access is Tailscale
-as a subnet router, so the same URL works at home and away, with no port
-opened on the router. **Do not let the household depend on this service
-before the restore drill in that runbook has been done once.**
+What runs there, file by file, and how to update, back up and restore it:
+[`docs/deployment.md`](docs/deployment.md). The service has no login, so it
+is reachable on the home network only.
 
 ## Tools
 
