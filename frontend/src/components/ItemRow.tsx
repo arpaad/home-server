@@ -44,7 +44,6 @@ interface Drag {
 export function ItemRow({
   item,
   today,
-  busy,
   canBuy,
   pending,
   onBuy,
@@ -54,7 +53,6 @@ export function ItemRow({
 }: {
   item: Item
   today: string
-  busy: boolean
   canBuy: boolean
   pending: boolean
   onBuy: () => void
@@ -75,7 +73,7 @@ export function ItemRow({
   const threshold = (row: HTMLElement) => Math.max(MIN_COMMIT_PX, row.offsetWidth * COMMIT_SHARE)
 
   const onPointerDown = (event: React.PointerEvent<HTMLLIElement>) => {
-    if (busy || (event.pointerType === 'mouse' && event.button !== 0)) return
+    if ((event.pointerType === 'mouse' && event.button !== 0)) return
     drag.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, swiping: false }
   }
 
@@ -157,7 +155,7 @@ export function ItemRow({
           data-testid={bought ? `undo-${item.name}` : `buy-${item.name}`}
           aria-label={bought ? `Undo buying ${item.name}` : `Mark ${item.name} as bought`}
           aria-pressed={bought}
-          disabled={busy || (!bought && !canBuy)}
+          disabled={!bought && !canBuy}
           title={bought ? 'Tap to undo' : canBuy ? 'Mark as bought' : 'Choose who you are first'}
           onClick={bought ? onUndo : onBuy}
         >

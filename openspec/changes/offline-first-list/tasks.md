@@ -26,6 +26,11 @@
 - [x] 4.3 Keep temporary failures (network, 5xx, 408, 429) paused or retrying with no notice; verify a test that a 503 followed by a 200 completes the change silently
 - [x] 4.4 Disable the write controls on the stores, categories and catalogue pages while offline, with a one-line reason; verify an end-to-end test that renaming a category offline is refused with that reason and nothing is queued
 
+## 4b. Fixes found on a phone
+
+- [x] 4.5 Stop locking the list while a list change is pending: a paused change must not disable the other rows' tick or swipe; verify an end-to-end test that five items bought offline one after another are all shown bought, survive an offline reload, and are all recorded on reconnecting
+- [x] 4.6 Bound every request with a timeout that counts as unreachable, and persist and resume in-flight list changes as well as paused ones; verify an end-to-end test with a server that never answers that a buy is queued, survives a reload, and lands once the server answers
+
 ## 5. Acceptance
 
 - [x] 5.1 Verify the service worker still caches nothing under `/api`: an end-to-end test that, with the worker active and the network blocked, an API request fails rather than being served from the worker

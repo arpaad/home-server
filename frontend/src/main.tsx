@@ -66,12 +66,31 @@ createRoot(root).render(
   <StrictMode>
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister, maxAge: SEVEN_DAYS }}
+      persistOptions={{
+        persister,
+        maxAge: SEVEN_DAYS,
+        dehydrateOptions: {
+          // Every unfinished change, not only paused ones (the library's
+          // default). A request in flight when the app is closed may or may
+          // not have reached the server; persisting it and sending it again
+          // is safe because every list operation is idempotent on replay,
+          // and dropping it loses the change outright.
+          shouldDehydrateMutation: (mutation) => mutation.state.status === 'pending',
+        },
+      }}
       onSuccess={() => {
         // Once the copy is restored, send anything that was waiting, then
         // refresh: the first successful contact replaces the optimistic
-        // view with the server's.
-        void queryClient.resumePausedMutations().then(() => queryClient.invalidateQueries())
+        // view with the server's. Every pending change, not only paused
+        // ones: a change restored from "in flight" is not marked paused,
+        // and resumePausedMutations would leave it pending for ever.
+        const unfinished = queryClient
+          .getMutationCache()
+          .getAll()
+          .filter((mutation) => mutation.state.status === 'pending')
+        void Promise.all(unfinished.map((mutation) => mutation.continue().catch(() => undefined))).then(() =>
+          queryClient.invalidateQueries(),
+        )
       }}
     >
       <BrowserRouter>

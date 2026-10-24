@@ -16,7 +16,9 @@ import {
   itemNames,
   pickFirstMember,
   resetList,
+  row,
   seededCategory,
+  swipe,
   starter,
 } from './helpers'
 
@@ -365,4 +367,108 @@ test('with the network blocked, an API request fails rather than being served by
   })
 
   expect(outcome).toBe('failed')
+})
+
+// ---- several changes, and a network that never answers ----
+
+async function purchasedOnServer(request: import('@playwright/test').APIRequestContext): Promise<string[]> {
+  const items = (await (await request.get(`${API}/shopping/items`)).json()) as { name: string; purchase: unknown }[]
+  return items
+    .filter((i) => i.purchase !== null)
+    .map((i) => i.name)
+    .sort()
+}
+
+test('five items bought offline, one after another, all stay bought and all land', async ({
+  page,
+  context,
+  request,
+}) => {
+  // Found on a phone: after the first offline tick the whole list locked,
+  // so only one change of a shop's worth was ever queued.
+  const names = ['b1', 'b2', 'b3', 'b4', 'b5']
+  for (const name of names) await createItem(request, name)
+  await page.goto('/')
+  await pickFirstMember(page)
+  await expect(itemNames(page)).toHaveText(names)
+  await settle(page)
+
+  await goOffline(context, page)
+  // Both ways a thumb buys: the tick and the swipe.
+  await page.getByTestId('buy-b1').click()
+  await page.getByTestId('buy-b2').click()
+  await swipe(page, 'b3', 220)
+  await page.getByTestId('buy-b4').click()
+  await swipe(page, 'b5', 220)
+
+  await expect(page.locator('[data-bought="true"]')).toHaveCount(5)
+  await expect(page.getByTestId('offline-banner')).toContainText('5 changes waiting to send')
+  await settle(page)
+
+  await page.reload()
+  await expect(page.locator('[data-bought="true"]')).toHaveCount(5)
+  await expect(page.getByTestId('offline-banner')).toContainText('5 changes waiting to send')
+
+  await context.setOffline(false)
+  await untilSynced(page)
+  await expect.poll(() => purchasedOnServer(request), { timeout: 15_000 }).toEqual(names)
+})
+
+/** Make the server accept requests and never answer, as shop "signal" does. */
+async function hang(page: Page): Promise<() => Promise<void>> {
+  const handler = () => new Promise<void>(() => undefined)
+  await page.route('**/api/**', handler)
+  await page.route('**/health', handler)
+  return async () => {
+    await page.unroute('**/api/**', handler)
+    await page.unroute('**/health', handler)
+  }
+}
+
+test('a request that is never answered counts as offline, and the change is queued', async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(60_000)
+  await createItem(request, 'milk')
+  await page.goto('/')
+  await pickFirstMember(page)
+  await expect(itemNames(page)).toHaveText(['milk'])
+  await settle(page)
+
+  const release = await hang(page)
+  await page.getByTestId('buy-milk').click()
+  await expect(row(page, 'milk')).toHaveAttribute('data-bought', 'true')
+
+  // Bounded: the app gives up waiting and says it cannot reach the server.
+  await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 15_000 })
+  await expect(page.getByTestId('pending-mark')).toHaveCount(1)
+
+  await release()
+  await expect.poll(() => purchasedOnServer(request), { timeout: 20_000 }).toEqual(['milk'])
+})
+
+test('a change still in flight survives a reload and is sent afterwards', async ({ page, request }) => {
+  // Found on a phone: refreshing while a request hung lost the change,
+  // because only paused changes were kept.
+  test.setTimeout(60_000)
+  await createItem(request, 'milk')
+  await page.goto('/')
+  await pickFirstMember(page)
+  await expect(itemNames(page)).toHaveText(['milk'])
+  await settle(page)
+
+  const release = await hang(page)
+  await page.getByTestId('buy-milk').click()
+  await expect(row(page, 'milk')).toHaveAttribute('data-bought', 'true')
+  await settle(page)
+
+  // Reloaded while the request is still unanswered — before any timeout.
+  await page.reload()
+  await expect(row(page, 'milk')).toHaveAttribute('data-bought', 'true')
+  await expect(page.getByTestId('pending-mark')).toHaveCount(1)
+
+  await release()
+  await expect.poll(() => purchasedOnServer(request), { timeout: 30_000 }).toEqual(['milk'])
+  await expect(page.getByTestId('pending-mark')).toHaveCount(0, { timeout: 15_000 })
 })

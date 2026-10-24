@@ -155,7 +155,10 @@ export function ListPage() {
           <GroupedList
             items={items.data}
             today={today}
-            busy={buyItem.isPending || undoPurchase.isPending || deleteItem.isPending}
+            // No list-wide "busy" lock: offline, a change stays pending until
+            // the server has it, and a lock on pending froze every row after
+            // the first tick in a shop with no signal. Changes are queued in
+            // order and each is safe to replay, so nothing needs guarding.
             canBuy={memberId !== null}
             pendingIds={pendingIds}
             onBuy={buy}
@@ -174,7 +177,9 @@ export function ListPage() {
               type="button"
               className="button button--quiet clear-bought__button"
               data-testid="clear-bought"
-              disabled={clearBought.isPending}
+              // Not disabled while an earlier clear is pending: offline it
+              // stays pending until the server has it, and a second trip's
+              // shopping must still be clearable. Clearing is idempotent.
               onClick={clear}
             >
               Clear {boughtCount} bought {boughtCount === 1 ? 'item' : 'items'}
